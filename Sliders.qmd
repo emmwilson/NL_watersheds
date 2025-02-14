@@ -1,15 +1,16 @@
 ---
-title: "  Sliders"
+title: "Sliders"
 engine: knitr
 theme: sandstone
 format: 
   live-html:
-    page-layout: custom
+    grid: 
+      body-width: 3000px
 execute:
   echo: false
 ---
 {{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
-  Set the below variable values to see predictions of several response variables shown in the bar graph
+Set the below variable values to see predictions of several response variables shown in the bar graph
 ```{r, load}
 #| include: false
 library(shiny)
