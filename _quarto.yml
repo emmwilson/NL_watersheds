@@ -3,7 +3,7 @@ project:
   output-dir: docs
 
 website:
-  title: "Exploits watershed predictions"
+  title: "Salmon resource predictions"
   navbar:
     left:
       - text: "Home" 

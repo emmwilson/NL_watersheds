@@ -51,7 +51,7 @@ viewof percent = Inputs.range(
 ```{ojs}
 //| echo: false
 //| panel: fill
-//| layout: [ [1], [1,1] ]
+
 function myFunction(wetted, substrate, percent) {
   return aq.table({
   'wetted': [wetted, wetted, wetted, wetted],
@@ -59,49 +59,37 @@ function myFunction(wetted, substrate, percent) {
   'percent': [percent, percent, percent, percent],
   'response_type': ["Invertebrate biomass ()", "Periphyton biomass ()", "Invertebrate diversity", "Par length (cm)"],
   'response_predict': [0.83-0.095*wetted+0.03*substrate, 0.44+0.026*wetted+0.32*percent, 0.7+0.0016*substrate, 0.1+0.06*wetted],
-  'image_path': ["https://github.com/emmwilson/exploits_watershed/blob/1e2a6e53708bb3b2821020c2342e07fee41eebc2/data/invert.png","https://github.com/emmwilson/exploits_watershed/blob/1e2a6e53708bb3b2821020c2342e07fee41eebc2/data/embed.png","https://github.com/emmwilson/exploits_watershed/blob/1e2a6e53708bb3b2821020c2342e07fee41eebc2/data/invert_div.png","https://github.com/emmwilson/exploits_watershed/blob/1e2a6e53708bb3b2821020c2342e07fee41eebc2/data/par_len.png"]
+  'image_path': ["https://upload.wikimedia.org/wikipedia/commons/thu…rt_Williamstown_Portrait_of_George_Washington.jpg","https://github.com/emmwilson/exploits_predictions/blob/f21d4f3b41a6d8e2b940a71faf2dc37451d0e730/data/embed.png","https://github.com/emmwilson/exploits_predictions/blob/f21d4f3b41a6d8e2b940a71faf2dc37451d0e730/data/invert_div.png","https://github.com/emmwilson/exploits_predictions/blob/f21d4f3b41a6d8e2b940a71faf2dc37451d0e730/data/par_len.png"]
 })
 }
 
 predictions_ps = myFunction(wetted, substrate, percent)
 
 
-weatherColors = ["darkgray", "steelblue", "paleturquoise", "gold"]
+weatherColors = ["darkgray", "steelblue", "paleturquoise", "gold"] 
 
-vl
-  .data(predictions_ps)
-  .layer(
-    vl.markBar()
-      .encode(
-        vl.x().fieldN('response_type')
-              .axis({title: "Response Types", labels: false}), 
-        vl.y().fieldQ('response_predict')
-              .axis({ title: null, grid: false })
-              .scale({domain: [0, 8]}),
-        vl.color({legend: null}).fieldN("response_type")
-                  .scale({ range: weatherColors })
-        ),
-    vl.markText({ align: "center", dy: -7, fontSize: 18})
-      .encode(
-        vl.x().fieldN("response_type")
-              .axis({title: "Response Types", labels: false}), 
-        vl.y().fieldQ("response_predict")
-              .axis({ title: null, grid: false })
-              .scale({domain: [0, 8]}),
-        vl.text().fieldQ("response_predict")
-        ),
-    vl.markImage()
-      .encode(
-        vl.x().fieldN("response_type")
-              .axis({title: "Response Types", labels: false}), 
-        vl.y().fieldQ("response_predict")
-              .axis({ title: null, grid: false })
-              .scale({domain: [0, 8]}),
-        vl.url().fieldN("image_path")
-        )
-      )
-  .width(Math.floor(width-0.3*width))
-  .height(Math.floor(0.4 * width))
-  .autosize('fit')
-  .render()
+Plot.plot({
+  width: Math.max(width, 550),
+  height: Math.floor(0.5 * width),
+  marginLeft: 0,
+  marginRight: 0,
+  marginBottom: 150,
+  colour: {legend: false},
+  y: {domain: [0,8], axis: null},
+  x: {label: "Response type"},
+  marks:[
+    Plot.axisX({fontSize: 18}),
+    Plot.barY(predictions_ps,
+     {x: "response_type",
+     y: "response_predict",
+     fill: "response_type"}),
+    Plot.text(predictions_ps, {x: "response_type", y: "response_predict", text: "response_predict", dy: -7, lineAnchor: "bottom", fontSize: 25}),
+    Plot.image(predictions_ps, 
+      {x: "response_type",
+      y: [-1.2, -1.2, -1.2, -1.2],
+      src: "image_path",
+      width: 100
+      })
+   ]
+})
 ```
