@@ -1,0 +1,699 @@
+---
+title: "Tutorial"
+subtitle: "How to customize the 'Exploits_predictions' GitPage"
+author: "Emmerson Wilson"
+format: 
+  revealjs:
+    width: 1600
+    incremental: true 
+    theme: solarized
+revealjs-plugins:
+  - drop
+date: last-modified
+date-format: "DD/MM/YY"
+engine: knitr
+---
+
+## Content
+
+This presentation will walk through using and customizing the "exploits_predictions" GitPage
+
+-   Using Github
+-   Parts of a Quorto Webpage
+-   The website itself!
+    -   Home tab
+    -   Slider tab
+    -   Map tab
+-   Getting it online
+
+# GitHub basics
+
+Somewhere to store, share, collaborate on code/software
+
+## Repositories
+
+This is where you store all your code/data/versions etc
+
+All of the information for this website is at my repository: 
+<https://github.com/emmwilson/exploits_predictions>
+![](data/for%20webpage/git_repository.png)
+
+## Your own version
+
+I don't want you changing this version of the website
+
+So let's make you your own!
+
+To do this we can :
+
+1) fork the repository to your Git account
+
+2) clone the forked repository to your computer
+
+
+## fork
+
+::::: columns
+::: {.column .fragment width="30%"}
+In the top right corner click fork
+![](data/for%20webpage/fork.png)
+
+:::
+
+::: {.column .fragment width="70%"}
+Then give your repository its own name and description
+![](data/for%20webpage/name_fork.png)
+
+:::
+::::
+
+## Clone 
+
+Now to get the repository onto your computer to work on
+
+
+We will do this using RStudio
+
+:::{.nonincremental}
+1) In GitHub copy the url to the repository
+:::
+
+![](data/for%20webpage/git_url.png)
+
+## Clone {.nostretch}
+
+::: {.fragment .nostretch .nonincremental}
+2) Create a new project 
+
+![](data/for%20webpage/new_project.png){width="30%"}
+:::
+
+::: {.fragment .nostretch .nonincremental}
+i) Select Version control, using GIT 
+
+![](data/for%20webpage/version_ctrl.png){width="40%"}
+![](data/for%20webpage/version_git.png){width="40%"}
+:::
+
+
+## Clone
+
+::: {.nonincremental}
+2) Create a new project 
+:::
+
+::::: columns
+::: {.column .fragment .nonincremental width="50%"}
+
+ii) Paste in the URL
+
+iii) Give the repository a folder name on your computer,</br> and choose where to store it
+:::
+
+::: {.column .fragment .nonincremental width="50%"}
+![](data/for%20webpage/clone_repo.png)
+:::
+:::::
+
+## Git in RStudio
+
+Now as you work on the project you can keep track of your changes using GitHub
+
+</br>
+This is done by:
+
+1) Commit: creates a snapshot of the repository with the specified chanegs
+
+2) Push: send the changes to the repository online
+
+## Resources
+</br>
+Skipped over installing git:
+
+<https://github.com/git-guides/install-git>
+
+</br>
+Other helpful places to look for instructions
+
+
+<https://docs.github.com/en/get-started/start-your-journey/about-github-and-git>
+
+
+<https://happygitwithr.com/rstudio-git-github.html>
+
+
+# Parts of a Quarto Webpage
+
+## .qmd files
+
+Each of these files specifies a different page on the website.
+
+For example:
+
+::::: columns
+::: {.column .fragment width="40%"}
+![](data/for%20webpage/ex_qmd.png)
+:::
+
+::: {.column .fragment width="60%"}
+![](data/for%20webpage/ex_qmd_page.png)
+:::
+:::::
+
+## \_quarto.yml
+
+Can specify:
+
+-   How the page gets rendered
+-   Which .qmd files get included as pages
+-   Universal themes
+
+![](data/for%20webpage/yaml.png){.absolute bottom="10" left="900"}
+
+## others
+
+There are also other files that are important to building a quorto webpage:
+
+-   styles.css
+-   \_extensions folder
+-   \_site folder
+-   etc...
+
+. . .
+
+But we don't need to alter any of them so we will skip over
+
+# The website itself
+<https://emmwilson.github.io/exploits_predictions/>
+
+## {.center}
+
+These next few slides go over which parts of the different qmd files you will need to customize to get this website to show your results
+
+::: {.nonincremental}
+- index.qmd
+- Sliders.qmd
+- Exploits_map.qmd
+:::
+
+## Index
+
+Simply type in the information on each line.
+
+::::: columns
+::: {.column width="45%"}
+![](data/for%20webpage/index.png)
+:::
+
+::: {.column width="55%" .smaller}
+- about... :Describe the results that will show on each tab
+- Affiliated manuscript: if applicable fill this out, if not you can delete that line
+- Authors, Affiliations, Funding: add applicable information
+:::
+::::
+
+## Produces
+
+```{=html}
+<iframe width="1500" height="700" src="https://emmwilson.github.io/exploits_predictions/" title="Webpage example"></iframe>
+```
+
+## Sliders
+Creates a page where you can select predictor variable values and see predicted levels of response variables in a bar graph
+
+There are several parts you will need to customize:
+
+- png paths 
+    - specify paths(lines: 38 - 41)
+    - create table with paths (lines: 81 - 84)
+- set up sliders (lines: 46 - 59)
+- create table with predictions (lines: 67 - 78)
+
+## png paths
+
+For the response variables
+
+::::: columns
+::: {.column .fragment width="35%" .nonincremental}
+1) save pngs to the "data" folder
+![](data/for%20webpage/png_save.png)
+:::
+
+::: {.column .fragment width="65%" .nonincremental}
+
+2) add a line for your specific image</br>(or change out for one you aren't using; lines: 38 - 41)
+
+
+```{ojs}
+//| echo: true
+//| eval: false
+
+// references to images stored in data folder for each response variable
+imageURL_invert = FileAttachment("/data/invert 2.png").url()
+imageURL_peri = FileAttachment("/data/periphyton.png").url()
+imageURL_invert_div = FileAttachment("/data/invert_div.png").url()
+imageURL_par_len = FileAttachment("/data/par_len.png").url()
+```
+:::
+:::::
+
+## png paths
+
+For the response variables
+
+::: {.nonincremental}
+3) create table with paths (lines 81 - 84)
+
+```{ojs}
+//| echo: true
+//| eval: false
+//| code-line-numbers: "|3|4"
+
+// create a table that stores the image paths
+images = aq.table({
+  'response_type': ["Invertebrate biomass ()", "Invertebrate diversity", "Par length (cm)", "Periphyton biomass ()"], // ordered alphabetically
+  'image_path': [imageURL_invert, imageURL_invert_div, imageURL_par_len, imageURL_peri] //order these to match alphabetically ordered response variables (response_type)
+})
+```
+:::
+
+## set up sliders
+
+For the predictor variables
+
+::: {.nonincremental}
+Add in name of variable, range, starting value, step, and label
+
+
+```{ojs}
+//| echo: true
+//| eval: false
+//| code-line-numbers: "|1|2|3"
+
+// example: wetted width
+viewof wetted = Inputs.range(
+  [0, 10], 
+  {value: 5, step: 0.1, label: "Wetted width (units):"}
+);
+// example: substrate size
+viewof substrate = Inputs.range(
+  [0, 10], 
+  {value: 5, step: 0.1, label: "Substrate size (units):"}
+);
+// example: percent lakes
+viewof percent = Inputs.range(
+  [0, 20], 
+  {value: 10, step: 0.1, label: "Percent lake (units):"}
+);
+```
+:::
+
+## create table with predictions
+
+Uses the inputs from sliders to calculate the predicted resonse variables:
+
+1) Need to make sure predictor variables match sliders
+
+
+```{ojs}
+//| echo: true
+//| eval: false
+//| code-line-numbers: "|5-7"
+
+// function that takes input from sliders and creates prediction of each response variable
+
+function myFunction(wetted, substrate, percent) {
+  return aq.table({
+  'wetted': [wetted, wetted, wetted, wetted],
+  'substrate': [substrate, substrate, substrate, substrate],
+  'percent': [percent, percent, percent, percent],
+  'response_type': ["Invertebrate biomass (units)", "Invertebrate diversity", "Par length (cm)", "Periphyton biomass (units)"], // ordered alphabetically
+  'response_predict': [0.83-0.095*wetted+0.03*substrate, 0.44+0.026*wetted+0.32*percent, 0.7+0.0016*substrate, 0.1+0.06*wetted]
+  })
+}
+```
+
+## create table with predictions
+
+Uses the inputs from sliders to calculate the predicted response variables:
+
+::: {.nonincremental}
+
+2) Give response variables names (same as those for png files)
+
+```{ojs}
+//| echo: true
+//| eval: false
+//| code-line-numbers: "8"
+
+// function that takes input from sliders and creates prediction of each response variable
+
+function myFunction(wetted, substrate, percent) {
+  return aq.table({
+  'wetted': [wetted, wetted, wetted, wetted],
+  'substrate': [substrate, substrate, substrate, substrate],
+  'percent': [percent, percent, percent, percent],
+  'response_type': ["Invertebrate biomass (units)", "Invertebrate diversity", "Par length (cm)", "Periphyton biomass (units)"], // ordered alphabetically
+  'response_predict': [0.83-0.095*wetted+0.03*substrate, 0.44+0.026*wetted+0.32*percent, 0.7+0.0016*substrate, 0.1+0.06*wetted]
+  })
+}
+
+predictions_ps = myFunction(wetted, substrate, percent)
+```
+
+:::
+
+## create table with predictions
+
+Uses the inputs from sliders to calculate the predicted resonse variables:
+
+::: {.nonincremental}
+
+3) Specify calculations of response variables from predictor variables
+
+```{ojs}
+//| echo: true
+//| eval: false
+//| code-line-numbers: "9"
+
+// function that takes input from sliders and creates prediction of each response variable
+
+function myFunction(wetted, substrate, percent) {
+  return aq.table({
+  'wetted': [wetted, wetted, wetted, wetted],
+  'substrate': [substrate, substrate, substrate, substrate],
+  'percent': [percent, percent, percent, percent],
+  'response_type': ["Invertebrate biomass (units)", "Invertebrate diversity", "Par length (cm)", "Periphyton biomass (units)"], // ordered alphabetically
+  'response_predict': [0.83-0.095*wetted+0.03*substrate, 0.44+0.026*wetted+0.32*percent, 0.7+0.0016*substrate, 0.1+0.06*wetted]
+  })
+}
+```
+
+:::
+
+## Produces
+
+```{=html}
+<iframe width="1500" height="700" src="https://emmwilson.github.io/exploits_predictions/Sliders.html" title="Webpage example"></iframe>
+```
+
+## Map
+Creates a map of the Exploits Watershed with predicted levels of response variables for each reach that has been sampled.
+
+There are several parts you will need to customize:
+
+- importing layers (lines: 38 - 50)
+- create predictions (lines: 60-64)
+- colour palettes (lines: 70-72)
+- popups (lines: 80-86)
+- map (lines: 92 - 138 **but only lines that need changing are 117-130)
+
+## import spatial data
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-line-numbers: "|15-16"
+
+#import layers
+  ## river extent
+  exploits_drainage <- vect("data/spatial data/exploits_watershed.shp") |>  
+    project("EPSG:4326 - WGS 84")
+  
+  ## all rivers
+  exploits_river <- vect("data/spatial data/OrderSlopeSegJan22.shp") |>  
+    project("EPSG:4326 - WGS 84")
+  
+  ## lakes
+  lakes <- vect("data/spatial data/Exploits_lakes.shp") |>  
+    project("EPSG:4326 - WGS 84")
+  
+  ## data from river reaches sampled
+  field_reaches <- vect("data/spatial data/exploits_reaches_with_sites.shp") |>  
+    project("EPSG:4326 - WGS 84")
+```
+
+## create predictions 
+
+based on data from sampled reaches
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-line-numbers: "|4-5"
+
+# use river reach data to predict outcomes
+  predictions_reaches <- field_reaches
+    ## predict responses based on data from field at each reach
+  predictions_reaches$invert <- 0.43-0.015*predictions_reaches$avg_wet_wi+0.03*predictions_reaches$D50_pred  ## input your own formulas here
+  predictions_reaches$embed <- 0.43-0.015*predictions_reaches$avg_wet_wi+0.03*predictions_reaches$D50_pred
+  
+```
+
+
+## Colour palettes
+
+Add palettes as you add response variables
+
+```{r}
+#| echo: true
+#| eval: false
+
+ #colour palettes for predictions
+  invert.pal <- colorNumeric(c("#f47c3c", "#d9534f"), domain = predictions_reaches$invert, na.color = "transparent")
+  embed.pal <- colorNumeric(c("#e9c602", "#93c54b"), domain =  predictions_reaches$embed, na.color = "transparent")
+
+```
+
+```{r, out.height= "200px"}
+#| echo: false
+#| eval: true
+
+pacman::p_load(shades,
+               ggplot2)
+
+pal1 <- colorRampPalette(c("#f47c3c","#d9534f"))
+pal2 <- colorRampPalette(c("#e9c602","#93c54b"))
+
+swatch(pal1(5))
+
+swatch(pal2(5))
+```
+
+
+## pop ups
+
+Lists out the data that will show up when you click on a reach
+
+::::: columns
+::: {.column width="70%" .nonincremental}
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-line-numbers: "|1|2,3|4-6"
+
+
+  label_text <- glue("<b><u>{predictions_reaches$stream_nam}</u></b> <br/>", # stream name
+"<b>Embededness: </b> {predictions_reaches$embed}<br/>", # prediction example: embedness
+"<b>Invertegrate biomass: </b> {predictions_reaches$invert}<br/>", # prediction example: invert biomass
+"<b>Wetted width: </b> {predictions_reaches$avg_wet_wi}<br/>", # predictor variable example: wetted width
+"<b>Catchment: </b> {predictions_reaches$catchment_}<br/>", # predictor variable example: catchement
+"<b>Substrate size: </b> {predictions_reaches$D50_pred}<br/>") |> # predictor variable example: substrate
+```
+
+:::
+
+::: {.column .fragment width="30%" .nonincremental}
+
+Looks like 
+
+![](data/for%20webpage/ex_south.png)
+
+:::
+::::
+
+## Code for the map
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-line-numbers: "|5-8|10-14|16-24|26-36|38-39"
+
+exploits_map <- leaflet(width = 1900, height = 1600) |> 
+      addProviderTiles('Esri.WorldImagery') |> # adds base map
+
+      # open map to this screen
+      setView(-56.65499, 48.70449, zoom = 9) |> 
+  
+      #can recenter to that location by clicking button
+      addHomeButton(ext = c(-58.9311,47.9605, -53.830,49.3532), position = "topleft", group = "Recenter") |> 
+      
+      # create layers to add vectors to
+      addMapPane("drainage", zIndex = 410) |> 
+      addMapPane("river", zIndex = 415) |> 
+      addMapPane("reaches", zIndex = 420) |> 
+      addMapPane("lakes", zIndex = 425) |>
+      
+      # add polygons and lines
+      ## exploits drainage area
+      addPolygons(data = exploits_drainage, color = "#1f78b4", weight = 1.25, fillColor = "#1f78b4", fillOpacity = 0.2, options = pathOptions(pane = "drainage")) |>
+  
+      ## rivers of the exploits
+      addPolylines(data = exploits_river, color = "#1f78b4", weight = 1, options = pathOptions(pane = "river"), group = "exploits") |>
+  
+      ## lakes of the exploits
+      addPolygons(data = lakes, color = "#1f78b4", stroke = FALSE, fillOpacity = 1, options = pathOptions(pane = "lakes"), group = "exploits") |>
+  
+      ## predictions of invertebrate biomass
+      addPolylines(data = predictions_reaches, color = ~invert.pal(predictions_reaches$invert), weight = 2, options = pathOptions(pane = "reaches"), group = "Invertebrate Biomass", popup = ~label_text) |> 
+      addLegend(pal = invert.pal, values = predictions_reaches$invert,
+                title = "Invertebrate Biomass",
+                group = "Invertebrate Biomass", opacity = 1) |> 
+  
+      ## predictions of embededness
+      addPolylines(data = predictions_reaches, color = ~embed.pal(predictions_reaches$embed), weight = 2, options = pathOptions(pane = "reaches"), group = "Embededness", popup = ~label_text) |> 
+      addLegend(pal = embed.pal, values = predictions_reaches$embed,
+                title = "Embededness",
+                group = "Embededness", opacity = 1) |> 
+  
+      # ability to choose which predictions to see
+      addLayersControl(overlayGroups = c("Invertebrate Biomass", "Embededness"), position = "topleft", options = layersControlOptions(collapsed = F)) |>
+      htmlwidgets::onRender("
+        function() {
+            $('.leaflet-control-layers-overlays').prepend('<label style=\"text-align:left\">Available layers</label>');
+        }
+    ")  |>
+  addScaleBar(position = "bottomright") |> 
+  addLogo(arrow)
+
+```
+
+## Produces
+
+```{=html}
+<iframe width="1500" height="700" src="https://emmwilson.github.io/exploits_predictions/Exploits_map.html" title="Webpage example"></iframe>
+```
+
+# Getting the site online
+
+We use GitPages to host the interactive webpage
+
+## A few things you need first
+
+</br>
+
+:::{.fragment}
+In terminal run this line of code:
+
+</br>
+- quarto add r-wasm/quarto-live
+:::
+
+</br>
+
+:::{.fragment}
+(there should be a terminal tab beside the RStudio console tab)
+:::
+
+
+## Source folder
+
+GitPages needs to know where to look to render the webpage.
+In our case we are using the docs folder.
+
+</br>
+Go to GitHub [-> Your repository]{.fragment} [-> Settings (along the top)]{.fragment}[-> Pages (along left)]{.fragment}
+
+
+:::{.fragment}
+Make sure your deployment is configured like so:
+
+![](data/for%20webpage/build_deploy.png)
+::: 
+
+## Render locally
+
+To get the docs folder ready we need to render everything locally
+
+:::{.fragment}
+</br>
+To do that click
+![](data/for%20webpage/render.png)
+along the top of RStudio for each qmd file
+:::
+
+:::{.fragment}
+</br>
+This should open up each page in the browser
+:::
+
+:::{.fragment}
+</br>
+And will create the necessary files in the docs folder
+:::
+
+## Commit and Push
+
+Now we need to commit and push all the changes we've made
+
+</br>
+
+1) In RStudio: go to the Git tab (one along top or one by the environment tab)
+
+</br>
+
+2) Select 
+![](data/for%20webpage/commit.png)
+
+## Commit and Push
+
+:::{.nonincremental}
+3) Commit: 
+:::
+
+:::::: {.columns}
+
+::::: {.column width="55%"}
+
+:::: {layout="[[1,1], [1]]"}
+
+:::{style="text-align: center"}
+i. Select the files and folders that show up in the top left console 
+:::
+
+:::{.fragment style="text-align: center"}
+![](data/for%20webpage/file_commit.png)
+:::
+
+:::{style="text-align: center"}
+ii. Add a commit message and select "Commit"
+:::
+::::
+:::::
+
+::: {.column width="45%" .fragment}
+** Important ** 
+There is a limit to how much you can commit and push at one time! 
+
+If you are adding any spatial data, do a seperate commit and push for that file
+
+And be conservative about how much you commit at one time
+:::
+::::::
+
+4) After it has finished with the commit click Push
+![](data/for%20webpage/push.png)
+
+## pages build and deployment
+
+GitHub will now build and deploy your webpage!
+
+:::{.fragment}
+Once it has finished you can go to: 
+
+Settings -> Pages
+
+and you should have the option to visit the site
+![](data/for%20webpage/live.png)
+:::

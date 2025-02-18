@@ -13,16 +13,17 @@ execute:
 Set the below variable values to see predictions of several response variables shown in the bar graph
 ```{r, load}
 #| include: false
-library(shiny)
-library(bslib)
-library(ggplot2)
-library(ggtext)
-library(shinythemes)
-library(thematic)
-library(tidyverse)
-library(httr)
-library(htmltools)
-library(glue)
+
+pacman::p_load(shiny,
+               bslib,
+               ggplot2,
+               ggtext,
+               shinythemes,
+               thematic,
+               tidyverse,
+               httr,
+               htmltools,
+               glue)
 ```
 
 ```{ojs}

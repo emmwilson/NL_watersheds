@@ -33,5 +33,306 @@
     "title": "Sliders",
     "section": "",
     "text": "Set the below variable values to see predictions of several response variables shown in the bar graph\n\n\nimport {vl} from \"@vega/vega-lite-api\"\nimport {aq, op} from \"@uwdata/arquero\"\n\nvg = require('vega-lite')\n\n// references to images stored in data folder for each response variable\nimageURL_invert = FileAttachment(\"/data/invert 2.png\").url()\nimageURL_peri = FileAttachment(\"/data/periphyton.png\").url()\nimageURL_invert_div = FileAttachment(\"/data/invert_div.png\").url()\nimageURL_par_len = FileAttachment(\"/data/par_len.png\").url()\n\n// sliders for predictor variables\n\n// example: wetted width\nviewof wetted = Inputs.range(\n  [0, 10], \n  {value: 5, step: 0.1, label: \"Wetted width (units):\"}\n);\n// example: substrate size\nviewof substrate = Inputs.range(\n  [0, 10], \n  {value: 5, step: 0.1, label: \"Substrate size (units):\"}\n);\n// example: percent lakes\nviewof percent = Inputs.range(\n  [0, 20], \n  {value: 10, step: 0.1, label: \"Percent lake (units):\"}\n);\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nfunction myFunction(wetted, substrate, percent) {\n  return aq.table({\n  'wetted': [wetted, wetted, wetted, wetted],\n  'substrate': [substrate, substrate, substrate, substrate],\n  'percent': [percent, percent, percent, percent],\n  'response_type': [\"Invertebrate biomass (units)\", \"Invertebrate diversity\", \"Par length (cm)\", \"Periphyton biomass (units)\"], // ordered alphabetically\n  'response_predict': [0.83-0.095*wetted+0.03*substrate, 0.44+0.026*wetted+0.32*percent, 0.7+0.0016*substrate, 0.1+0.06*wetted]\n  })\n}\n\n// create the table\npredictions_ps = myFunction(wetted, substrate, percent)\n\n// create a table that stores the image paths\nimages = aq.table({\n  'response_type': [\"Invertebrate biomass ()\", \"Invertebrate diversity\", \"Par length (cm)\", \"Periphyton biomass ()\"], // ordered alphabetically\n  'image_path': [imageURL_invert, imageURL_invert_div, imageURL_par_len, imageURL_peri] //order these to match alphabetically ordered response variables (response_type)\n})\n\n// create the bar plot based on predictions_ps\nPlot.plot({\n  width: Math.max(width, 550),\n  height: Math.floor(0.4 * width),\n  marginLeft: 0,\n  marginRight: 0,\n  colour: {legend: false},\n  y: {domain: [0,8], axis: null},\n  x: {label: null},\n  marks:[\n    Plot.axisX({fontSize: 18}),\n    Plot.barY(predictions_ps,\n     {x: \"response_type\",\n     y: \"response_predict\",\n     fill: \"response_type\"}),\n    Plot.text(predictions_ps, {x: \"response_type\", y: \"response_predict\", text: \"response_predict\", dy: -7, lineAnchor: \"bottom\", fontSize: 25}),\n   ]\n})\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPlot.plot({\n  width: Math.max(width, 550),\n  height: Math.floor(0.1 * width),\n  marginLeft: 0,\n  marginRight: 0,\n  colour: {legend: false},\n  y: {domain: [0,0], axis: null},\n  x: {label: \"Response type\", axis: null, fontSize: 22},\n  marks:[\n    Plot.image(images, \n      {x: \"response_type\",\n      y: [0, 0, 0, 0],\n      src: \"image_path\",\n      width: 150,\n      axis: null\n      })\n   ]\n})"
+  },
+  {
+    "objectID": "tutorial.html#how-to-make-this-webpage-your-own",
+    "href": "tutorial.html#how-to-make-this-webpage-your-own",
+    "title": "tutorial",
+    "section": "How to make this webpage your own!",
+    "text": "How to make this webpage your own!"
+  },
+  {
+    "objectID": "tutorial.html#github-basics",
+    "href": "tutorial.html#github-basics",
+    "title": "Tutorial",
+    "section": "GitHub basics",
+    "text": "GitHub basics"
+  },
+  {
+    "objectID": "tutorial.html#content",
+    "href": "tutorial.html#content",
+    "title": "Tutorial",
+    "section": "Content",
+    "text": "Content\nThis presentation will walk through using and customizing the “exploits_predictions” GitPage\n\nUsing Github\nParts of a Quorto Webpage\nThe website itself!\n\nHome tab\nSlider tab\nMap tab\n\nGetting it online"
+  },
+  {
+    "objectID": "tutorial.html#qmd-files",
+    "href": "tutorial.html#qmd-files",
+    "title": "Tutorial",
+    "section": ".qmd files",
+    "text": ".qmd files\nEach of these files specifies a different page on the website.\nFor example:"
+  },
+  {
+    "objectID": "tutorial.html#quarto.yml",
+    "href": "tutorial.html#quarto.yml",
+    "title": "Tutorial",
+    "section": "_quarto.yml",
+    "text": "_quarto.yml\nCan specify:\n\nHow the page gets rendered\nWhich .qmd files get included as pages\nUniversal themes"
+  },
+  {
+    "objectID": "tutorial.html#others",
+    "href": "tutorial.html#others",
+    "title": "Tutorial",
+    "section": "others",
+    "text": "others\nThere are also other files that are important to building a quorto webpage:\n\nstyles.css\n_extensions folder\n_site folder\netc…\n\n\nBut we don’t need to alter any of them so we will skip over"
+  },
+  {
+    "objectID": "tutorial.html#repositories",
+    "href": "tutorial.html#repositories",
+    "title": "Tutorial",
+    "section": "Repositories",
+    "text": "Repositories\nThis is where you store all your code/data/versions etc\nAll of the information for this website is at my repository: https://github.com/emmwilson/exploits_predictions"
+  },
+  {
+    "objectID": "tutorial.html#cloning",
+    "href": "tutorial.html#cloning",
+    "title": "Tutorial",
+    "section": "Cloning",
+    "text": "Cloning"
+  },
+  {
+    "objectID": "tutorial.html#git-in-rstudio",
+    "href": "tutorial.html#git-in-rstudio",
+    "title": "Tutorial",
+    "section": "Git in RStudio",
+    "text": "Git in RStudio\nNow as you work on the project you can keep track of your changes using GitHub\n This is done by:\n\nCommit: creates a snapshot of the repository with the specified chanegs\nPush: send the changes to the repository online"
+  },
+  {
+    "objectID": "tutorial.html#resources",
+    "href": "tutorial.html#resources",
+    "title": "Tutorial",
+    "section": "Resources",
+    "text": "Resources\n Skipped over installing git:\nhttps://github.com/git-guides/install-git\n Other helpful places to look for instructions\nhttps://docs.github.com/en/get-started/start-your-journey/about-github-and-git\nhttps://happygitwithr.com/rstudio-git-github.html"
+  },
+  {
+    "objectID": "tutorial.html#section",
+    "href": "tutorial.html#section",
+    "title": "Tutorial",
+    "section": "",
+    "text": "These next few slides go over which parts of the different qmd files you will need to customize to get this website to show your results\n\n\nindex.qmd\nSliders.qmd\nExploits_map.qmd"
+  },
+  {
+    "objectID": "tutorial.html#index",
+    "href": "tutorial.html#index",
+    "title": "Tutorial",
+    "section": "Index",
+    "text": "Index\nSimply type in the information on each line.\n\n\n\n\n\nabout… :Describe the results that will show on each tab\nAffiliated manuscript: if applicable fill this out, if not you can delete that line\nAuthors, Affiliations, Funding: add applicable information"
+  },
+  {
+    "objectID": "tutorial.html#sliders",
+    "href": "tutorial.html#sliders",
+    "title": "Tutorial",
+    "section": "Sliders",
+    "text": "Sliders\nCreates a page where you can select predictor variable values and see predicted levels of response variables in a bar graph\nThere are several parts you will need to customize:\n\npng paths\n\nspecify paths(lines: 38 - 41)\ncreate table with paths (lines: 81 - 84)\n\nset up sliders (lines: 46 - 59)\ncreate table with predictions (lines: 67 - 78)"
+  },
+  {
+    "objectID": "tutorial.html#map",
+    "href": "tutorial.html#map",
+    "title": "Tutorial",
+    "section": "Map",
+    "text": "Map\nCreates a map of the Exploits Watershed with predicted levels of response variables for each reach that has been sampled.\nThere are several parts you will need to customize:\n\nimporting layers (lines: 38 - 50)\ncreate predictions (lines: 60-64)\ncolour palettes (lines: 70-72)\npopups (lines: 80-86)\nmap (lines: 92 - 138 **but only lines that need changing are 117-130)"
+  },
+  {
+    "objectID": "tutorial.html#section-1",
+    "href": "tutorial.html#section-1",
+    "title": "Tutorial",
+    "section": "",
+    "text": "Looks like"
+  },
+  {
+    "objectID": "tutorial.html#png-paths",
+    "href": "tutorial.html#png-paths",
+    "title": "Tutorial",
+    "section": "png paths",
+    "text": "png paths\nFor the response variables\n\n\n\nsave pngs to the “data” folder \n\n\n\nadd a line for your specific image(or change out for one you aren’t using; lines: 38 - 41)\n\n\nimageURL_invert = FileAttachment(\"/data/invert 2.png\").url()\nimageURL_peri = FileAttachment(\"/data/periphyton.png\").url()\nimageURL_invert_div = FileAttachment(\"/data/invert_div.png\").url()\nimageURL_par_len = FileAttachment(\"/data/par_len.png\").url()"
+  },
+  {
+    "objectID": "tutorial.html#png-paths-1",
+    "href": "tutorial.html#png-paths-1",
+    "title": "Tutorial",
+    "section": "png paths",
+    "text": "png paths\nFor the response variables\n\n\ncreate table with paths (lines 81 - 84)\n\n\n// create a table that stores the image paths\nimages = aq.table({\n  'response_type': [\"Invertebrate biomass ()\", \"Invertebrate diversity\", \"Par length (cm)\", \"Periphyton biomass ()\"], // ordered alphabetically\n  'image_path': [imageURL_invert, imageURL_invert_div, imageURL_par_len, imageURL_peri] //order these to match alphabetically ordered response variables (response_type)\n})"
+  },
+  {
+    "objectID": "tutorial.html#set-up-sliders",
+    "href": "tutorial.html#set-up-sliders",
+    "title": "Tutorial",
+    "section": "set up sliders",
+    "text": "set up sliders\nFor the predictor variables\n\nAdd in name of variable, range, starting value, step, and label\n\nviewof wetted = Inputs.range(\n  [0, 10], \n  {value: 5, step: 0.1, label: \"Wetted width (units):\"}\n);\n// example: substrate size\nviewof substrate = Inputs.range(\n  [0, 10], \n  {value: 5, step: 0.1, label: \"Substrate size (units):\"}\n);\n// example: percent lakes\nviewof percent = Inputs.range(\n  [0, 20], \n  {value: 10, step: 0.1, label: \"Percent lake (units):\"}\n);"
+  },
+  {
+    "objectID": "tutorial.html#create-table-with-predictions",
+    "href": "tutorial.html#create-table-with-predictions",
+    "title": "Tutorial",
+    "section": "create table with predictions",
+    "text": "create table with predictions\nUses the inputs from sliders to calculate the predicted resonse variables:\n\nNeed to make sure predictor variables match sliders\n\n\n// function that takes input from sliders and creates prediction of each response variable\n\nfunction myFunction(wetted, substrate, percent) {\n  return aq.table({\n  'wetted': [wetted, wetted, wetted, wetted],\n  'substrate': [substrate, substrate, substrate, substrate],\n  'percent': [percent, percent, percent, percent],\n  'response_type': [\"Invertebrate biomass (units)\", \"Invertebrate diversity\", \"Par length (cm)\", \"Periphyton biomass (units)\"], // ordered alphabetically\n  'response_predict': [0.83-0.095*wetted+0.03*substrate, 0.44+0.026*wetted+0.32*percent, 0.7+0.0016*substrate, 0.1+0.06*wetted]\n  })\n}"
+  },
+  {
+    "objectID": "tutorial.html#section-2",
+    "href": "tutorial.html#section-2",
+    "title": "Tutorial",
+    "section": "",
+    "text": "aq.table({\n  'wetted': [\"wetted\", \"wetted\", \"wetted\", \"wetted\"],\n  'substrate': [\"substrate\", \"substrate\", \"substrate\", \"substrate\"],\n  'percent': [\"percent\", \"percent\", \"percent\", \"percent\"],\n  'response_type': [\"Invertebrate biomass (units)\", \"Invertebrate diversity\", \"Par length (cm)\", \"Periphyton biomass (units)\"], // ordered alphabetically\n  'response_predict': ['0.83-0.095*wetted+0.03*substrate', '0.44+0.026*wetted+0.32*percent', '0.7+0.0016*substrate', '0.1+0.06*wetted']\n  }).view()"
+  },
+  {
+    "objectID": "tutorial.html#create-table-with-predictions-1",
+    "href": "tutorial.html#create-table-with-predictions-1",
+    "title": "Tutorial",
+    "section": "create table with predictions",
+    "text": "create table with predictions\nUses the inputs from sliders to calculate the predicted response variables:\n\n\nGive response variables names (same as those for png files)\n\n\nfunction myFunction(wetted, substrate, percent) {\n  return aq.table({\n  'wetted': [wetted, wetted, wetted, wetted],\n  'substrate': [substrate, substrate, substrate, substrate],\n  'percent': [percent, percent, percent, percent],\n  'response_type': [\"Invertebrate biomass (units)\", \"Invertebrate diversity\", \"Par length (cm)\", \"Periphyton biomass (units)\"], // ordered alphabetically\n  'response_predict': [0.83-0.095*wetted+0.03*substrate, 0.44+0.026*wetted+0.32*percent, 0.7+0.0016*substrate, 0.1+0.06*wetted]\n  })\n}\n\npredictions_ps = myFunction(wetted, substrate, percent)"
+  },
+  {
+    "objectID": "tutorial.html#create-table-with-predictions-2",
+    "href": "tutorial.html#create-table-with-predictions-2",
+    "title": "Tutorial",
+    "section": "create table with predictions",
+    "text": "create table with predictions\nUses the inputs from sliders to calculate the predicted resonse variables:\n\n\nSpecify calculations of response variables from predictor variables\n\n\n// function that takes input from sliders and creates prediction of each response variable\n\nfunction myFunction(wetted, substrate, percent) {\n  return aq.table({\n  'wetted': [wetted, wetted, wetted, wetted],\n  'substrate': [substrate, substrate, substrate, substrate],\n  'percent': [percent, percent, percent, percent],\n  'response_type': [\"Invertebrate biomass (units)\", \"Invertebrate diversity\", \"Par length (cm)\", \"Periphyton biomass (units)\"], // ordered alphabetically\n  'response_predict': [0.83-0.095*wetted+0.03*substrate, 0.44+0.026*wetted+0.32*percent, 0.7+0.0016*substrate, 0.1+0.06*wetted]\n  })\n}"
+  },
+  {
+    "objectID": "tutorial.html#produces",
+    "href": "tutorial.html#produces",
+    "title": "Tutorial",
+    "section": "Produces",
+    "text": "Produces"
+  },
+  {
+    "objectID": "tutorial.html#produces-1",
+    "href": "tutorial.html#produces-1",
+    "title": "Tutorial",
+    "section": "Produces",
+    "text": "Produces"
+  },
+  {
+    "objectID": "tutorial.html#import-spatial-data",
+    "href": "tutorial.html#import-spatial-data",
+    "title": "Tutorial",
+    "section": "import spatial data",
+    "text": "import spatial data\n\n#import layers\n  ## river extent\n  exploits_drainage &lt;- vect(\"data/spatial data/exploits_watershed.shp\") |&gt;  \n    project(\"EPSG:4326 - WGS 84\")\n  \n  ## all rivers\n  exploits_river &lt;- vect(\"data/spatial data/OrderSlopeSegJan22.shp\") |&gt;  \n    project(\"EPSG:4326 - WGS 84\")\n  \n  ## lakes\n  lakes &lt;- vect(\"data/spatial data/Exploits_lakes.shp\") |&gt;  \n    project(\"EPSG:4326 - WGS 84\")\n  \n  ## data from river reaches sampled\n  field_reaches &lt;- vect(\"data/spatial data/exploits_reaches_with_sites.shp\") |&gt;  \n    project(\"EPSG:4326 - WGS 84\")"
+  },
+  {
+    "objectID": "tutorial.html#create-predictions",
+    "href": "tutorial.html#create-predictions",
+    "title": "Tutorial",
+    "section": "create predictions",
+    "text": "create predictions\nbased on data from sampled reaches\n\n# use river reach data to predict outcomes\n  predictions_reaches &lt;- field_reaches\n    ## predict responses based on data from field at each reach\n  predictions_reaches$invert &lt;- 0.43-0.015*predictions_reaches$avg_wet_wi+0.03*predictions_reaches$D50_pred  ## input your own formulas here\n  predictions_reaches$embed &lt;- 0.43-0.015*predictions_reaches$avg_wet_wi+0.03*predictions_reaches$D50_pred"
+  },
+  {
+    "objectID": "tutorial.html#pop-ups",
+    "href": "tutorial.html#pop-ups",
+    "title": "Tutorial",
+    "section": "pop ups",
+    "text": "pop ups\nLists out the data that will show up when you click on a reach\n\n\n\n  label_text &lt;- glue(\"&lt;b&gt;&lt;u&gt;{predictions_reaches$stream_nam}&lt;/u&gt;&lt;/b&gt; &lt;br/&gt;\", # stream name\n\"&lt;b&gt;Embededness: &lt;/b&gt; {predictions_reaches$embed}&lt;br/&gt;\", # prediction example: embedness\n\"&lt;b&gt;Invertegrate biomass: &lt;/b&gt; {predictions_reaches$invert}&lt;br/&gt;\", # prediction example: invert biomass\n\"&lt;b&gt;Wetted width: &lt;/b&gt; {predictions_reaches$avg_wet_wi}&lt;br/&gt;\", # predictor variable example: wetted width\n\"&lt;b&gt;Catchment: &lt;/b&gt; {predictions_reaches$catchment_}&lt;br/&gt;\", # predictor variable example: catchement\n\"&lt;b&gt;Substrate size: &lt;/b&gt; {predictions_reaches$D50_pred}&lt;br/&gt;\") |&gt; # predictor variable example: substrate\n\n\nLooks like"
+  },
+  {
+    "objectID": "tutorial.html#colour-palettes",
+    "href": "tutorial.html#colour-palettes",
+    "title": "Tutorial",
+    "section": "Colour palettes",
+    "text": "Colour palettes\nAdd palettes as you add response variables\n\n #colour palettes for predictions\n  invert.pal &lt;- colorNumeric(c(\"#f47c3c\", \"#d9534f\"), domain = predictions_reaches$invert, na.color = \"transparent\")\n  embed.pal &lt;- colorNumeric(c(\"#e9c602\", \"#93c54b\"), domain =  predictions_reaches$embed, na.color = \"transparent\")"
+  },
+  {
+    "objectID": "tutorial.html#code-for-the-map",
+    "href": "tutorial.html#code-for-the-map",
+    "title": "Tutorial",
+    "section": "Code for the map",
+    "text": "Code for the map\n\nexploits_map &lt;- leaflet(width = 1900, height = 1600) |&gt; \n      addProviderTiles('Esri.WorldImagery') |&gt; # adds base map\n\n      # open map to this screen\n      setView(-56.65499, 48.70449, zoom = 9) |&gt; \n  \n      #can recenter to that location by clicking button\n      addHomeButton(ext = c(-58.9311,47.9605, -53.830,49.3532), position = \"topleft\", group = \"Recenter\") |&gt; \n      \n      # create layers to add vectors to\n      addMapPane(\"drainage\", zIndex = 410) |&gt; \n      addMapPane(\"river\", zIndex = 415) |&gt; \n      addMapPane(\"reaches\", zIndex = 420) |&gt; \n      addMapPane(\"lakes\", zIndex = 425) |&gt;\n      \n      # add polygons and lines\n      ## exploits drainage area\n      addPolygons(data = exploits_drainage, color = \"#1f78b4\", weight = 1.25, fillColor = \"#1f78b4\", fillOpacity = 0.2, options = pathOptions(pane = \"drainage\")) |&gt;\n  \n      ## rivers of the exploits\n      addPolylines(data = exploits_river, color = \"#1f78b4\", weight = 1, options = pathOptions(pane = \"river\"), group = \"exploits\") |&gt;\n  \n      ## lakes of the exploits\n      addPolygons(data = lakes, color = \"#1f78b4\", stroke = FALSE, fillOpacity = 1, options = pathOptions(pane = \"lakes\"), group = \"exploits\") |&gt;\n  \n      ## predictions of invertebrate biomass\n      addPolylines(data = predictions_reaches, color = ~invert.pal(predictions_reaches$invert), weight = 2, options = pathOptions(pane = \"reaches\"), group = \"Invertebrate Biomass\", popup = ~label_text) |&gt; \n      addLegend(pal = invert.pal, values = predictions_reaches$invert,\n                title = \"Invertebrate Biomass\",\n                group = \"Invertebrate Biomass\", opacity = 1) |&gt; \n  \n      ## predictions of embededness\n      addPolylines(data = predictions_reaches, color = ~embed.pal(predictions_reaches$embed), weight = 2, options = pathOptions(pane = \"reaches\"), group = \"Embededness\", popup = ~label_text) |&gt; \n      addLegend(pal = embed.pal, values = predictions_reaches$embed,\n                title = \"Embededness\",\n                group = \"Embededness\", opacity = 1) |&gt; \n  \n      # ability to choose which predictions to see\n      addLayersControl(overlayGroups = c(\"Invertebrate Biomass\", \"Embededness\"), position = \"topleft\", options = layersControlOptions(collapsed = F)) |&gt;\n      htmlwidgets::onRender(\"\n        function() {\n            $('.leaflet-control-layers-overlays').prepend('&lt;label style=\\\"text-align:left\\\"&gt;Available layers&lt;/label&gt;');\n        }\n    \")  |&gt;\n  addScaleBar(position = \"bottomright\") |&gt; \n  addLogo(arrow)"
+  },
+  {
+    "objectID": "tutorial.html#produces-2",
+    "href": "tutorial.html#produces-2",
+    "title": "Tutorial",
+    "section": "Produces",
+    "text": "Produces"
+  },
+  {
+    "objectID": "tutorial.html#your-own-version",
+    "href": "tutorial.html#your-own-version",
+    "title": "Tutorial",
+    "section": "Your own version",
+    "text": "Your own version\nI don’t want you changing this version of the website\nSo let’s make you your own!\nTo do this we can :\n\nfork the repository to your Git account\nclone the forked repository to your computer"
+  },
+  {
+    "objectID": "tutorial.html#fork",
+    "href": "tutorial.html#fork",
+    "title": "Tutorial",
+    "section": "fork",
+    "text": "fork\n\n\nIn the top right corner click fork \n\nThen give your repository its own name and description"
+  },
+  {
+    "objectID": "tutorial.html#clone",
+    "href": "tutorial.html#clone",
+    "title": "Tutorial",
+    "section": "Clone",
+    "text": "Clone\nNow to get the repository onto your computer to work on\nWe will do this using RStudio\n\n\nIn GitHub copy the url to the repository"
+  },
+  {
+    "objectID": "tutorial.html#clone-1",
+    "href": "tutorial.html#clone-1",
+    "title": "Tutorial",
+    "section": "Clone",
+    "text": "Clone\n\n\nCreate a new project\n\n\n\n\n\nSelect Version control, using GIT"
+  },
+  {
+    "objectID": "tutorial.html#clone-2",
+    "href": "tutorial.html#clone-2",
+    "title": "Tutorial",
+    "section": "Clone",
+    "text": "Clone\n\n\nCreate a new project\n\n\n\n\n\nPaste in the URL\nGive the repository a folder name on your computer, and choose where to store it"
+  },
+  {
+    "objectID": "tutorial.html",
+    "href": "tutorial.html",
+    "title": "Tutorial",
+    "section": "",
+    "text": "This presentation will walk through using and customizing the “exploits_predictions” GitPage\n\nUsing Github\nParts of a Quorto Webpage\nThe website itself!\n\nHome tab\nSlider tab\nMap tab\n\nGetting it online"
+  },
+  {
+    "objectID": "tutorial.html#a-few-things-you-need-first",
+    "href": "tutorial.html#a-few-things-you-need-first",
+    "title": "Tutorial",
+    "section": "A few things you need first",
+    "text": "A few things you need first\n\n\nIn terminal run this line of code:\n - quarto add r-wasm/quarto-live\n\n\n\n(there should be a terminal tab beside the RStudio console tab)"
+  },
+  {
+    "objectID": "tutorial.html#source-folder",
+    "href": "tutorial.html#source-folder",
+    "title": "Tutorial",
+    "section": "Source folder",
+    "text": "Source folder\nGitPages needs to know where to look to render the webpage. In our case we are using the docs folder.\n Go to GitHub -&gt; Your repository -&gt; Settings (along the top)-&gt; Pages (along left)\n\nMake sure your deployment is configured like so:"
+  },
+  {
+    "objectID": "tutorial.html#render-locally",
+    "href": "tutorial.html#render-locally",
+    "title": "Tutorial",
+    "section": "Render locally",
+    "text": "Render locally\nTo get the docs folder ready we need to render everything locally\n\n To do that click  along the top of RStudio for each qmd file\n\n\n This should open up each page in the browser\n\n\n And will create the necessary files in the docs folder"
+  },
+  {
+    "objectID": "tutorial.html#commit-and-push",
+    "href": "tutorial.html#commit-and-push",
+    "title": "Tutorial",
+    "section": "Commit and Push",
+    "text": "Commit and Push\nNow we need to commit and push all the changes we’ve made\n\n\nIn RStudio: go to the Git tab (one along top or one by the environment tab)\n\n\n\nSelect"
+  },
+  {
+    "objectID": "tutorial.html#commit-and-push-1",
+    "href": "tutorial.html#commit-and-push-1",
+    "title": "Tutorial",
+    "section": "Commit and Push",
+    "text": "Commit and Push\n\n\nCommit:\n\n\n\n\n\n\n\n\n\n\n\nSelect the files and folders that show up in the top left console\n\n\n\n\n\n\n\n\n\nAdd a commit message and select “Commit”\n\n\n\n\n\n** Important ** There is a limit to how much you can commit and push at one time!\nIf you are adding any spatial data, do a seperate commit and push for that file\nAnd be conservative about how much you commit at one time\n\n\nAfter it has finished with the commit click Push"
+  },
+  {
+    "objectID": "tutorial.html#commit-and-push-2",
+    "href": "tutorial.html#commit-and-push-2",
+    "title": "Tutorial",
+    "section": "Commit and Push",
+    "text": "Commit and Push\n\n\nAfter it has finished with the commit click"
+  },
+  {
+    "objectID": "tutorial.html#pages-build-and-deployment",
+    "href": "tutorial.html#pages-build-and-deployment",
+    "title": "Tutorial",
+    "section": "pages build and deployment",
+    "text": "pages build and deployment\nGitHub will now build and deploy your webpage!\n\nOnce it has finished you can go to:\nSettings -&gt; Pages\nand you should have the option to visit the site"
   }
 ]
