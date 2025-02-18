@@ -676,7 +676,7 @@ Emmerson Wilson
 <h2>set up sliders</h2>
 <p>For the predictor variables</p>
 <div>
-<p>Add in name of variable, range, starting value, step, and label</p>
+<p>Add in name of variable, range, starting value, step, and label (lines: 46 - 59)</p>
 <div class="cell" data-eval="false">
 <div class="sourceCode cell-code" id="cb3" data-startfrom="300" data-source-offset="-26" data-code-line-numbers="|1|2|3"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 299;"><span id="cb3-300"><a></a>viewof wetted <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">range</span>(</span>
 <span id="cb3-301"><a></a>  [<span class="dv">0</span><span class="op">,</span> <span class="dv">10</span>]<span class="op">,</span> </span>
@@ -718,25 +718,34 @@ Emmerson Wilson
 </section>
 <section id="create-table-with-predictions" class="slide level2">
 <h2>create table with predictions</h2>
-<p>Uses the inputs from sliders to calculate the predicted resonse variables:</p>
+<p>Uses the inputs from sliders to calculate the predicted response variables (lines: 67 - 78):</p>
 <ol type="1">
 <li class="fragment">Need to make sure predictor variables match sliders</li>
 </ol>
 <div class="cell" data-eval="false">
-<div class="sourceCode cell-code" id="cb4" data-startfrom="327" data-source-offset="0" data-code-line-numbers="|5-7"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 326;"><span id="cb4-327"><a></a><span class="co">// function that takes input from sliders and creates prediction of each response variable</span></span>
-<span id="cb4-328"><a></a></span>
-<span id="cb4-329"><a></a><span class="kw">function</span> <span class="fu">myFunction</span>(wetted<span class="op">,</span> substrate<span class="op">,</span> percent) {</span>
-<span id="cb4-330"><a></a>  <span class="cf">return</span> aq<span class="op">.</span><span class="fu">table</span>({</span>
-<span id="cb4-331"><a></a>  <span class="st">'wetted'</span><span class="op">:</span> [wetted<span class="op">,</span> wetted<span class="op">,</span> wetted<span class="op">,</span> wetted]<span class="op">,</span></span>
-<span id="cb4-332"><a></a>  <span class="st">'substrate'</span><span class="op">:</span> [substrate<span class="op">,</span> substrate<span class="op">,</span> substrate<span class="op">,</span> substrate]<span class="op">,</span></span>
-<span id="cb4-333"><a></a>  <span class="st">'percent'</span><span class="op">:</span> [percent<span class="op">,</span> percent<span class="op">,</span> percent<span class="op">,</span> percent]<span class="op">,</span></span>
-<span id="cb4-334"><a></a>  <span class="st">'response_type'</span><span class="op">:</span> [<span class="st">"Invertebrate biomass (units)"</span><span class="op">,</span> <span class="st">"Invertebrate diversity"</span><span class="op">,</span> <span class="st">"Par length (cm)"</span><span class="op">,</span> <span class="st">"Periphyton biomass (units)"</span>]<span class="op">,</span> <span class="co">// ordered alphabetically</span></span>
-<span id="cb4-335"><a></a>  <span class="st">'response_predict'</span><span class="op">:</span> [<span class="fl">0.83</span><span class="op">-</span><span class="fl">0.095</span><span class="op">*</span>wetted<span class="op">+</span><span class="fl">0.03</span><span class="op">*</span>substrate<span class="op">,</span> <span class="fl">0.44</span><span class="op">+</span><span class="fl">0.026</span><span class="op">*</span>wetted<span class="op">+</span><span class="fl">0.32</span><span class="op">*</span>percent<span class="op">,</span> <span class="fl">0.7</span><span class="op">+</span><span class="fl">0.0016</span><span class="op">*</span>substrate<span class="op">,</span> <span class="fl">0.1</span><span class="op">+</span><span class="fl">0.06</span><span class="op">*</span>wetted]</span>
-<span id="cb4-336"><a></a>  })</span>
-<span id="cb4-337"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4" data-startfrom="331" data-source-offset="-93" data-code-line-numbers="|3-5"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 330;"><span id="cb4-331"><a></a><span class="kw">function</span> <span class="fu">myFunction</span>(wetted<span class="op">,</span> substrate<span class="op">,</span> percent) {</span>
+<span id="cb4-332"><a></a>  <span class="cf">return</span> aq<span class="op">.</span><span class="fu">table</span>({</span>
+<span id="cb4-333"><a></a>  <span class="st">'wetted'</span><span class="op">:</span> [wetted<span class="op">,</span> wetted<span class="op">,</span> wetted<span class="op">,</span> wetted]<span class="op">,</span></span>
+<span id="cb4-334"><a></a>  <span class="st">'substrate'</span><span class="op">:</span> [substrate<span class="op">,</span> substrate<span class="op">,</span> substrate<span class="op">,</span> substrate]<span class="op">,</span></span>
+<span id="cb4-335"><a></a>  <span class="st">'percent'</span><span class="op">:</span> [percent<span class="op">,</span> percent<span class="op">,</span> percent<span class="op">,</span> percent]<span class="op">,</span></span>
+<span id="cb4-336"><a></a>  <span class="st">'response_type'</span><span class="op">:</span> [<span class="st">"Invertebrate biomass (units)"</span><span class="op">,</span> <span class="st">"Invertebrate diversity"</span><span class="op">,</span> <span class="st">"Par length (cm)"</span><span class="op">,</span> <span class="st">"Periphyton biomass (units)"</span>]<span class="op">,</span> <span class="co">// ordered alphabetically</span></span>
+<span id="cb4-337"><a></a>  <span class="st">'response_predict'</span><span class="op">:</span> [<span class="fl">0.83</span><span class="op">-</span><span class="fl">0.095</span><span class="op">*</span>wetted<span class="op">+</span><span class="fl">0.03</span><span class="op">*</span>substrate<span class="op">,</span> <span class="fl">0.44</span><span class="op">+</span><span class="fl">0.026</span><span class="op">*</span>wetted<span class="op">+</span><span class="fl">0.32</span><span class="op">*</span>percent<span class="op">,</span> <span class="fl">0.7</span><span class="op">+</span><span class="fl">0.0016</span><span class="op">*</span>substrate<span class="op">,</span> <span class="fl">0.1</span><span class="op">+</span><span class="fl">0.06</span><span class="op">*</span>wetted]</span>
+<span id="cb4-338"><a></a>  })</span>
+<span id="cb4-339"><a></a>}</span>
+<span id="cb4-340"><a></a></span>
+<span id="cb4-341"><a></a>predictions_ps <span class="op">=</span> <span class="fu">myFunction</span>(wetted<span class="op">,</span> substrate<span class="op">,</span> percent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<div id="ojs-cell-4" data-nodetype="declaration">
+<div>
+<div id="ojs-cell-4-1" data-nodetype="declaration">
 
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-4-2" data-nodetype="declaration">
+
+</div>
 </div>
 </div>
 </div>
@@ -749,20 +758,29 @@ Emmerson Wilson
 <li>Give response variables names (same as those for png files)</li>
 </ol>
 <div class="cell" data-eval="false">
-<div class="sourceCode cell-code" id="cb5" data-startfrom="353" data-source-offset="0" data-code-line-numbers="8"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 352;"><span id="cb5-353"><a></a><span class="co">// function that takes input from sliders and creates prediction of each response variable</span></span>
-<span id="cb5-354"><a></a></span>
-<span id="cb5-355"><a></a><span class="kw">function</span> <span class="fu">myFunction</span>(wetted<span class="op">,</span> substrate<span class="op">,</span> percent) {</span>
-<span id="cb5-356"><a></a>  <span class="cf">return</span> aq<span class="op">.</span><span class="fu">table</span>({</span>
-<span id="cb5-357"><a></a>  <span class="st">'wetted'</span><span class="op">:</span> [wetted<span class="op">,</span> wetted<span class="op">,</span> wetted<span class="op">,</span> wetted]<span class="op">,</span></span>
-<span id="cb5-358"><a></a>  <span class="st">'substrate'</span><span class="op">:</span> [substrate<span class="op">,</span> substrate<span class="op">,</span> substrate<span class="op">,</span> substrate]<span class="op">,</span></span>
-<span id="cb5-359"><a></a>  <span class="st">'percent'</span><span class="op">:</span> [percent<span class="op">,</span> percent<span class="op">,</span> percent<span class="op">,</span> percent]<span class="op">,</span></span>
-<span id="cb5-360"><a></a>  <span class="st">'response_type'</span><span class="op">:</span> [<span class="st">"Invertebrate biomass (units)"</span><span class="op">,</span> <span class="st">"Invertebrate diversity"</span><span class="op">,</span> <span class="st">"Par length (cm)"</span><span class="op">,</span> <span class="st">"Periphyton biomass (units)"</span>]<span class="op">,</span> <span class="co">// ordered alphabetically</span></span>
-<span id="cb5-361"><a></a>  <span class="st">'response_predict'</span><span class="op">:</span> [<span class="fl">0.83</span><span class="op">-</span><span class="fl">0.095</span><span class="op">*</span>wetted<span class="op">+</span><span class="fl">0.03</span><span class="op">*</span>substrate<span class="op">,</span> <span class="fl">0.44</span><span class="op">+</span><span class="fl">0.026</span><span class="op">*</span>wetted<span class="op">+</span><span class="fl">0.32</span><span class="op">*</span>percent<span class="op">,</span> <span class="fl">0.7</span><span class="op">+</span><span class="fl">0.0016</span><span class="op">*</span>substrate<span class="op">,</span> <span class="fl">0.1</span><span class="op">+</span><span class="fl">0.06</span><span class="op">*</span>wetted]</span>
-<span id="cb5-362"><a></a>  })</span>
-<span id="cb5-363"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5" data-startfrom="359" data-source-offset="-93" data-code-line-numbers="6"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 358;"><span id="cb5-359"><a></a><span class="kw">function</span> <span class="fu">myFunction</span>(wetted<span class="op">,</span> substrate<span class="op">,</span> percent) {</span>
+<span id="cb5-360"><a></a>  <span class="cf">return</span> aq<span class="op">.</span><span class="fu">table</span>({</span>
+<span id="cb5-361"><a></a>  <span class="st">'wetted'</span><span class="op">:</span> [wetted<span class="op">,</span> wetted<span class="op">,</span> wetted<span class="op">,</span> wetted]<span class="op">,</span></span>
+<span id="cb5-362"><a></a>  <span class="st">'substrate'</span><span class="op">:</span> [substrate<span class="op">,</span> substrate<span class="op">,</span> substrate<span class="op">,</span> substrate]<span class="op">,</span></span>
+<span id="cb5-363"><a></a>  <span class="st">'percent'</span><span class="op">:</span> [percent<span class="op">,</span> percent<span class="op">,</span> percent<span class="op">,</span> percent]<span class="op">,</span></span>
+<span id="cb5-364"><a></a>  <span class="st">'response_type'</span><span class="op">:</span> [<span class="st">"Invertebrate biomass (units)"</span><span class="op">,</span> <span class="st">"Invertebrate diversity"</span><span class="op">,</span> <span class="st">"Par length (cm)"</span><span class="op">,</span> <span class="st">"Periphyton biomass (units)"</span>]<span class="op">,</span> <span class="co">// ordered alphabetically</span></span>
+<span id="cb5-365"><a></a>  <span class="st">'response_predict'</span><span class="op">:</span> [<span class="fl">0.83</span><span class="op">-</span><span class="fl">0.095</span><span class="op">*</span>wetted<span class="op">+</span><span class="fl">0.03</span><span class="op">*</span>substrate<span class="op">,</span> <span class="fl">0.44</span><span class="op">+</span><span class="fl">0.026</span><span class="op">*</span>wetted<span class="op">+</span><span class="fl">0.32</span><span class="op">*</span>percent<span class="op">,</span> <span class="fl">0.7</span><span class="op">+</span><span class="fl">0.0016</span><span class="op">*</span>substrate<span class="op">,</span> <span class="fl">0.1</span><span class="op">+</span><span class="fl">0.06</span><span class="op">*</span>wetted]</span>
+<span id="cb5-366"><a></a>  })</span>
+<span id="cb5-367"><a></a>}</span>
+<span id="cb5-368"><a></a></span>
+<span id="cb5-369"><a></a>predictions_ps <span class="op">=</span> <span class="fu">myFunction</span>(wetted<span class="op">,</span> substrate<span class="op">,</span> percent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<div id="ojs-cell-5" data-nodetype="declaration">
+<div>
+<div id="ojs-cell-5-1" data-nodetype="declaration">
 
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-5-2" data-nodetype="declaration">
+
+</div>
 </div>
 </div>
 </div>
@@ -776,20 +794,29 @@ Emmerson Wilson
 <li>Specify calculations of response variables from predictor variables</li>
 </ol>
 <div class="cell" data-eval="false">
-<div class="sourceCode cell-code" id="cb6" data-startfrom="381" data-source-offset="0" data-code-line-numbers="9"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 380;"><span id="cb6-381"><a></a><span class="co">// function that takes input from sliders and creates prediction of each response variable</span></span>
-<span id="cb6-382"><a></a></span>
-<span id="cb6-383"><a></a><span class="kw">function</span> <span class="fu">myFunction</span>(wetted<span class="op">,</span> substrate<span class="op">,</span> percent) {</span>
-<span id="cb6-384"><a></a>  <span class="cf">return</span> aq<span class="op">.</span><span class="fu">table</span>({</span>
-<span id="cb6-385"><a></a>  <span class="st">'wetted'</span><span class="op">:</span> [wetted<span class="op">,</span> wetted<span class="op">,</span> wetted<span class="op">,</span> wetted]<span class="op">,</span></span>
-<span id="cb6-386"><a></a>  <span class="st">'substrate'</span><span class="op">:</span> [substrate<span class="op">,</span> substrate<span class="op">,</span> substrate<span class="op">,</span> substrate]<span class="op">,</span></span>
-<span id="cb6-387"><a></a>  <span class="st">'percent'</span><span class="op">:</span> [percent<span class="op">,</span> percent<span class="op">,</span> percent<span class="op">,</span> percent]<span class="op">,</span></span>
-<span id="cb6-388"><a></a>  <span class="st">'response_type'</span><span class="op">:</span> [<span class="st">"Invertebrate biomass (units)"</span><span class="op">,</span> <span class="st">"Invertebrate diversity"</span><span class="op">,</span> <span class="st">"Par length (cm)"</span><span class="op">,</span> <span class="st">"Periphyton biomass (units)"</span>]<span class="op">,</span> <span class="co">// ordered alphabetically</span></span>
-<span id="cb6-389"><a></a>  <span class="st">'response_predict'</span><span class="op">:</span> [<span class="fl">0.83</span><span class="op">-</span><span class="fl">0.095</span><span class="op">*</span>wetted<span class="op">+</span><span class="fl">0.03</span><span class="op">*</span>substrate<span class="op">,</span> <span class="fl">0.44</span><span class="op">+</span><span class="fl">0.026</span><span class="op">*</span>wetted<span class="op">+</span><span class="fl">0.32</span><span class="op">*</span>percent<span class="op">,</span> <span class="fl">0.7</span><span class="op">+</span><span class="fl">0.0016</span><span class="op">*</span>substrate<span class="op">,</span> <span class="fl">0.1</span><span class="op">+</span><span class="fl">0.06</span><span class="op">*</span>wetted]</span>
-<span id="cb6-390"><a></a>  })</span>
-<span id="cb6-391"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6" data-startfrom="389" data-source-offset="-93" data-code-line-numbers="7"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 388;"><span id="cb6-389"><a></a><span class="kw">function</span> <span class="fu">myFunction</span>(wetted<span class="op">,</span> substrate<span class="op">,</span> percent) {</span>
+<span id="cb6-390"><a></a>  <span class="cf">return</span> aq<span class="op">.</span><span class="fu">table</span>({</span>
+<span id="cb6-391"><a></a>  <span class="st">'wetted'</span><span class="op">:</span> [wetted<span class="op">,</span> wetted<span class="op">,</span> wetted<span class="op">,</span> wetted]<span class="op">,</span></span>
+<span id="cb6-392"><a></a>  <span class="st">'substrate'</span><span class="op">:</span> [substrate<span class="op">,</span> substrate<span class="op">,</span> substrate<span class="op">,</span> substrate]<span class="op">,</span></span>
+<span id="cb6-393"><a></a>  <span class="st">'percent'</span><span class="op">:</span> [percent<span class="op">,</span> percent<span class="op">,</span> percent<span class="op">,</span> percent]<span class="op">,</span></span>
+<span id="cb6-394"><a></a>  <span class="st">'response_type'</span><span class="op">:</span> [<span class="st">"Invertebrate biomass (units)"</span><span class="op">,</span> <span class="st">"Invertebrate diversity"</span><span class="op">,</span> <span class="st">"Par length (cm)"</span><span class="op">,</span> <span class="st">"Periphyton biomass (units)"</span>]<span class="op">,</span> <span class="co">// ordered alphabetically</span></span>
+<span id="cb6-395"><a></a>  <span class="st">'response_predict'</span><span class="op">:</span> [<span class="fl">0.83</span><span class="op">-</span><span class="fl">0.095</span><span class="op">*</span>wetted<span class="op">+</span><span class="fl">0.03</span><span class="op">*</span>substrate<span class="op">,</span> <span class="fl">0.44</span><span class="op">+</span><span class="fl">0.026</span><span class="op">*</span>wetted<span class="op">+</span><span class="fl">0.32</span><span class="op">*</span>percent<span class="op">,</span> <span class="fl">0.7</span><span class="op">+</span><span class="fl">0.0016</span><span class="op">*</span>substrate<span class="op">,</span> <span class="fl">0.1</span><span class="op">+</span><span class="fl">0.06</span><span class="op">*</span>wetted]</span>
+<span id="cb6-396"><a></a>  })</span>
+<span id="cb6-397"><a></a>}</span>
+<span id="cb6-398"><a></a></span>
+<span id="cb6-399"><a></a>predictions_ps <span class="op">=</span> <span class="fu">myFunction</span>(wetted<span class="op">,</span> substrate<span class="op">,</span> percent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<div id="ojs-cell-6" data-nodetype="declaration">
+<div>
+<div id="ojs-cell-6-1" data-nodetype="declaration">
 
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-6-2" data-nodetype="declaration">
+
+</div>
 </div>
 </div>
 </div>
@@ -813,6 +840,7 @@ Emmerson Wilson
 </section>
 <section id="import-spatial-data" class="slide level2">
 <h2>import spatial data</h2>
+<p>(lines: 38 - 50)</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7" data-code-line-numbers="|15-16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a><span class="co">#import layers</span></span>
 <span id="cb7-2"><a></a>  <span class="do">## river extent</span></span>
@@ -834,7 +862,7 @@ Emmerson Wilson
 </section>
 <section id="create-predictions" class="slide level2">
 <h2>create predictions</h2>
-<p>based on data from sampled reaches</p>
+<p>based on data from sampled reaches (lines: 60-64)</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8" data-code-line-numbers="|4-5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="co"># use river reach data to predict outcomes</span></span>
 <span id="cb8-2"><a></a>  predictions_reaches <span class="ot">&lt;-</span> field_reaches</span>
@@ -845,7 +873,7 @@ Emmerson Wilson
 </section>
 <section id="colour-palettes" class="slide level2">
 <h2>Colour palettes</h2>
-<p>Add palettes as you add response variables</p>
+<p>Add palettes as you add response variables (lines: 70-72)</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a> <span class="co">#colour palettes for predictions</span></span>
 <span id="cb9-2"><a></a>  invert.pal <span class="ot">&lt;-</span> <span class="fu">colorNumeric</span>(<span class="fu">c</span>(<span class="st">"#f47c3c"</span>, <span class="st">"#d9534f"</span>), <span class="at">domain =</span> predictions_reaches<span class="sc">$</span>invert, <span class="at">na.color =</span> <span class="st">"transparent"</span>)</span>
@@ -870,7 +898,7 @@ Emmerson Wilson
 </section>
 <section id="pop-ups" class="slide level2">
 <h2>pop ups</h2>
-<p>Lists out the data that will show up when you click on a reach</p>
+<p>Lists out the data that will show up when you click on a reach (lines: 80-86)</p>
 <div class="columns">
 <div class="column" style="width:70%;">
 <div class="cell">
@@ -888,6 +916,7 @@ Emmerson Wilson
 </section>
 <section id="code-for-the-map" class="slide level2">
 <h2>Code for the map</h2>
+<p>(lines: 92 - 138 **but only lines that need changing are 117-130)</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11" data-code-line-numbers="|5-8|10-14|16-24|26-36|38-39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a>exploits_map <span class="ot">&lt;-</span> <span class="fu">leaflet</span>(<span class="at">width =</span> <span class="dv">1900</span>, <span class="at">height =</span> <span class="dv">1600</span>) <span class="sc">|&gt;</span> </span>
 <span id="cb11-2"><a></a>      <span class="fu">addProviderTiles</span>(<span class="st">'Esri.WorldImagery'</span>) <span class="sc">|&gt;</span> <span class="co"># adds base map</span></span>
@@ -1039,6 +1068,7 @@ Emmerson Wilson
 <p>Once it has finished you can go to:</p>
 <p>Settings -&gt; Pages</p>
 <p>and you should have the option to visit the site <img data-src="data/for webpage/live.png"></p>
+<p><a href="https://emmwilson.github.io/exploits_predictions/" class="uri">https://emmwilson.github.io/exploits_predictions/</a></p>
 </div>
 </section>
 <section id="congrats-youve-customized-the-webpage" class="slide level2">

@@ -285,10 +285,10 @@ images = aq.table({
 
 ## set up sliders
 
-For the predictor variables
+For the predictor variables 
 
 ::: {.nonincremental}
-Add in name of variable, range, starting value, step, and label
+Add in name of variable, range, starting value, step, and label (lines: 46 - 59)
 
 
 ```{ojs}
@@ -316,15 +316,15 @@ viewof percent = Inputs.range(
 
 ## create table with predictions
 
-Uses the inputs from sliders to calculate the predicted resonse variables:
+Uses the inputs from sliders to calculate the predicted response variables (lines: 67 - 78):
 
-1) Need to make sure predictor variables match sliders
+1) Need to make sure predictor variables match sliders 
 
 
 ```{ojs}
 //| echo: true
 //| eval: false
-//| code-line-numbers: "|5-7"
+//| code-line-numbers: "|3-5"
 
 // function that takes input from sliders and creates prediction of each response variable
 
@@ -337,6 +337,8 @@ function myFunction(wetted, substrate, percent) {
   'response_predict': [0.83-0.095*wetted+0.03*substrate, 0.44+0.026*wetted+0.32*percent, 0.7+0.0016*substrate, 0.1+0.06*wetted]
   })
 }
+
+predictions_ps = myFunction(wetted, substrate, percent)
 ```
 
 ## create table with predictions
@@ -350,7 +352,7 @@ Uses the inputs from sliders to calculate the predicted response variables:
 ```{ojs}
 //| echo: true
 //| eval: false
-//| code-line-numbers: "8"
+//| code-line-numbers: "6"
 
 // function that takes input from sliders and creates prediction of each response variable
 
@@ -363,6 +365,8 @@ function myFunction(wetted, substrate, percent) {
   'response_predict': [0.83-0.095*wetted+0.03*substrate, 0.44+0.026*wetted+0.32*percent, 0.7+0.0016*substrate, 0.1+0.06*wetted]
   })
 }
+
+predictions_ps = myFunction(wetted, substrate, percent)
 ```
 
 :::
@@ -378,7 +382,7 @@ Uses the inputs from sliders to calculate the predicted resonse variables:
 ```{ojs}
 //| echo: true
 //| eval: false
-//| code-line-numbers: "9"
+//| code-line-numbers: "7"
 
 // function that takes input from sliders and creates prediction of each response variable
 
@@ -391,6 +395,8 @@ function myFunction(wetted, substrate, percent) {
   'response_predict': [0.83-0.095*wetted+0.03*substrate, 0.44+0.026*wetted+0.32*percent, 0.7+0.0016*substrate, 0.1+0.06*wetted]
   })
 }
+
+predictions_ps = myFunction(wetted, substrate, percent)
 ```
 
 :::
@@ -413,6 +419,8 @@ There are several parts you will need to customize:
 - map (lines: 92 - 138 **but only lines that need changing are 117-130)
 
 ## import spatial data
+
+(lines: 38 - 50)
 
 ```{r}
 #| echo: true
@@ -439,7 +447,7 @@ There are several parts you will need to customize:
 
 ## create predictions 
 
-based on data from sampled reaches
+based on data from sampled reaches (lines: 60-64)
 
 ```{r}
 #| echo: true
@@ -457,7 +465,7 @@ based on data from sampled reaches
 
 ## Colour palettes
 
-Add palettes as you add response variables
+Add palettes as you add response variables (lines: 70-72)
 
 ```{r}
 #| echo: true
@@ -487,7 +495,7 @@ swatch(pal2(5))
 
 ## pop ups
 
-Lists out the data that will show up when you click on a reach
+Lists out the data that will show up when you click on a reach (lines: 80-86)
 
 ::::: columns
 ::: {.column width="70%" .nonincremental}
@@ -518,6 +526,8 @@ Looks like
 ::::
 
 ## Code for the map
+
+(lines: 92 - 138 **but only lines that need changing are 117-130)
 
 ```{r}
 #| echo: true
@@ -700,6 +710,10 @@ Settings -> Pages
 
 and you should have the option to visit the site
 ![](data/for%20webpage/live.png)
+
+
+<https://emmwilson.github.io/exploits_predictions/>
+
 :::
 
 
