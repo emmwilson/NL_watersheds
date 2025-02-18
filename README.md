@@ -1,6 +1,6 @@
 Template code to create a GitPage for salmon resource predictions
 
-Author/developer: Emmerson Wilson
+Author/developer: Emmerson Wilson (emmerson.r.wilson@gmail.com)
 
 Contents:
 
