@@ -16,7 +16,7 @@
   {
     "objectID": "Exploits_map.html",
     "href": "Exploits_map.html",
-    "title": "Exploits watershed predictions",
+    "title": "Exploits watershed predictions from field data",
     "section": "",
     "text": "Predictions of invertebrate biomass and embededness for the sampled reaches of the Exploits watershed.\nClick on a reach that has been sampled (highlighted in orange-red or yellow-green) to see the predictions and underlying characteristics"
   },
@@ -348,5 +348,19 @@
     "title": "Tutorial",
     "section": "extra resources",
     "text": "extra resources\nQuarto:\nbasics of quarto pages: https://quarto.org/docs/websites/ info on using quarto and GitPages: https://quarto.org/docs/publishing/github-pages.html\nfor sliders\nusing observable js with quarto: https://quarto.org/docs/dashboards/interactivity/observable.html all the options available with Plot: https://observablehq.com/plot/what-is-plot going from ggplot to Plot: https://observablehq.com/@observablehq/plot-from-ggplot2\nusing leaflet\nhow to use leaflet to make maps in R: https://rstudio.github.io/leaflet/articles/leaflet.html"
+  },
+  {
+    "objectID": "Sliders NLM.html",
+    "href": "Sliders NLM.html",
+    "title": "Sliders with non-linear model",
+    "section": "",
+    "text": "Set the below variable values to see predictions of several response variables shown in the bar graph\n\n\nimport {vl} from \"@vega/vega-lite-api\"\nimport {aq, op} from \"@uwdata/arquero\"\n\nvg = require('vega-lite')\n\n// references to images stored in data folder for each response variable\nimageURL_invert = FileAttachment(\"/data/invert 2.png\").url()\nimageURL_peri = FileAttachment(\"/data/periphyton.png\").url()\nimageURL_invert_div = FileAttachment(\"/data/invert_div.png\").url()\nimageURL_par_len = FileAttachment(\"/data/par_len.png\").url()\n\n// sliders for predictor variables\n\n// example: wetted width\nviewof wetted = Inputs.range(\n  [0, 10], \n  {value: 5, step: 0.1, label: \"Wetted width (units):\"}\n);\n// example: substrate size\nviewof substrate = Inputs.range(\n  [0, 10], \n  {value: 5, step: 0.1, label: \"Substrate size (units):\"}\n);\n// example: percent lakes\nviewof percent = Inputs.range(\n  [0, 20], \n  {value: 10, step: 0.1, label: \"Percent lake (units):\"}\n);\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nfunction myFunction(wetted, substrate, percent) {\n  return aq.table({\n  'wetted': [wetted, wetted, wetted, wetted],\n  'substrate': [substrate, substrate, substrate, substrate],\n  'percent': [percent, percent, percent, percent],\n  'response_type': [\"Invertebrate biomass (units)\", \"Invertebrate diversity\", \"Par length (cm)\", \"Periphyton biomass (units)\"], // ordered alphabetically\n  'response_predict': [0.83-0.095*(wetted^2)+0.03*(substrate^5), 0.44+0.026*wetted+0.32*percent, 0.7+0.0016*substrate, 0.1+0.06*wetted]\n  })\n}\n\n\n\n// create the table\npredictions_ps = myFunction(wetted, substrate, percent)\n\n// create a table that stores the image paths\nimages = aq.table({\n  'response_type': [\"Invertebrate biomass ()\", \"Invertebrate diversity\", \"Par length (cm)\", \"Periphyton biomass ()\"], // ordered alphabetically\n  'image_path': [imageURL_invert, imageURL_invert_div, imageURL_par_len, imageURL_peri] //order these to match alphabetically ordered response variables (response_type)\n})\n\n\n// create the bar plot based on predictions_ps\nPlot.plot({\n  width: Math.max(width, 550),\n  height: Math.floor(0.4 * width),\n  marginLeft: 0,\n  marginRight: 0,\n  colour: {legend: false},\n  y: {domain: [0,8], axis: null},\n  x: {label: null},\n  marks:[\n    Plot.axisX({fontSize: 18}),\n    Plot.barY(predictions_ps,\n     {x: \"response_type\",\n     y: \"response_predict\",\n     fill: \"response_type\"}),\n    Plot.text(predictions_ps, {x: \"response_type\", y: \"response_predict\", text: \"response_predict\", dy: -7, lineAnchor: \"bottom\", fontSize: 25}),\n   ]\n})\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPlot.plot({\n  width: Math.max(width, 550),\n  height: Math.floor(0.1 * width),\n  marginLeft: 0,\n  marginRight: 0,\n  colour: {legend: false},\n  y: {domain: [0,0], axis: null},\n  x: {label: \"Response type\", axis: null, fontSize: 22},\n  marks:[\n    Plot.image(images, \n      {x: \"response_type\",\n      y: [0, 0, 0, 0],\n      src: \"image_path\",\n      width: 150,\n      axis: null\n      })\n   ]\n})"
+  },
+  {
+    "objectID": "Exploits_map2.html",
+    "href": "Exploits_map2.html",
+    "title": "Exploits River watershed predictions from HydroATLAS",
+    "section": "",
+    "text": "HydroATLAS data that can be used in gravel models to estimate gravel with the proper size for salmon spawning.\nClick on a reach to see the data for each segment.\n\n\n\n\n\n\nHydroATLAS data:\nLinke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6 Lehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z"
   }
 ]
