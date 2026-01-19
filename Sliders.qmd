@@ -28,78 +28,166 @@ pacman::p_load(shiny,
 
 ```{ojs}
 //| echo: false
-//| panel: sidebar
+//| output: false
 
 import {vl} from "@vega/vega-lite-api"
-import {aq, op} from "@uwdata/arquero"
+import { aq, op } from '@uwdata/arquero'
 
 vg = require('vega-lite')
 
 // references to images stored in data folder for each response variable
 imageURL_invert = FileAttachment("/data/invert 2.png").url()
 imageURL_peri = FileAttachment("/data/periphyton.png").url()
-imageURL_invert_div = FileAttachment("/data/invert_div.png").url()
+imageURL_gravel = FileAttachment("/data/gravel.png").url()
 imageURL_par_len = FileAttachment("/data/par_len.png").url()
+
+// function to convert all predictions that are negative to 0
+function negativetozero(equation) { 
+  return op.bin(equation, 0, op.greatest(equation), 0.0001)
+}
+
+```
+
+
+::: {.panel-tabset}
+
+## Invertebrate, periphyton and juvenile salmon estimates
+
+```{ojs}
+//| echo: false
+//| panel: sidebar
 
 // sliders for predictor variables
 
-// example: wetted width
-viewof wetted = Inputs.range(
-  [0, 10], 
-  {value: 5, step: 0.1, label: "Wetted width (units):"}
+// example: periphyton biomass (mean - 1 outlier)
+viewof peri = Inputs.range(
+  [0, 0.5], 
+  {value: 0.25, step: (0.5)/100, label: "Periphyton biomass (units):"}
 );
-// example: substrate size
-viewof substrate = Inputs.range(
-  [0, 10], 
-  {value: 5, step: 0.1, label: "Substrate size (units):"}
+// example: Water temp
+viewof temp = Inputs.range(
+  [10, 40], 
+  {value: 10, step: (40-10)/100, label: "Water temperature (c):"}
 );
-// example: percent lakes
-viewof percent = Inputs.range(
-  [0, 20], 
-  {value: 10, step: 0.1, label: "Percent lake (units):"}
+// example: Wetted width
+viewof wwidth = Inputs.range(
+  [0, 40], 
+  {value: 10, step: 40/100, label: "Wetted width (m):"}
 );
+// example:Flow
+viewof flow = Inputs.range(
+  [0, 4], 
+  {value: 2, step: 4/100, label: "Flow (ft/s):"}
+);
+// example: invbio
+viewof invbio = Inputs.range(
+  [0, 4000], 
+  {value: 2000, step: 4000/100, label: "Invertebrate density (units):"}
+);
+// example: EPT
+viewof EPT = Inputs.range(
+  [0, 0.5], 
+  {value: 0.25, step: 0.5/100, label: "EPT (units):"}
+);
+// example: pH
+viewof pH = Inputs.range(
+  [5, 8], 
+  {value: 2, step: (8-5)/100, label: "pH:"}
+);
+
 ```
+
 
 ```{ojs}
 //| echo: false
 //| panel: fill
 
+// prediction functions
+function invertbiomass(peri, temp, wwidth, flow) {
+  return negativetozero(0+4.773*peri+0.072*temp-0.084*wwidth-4.291*flow)
+}
+
+function peribiomass(invbio, EPT, pH) {
+  return negativetozero(0.034 + 0.0000117984*invbio + 0.023*EPT + 0.020*pH) 
+}
+
+// error bar functions
+function inverthigh(peri, temp, wwidth, flow) {
+  return negativetozero(0+0.274+(4.773+3.379)*peri+(0.072+0.07)*temp-(0.084-0.036)*wwidth-(4.291-3.920)*flow)
+}
+
+function invertlow(peri, temp, wwidth, flow) {
+  return negativetozero(0-0.274+(4.773-3.379)*peri+(0.072-0.07)*temp-(0.084+0.036)*wwidth-(4.291+3.920)*flow)
+}
+
+function perihigh(invbio, EPT, pH) {
+  return negativetozero((0.034+0.006) + (0.0000117984+0.0000080939)*invbio + (0.023+0.009)*EPT + (0.020+0.016)*pH) 
+}
+
+function perilow(invbio, EPT, pH) {
+  return negativetozero((0.034-0.006) + (0.0000117984-0.0000080939)*invbio + (0.023-0.009)*EPT + (0.020-0.016)*pH) 
+}
+
+
 // function that takes input from sliders and creates prediction of each response variable
-function myFunction(wetted, substrate, percent) {
+function myFunction(peri, temp, wwidth, flow, invbio, EPT, pH) {
   return aq.table({
-  'wetted': [wetted, wetted, wetted, wetted],
-  'substrate': [substrate, substrate, substrate, substrate],
-  'percent': [percent, percent, percent, percent],
-  'response_type': ["Invertebrate biomass (units)", "Invertebrate diversity", "Par length (cm)", "Periphyton biomass (units)"], // ordered alphabetically
-  'response_predict': [0.83-0.095*wetted+0.03*substrate, 0.44+0.026*wetted+0.32*percent, 0.7+0.0016*substrate, 0.1+0.06*wetted]
+  'peri': [peri, peri], // repeat for each input
+  'temp': [temp, temp],
+  'wwidth': [wwidth, wwidth],
+  'flow':[flow, flow],
+  'invbio': [invbio, invbio],
+  'EPT': [EPT, EPT],
+  'pH': [pH, pH],
+  'response_type': ["Invertebrate biomass (units)", 
+                    "Periphyton biomass (units)",
+                    ], // ordered alphabetically
+  'response_predict': [invertbiomass(peri, temp, wwidth, flow),
+                      peribiomass(invbio, EPT, pH)   
+                       ],
+  'response_errorhigh': [inverthigh(peri, temp, wwidth, flow) ,
+                        perihigh(invbio, EPT, pH) 
+                        ],
+  'response_errorlow': [invertlow(peri, temp, wwidth, flow) ,
+                        perilow(invbio, EPT, pH)
+                        ]
   })
 }
 
 // create the table
-predictions_ps = myFunction(wetted, substrate, percent)
+predictions_ps = myFunction(peri, temp, wwidth, flow, invbio, EPT, pH)
 
 // create a table that stores the image paths
 images = aq.table({
-  'response_type': ["Invertebrate biomass ()", "Invertebrate diversity", "Par length (cm)", "Periphyton biomass ()"], // ordered alphabetically
-  'image_path': [imageURL_invert, imageURL_invert_div, imageURL_par_len, imageURL_peri] //order these to match alphabetically ordered response variables (response_type)
+  'response_type': ["Invertebrate biomass (units)", 
+                    "Periphyton biomass (units)",
+                    //"Invertebrate diversity", 
+                    //"Par length (cm)"
+                    ], // ordered alphabetically
+  'image_path': [imageURL_invert, 
+                  imageURL_peri
+                  //imageURL_invert_div, 
+                  //imageURL_par_len
+                  ] //order these to match alphabetically ordered response variables (response_type)
 })
 
 // create the bar plot based on predictions_ps
 Plot.plot({
   width: Math.max(width, 550),
-  height: Math.floor(0.4 * width),
+  height: Math.floor(0.5 * width),
   marginLeft: 0,
   marginRight: 0,
   colour: {legend: false},
-  y: {domain: [0,8], axis: null},
+  y: {domain: [0,10], axis: null},
   x: {label: null},
   marks:[
-    Plot.axisX({fontSize: 18}),
+    Plot.axisX({fontSize: 18}), 
     Plot.barY(predictions_ps,
      {x: "response_type",
      y: "response_predict",
-     fill: "response_type"}),
-    Plot.text(predictions_ps, {x: "response_type", y: "response_predict", text: "response_predict", dy: -7, lineAnchor: "bottom", fontSize: 25}),
+     fill: "response_type"}), // create bar graph
+    Plot.text(predictions_ps, {x: "response_type", y: "response_predict", text: "response_predict", dy: -7, dx: -200, lineAnchor: "bottom", fontSize: 25}), // write out predicted value
+    Plot.ruleX(predictions_ps, {x: "response_type", y1: 'response_errorlow', y2: 'response_errorhigh', strokeWidth: 3}) // add error bars
    ]
 })
 
@@ -123,3 +211,126 @@ Plot.plot({
    ]
 })
 ```
+
+## Gravel and spawning estimates
+
+```{ojs}
+//| echo: false
+//| panel: sidebar
+
+// sliders for predictor variables
+
+// example: discharge
+viewof DIS_AV_CMS = Inputs.range(
+  [0, 300], 
+  {value: 1, step: 300/1000, label: "Discharge (units):"}
+)
+// example: Stream width
+viewof swidth = Inputs.range(
+  [0, 100], 
+  {value: 20, step: 100/100, label: "Stream width (m):"}
+)
+// example: Stream gradient
+viewof sgr_dk_rav = Inputs.range(
+  [0, 0.05], 
+  {value: 0.01, step: 0.05/100, label: "Stream gradient:"}
+)
+// example: fish length
+viewof fish = Inputs.range(
+  [0, 2], 
+  {value: 1, step: 2/100, label: "Fish length (m):"}
+)
+
+```
+
+
+```{ojs}
+//| echo: false
+//| panel: fill
+
+// prediction functions
+function gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) {
+  return (2000*op.pow(0.04,(3/5))*op.pow((DIS_AV_CMS/swidth),(3/5))*op.pow(sgr_dk_rav,(7/10))/(650*0.04))*1000 ;
+}
+
+
+function spawningprob(DIS_AV_CMS, swidth, sgr_dk_rav, fish) {
+  return op.abs(1-(op.abs(32*fish/gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav)-1)));
+}
+
+
+// function that takes input from sliders and creates prediction of each response variable
+function gravelFunction(DIS_AV_CMS, swidth, sgr_dk_rav, fish) {
+  return aq.table({
+  'DIS_AV_CMS': [DIS_AV_CMS, DIS_AV_CMS], // repeat for each input
+  'swidth': [swidth, swidth],
+  'sgr_dk_rav':[sgr_dk_rav, sgr_dk_rav],
+  'fish': [fish, fish],
+  'response_type': ["Gravel size D50", 
+                    "Probability salmon spawn in predicted gravel size \n for fish of chosen length" //not sure what this variable will be yet
+                    ], // ordered alphabetically
+                      
+  'response_predict': [gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav),
+                        spawningprob(DIS_AV_CMS, swidth, sgr_dk_rav, fish)*2000
+                      ],
+  'response_predict_label': [gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav),
+                        spawningprob(DIS_AV_CMS, swidth, sgr_dk_rav, fish)
+                      ]
+  })
+}
+
+// create the table
+predictions_gravel = gravelFunction(DIS_AV_CMS, swidth, sgr_dk_rav, fish)
+
+// create a table that stores the image paths
+images2 = aq.table({
+  'response_type': ["Gravel size D50 (m)", 
+                    "Probability salmon spawn in predicted gravel size",
+                    ], // ordered alphabetically
+  'image_path': [imageURL_gravel, 
+                  imageURL_par_len
+                  ] //order these to match alphabetically ordered response variables (response_type)
+})
+
+// create the bar plot based on predictions_ps
+Plot.plot({
+  width: Math.max(width, 550),
+  height: Math.floor(0.5 * width),
+  marginLeft: 0,
+  marginRight: 0,
+  marginBottom: 50,
+  colour: {legend: false},
+  y: {domain: [0, 2000], label: null},
+  x: {label: null},
+  marks:[
+    Plot.axisX({fontSize: 18}),
+    Plot.barY(predictions_gravel,
+     {x: "response_type",
+     y: "response_predict",
+     fill: "response_type"}), // create bar graph
+    Plot.text(predictions_gravel, {x: "response_type", y: "response_predict", text: "response_predict_label", dy: -7, dx: -200, lineAnchor: "bottom", fontSize: 25}) // write out predicted value
+   ]
+})
+
+// add images below each bar
+Plot.plot({
+  width: Math.max(width, 550),
+  height: Math.floor(0.1 * width),
+  marginLeft: 0,
+  marginRight: 0,
+  colour: {legend: false},
+  y: {domain: [0,0], axis: null},
+  x: {label: "Response type", axis: null, fontSize: 22},
+  marks:[
+    Plot.image(images2, 
+      {x: "response_type",
+      y: [0, 0],
+      src: "image_path",
+      width: 150,
+      axis: null
+      })
+   ]
+})
+```
+
+:::
