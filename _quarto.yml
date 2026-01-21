@@ -10,10 +10,12 @@ website:
         href: index.qmd
       - text: "Sliders"
         href: Sliders.qmd
-      - text: "Map from field data"
-        href: Exploits_map.qmd 
-      - text: "Map from HydroSHEDs"
-        href: Exploits_map2.qmd 
+      - text: "Watersheds"
+        menu:
+        - text: "Map from field data"
+          href: Exploits_map.qmd 
+        - text: "Map from HydroSHEDs"
+          href: Exploits_map2.qmd 
 
 format:
   html:
