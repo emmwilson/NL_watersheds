@@ -8,15 +8,17 @@ website:
     left:
       - text: "Home" 
         href: index.qmd
-      - text: "Sliders"
-        href: Sliders.qmd
       - text: "Watersheds"
         menu:
-        - text: "Map from field data"
+        - text: "Exploits River Field Predictions"
           href: Exploits_map.qmd 
-        - text: "Map from HydroSHEDs"
+        - text: "Exploits River Watershed"
           href: Exploits_map2.qmd 
-
+        - text: "Rocky River Watershed"
+          href: Rocky_map.qmd
+      - text: "Sliders"
+        href: Sliders.qmd
+        
 format:
   html:
     theme: sandstone

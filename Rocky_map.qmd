@@ -1,0 +1,191 @@
+---
+title: "Rocky River watershed hydrological data"
+theme: sandstone
+format:
+  html:
+    grid:
+      sidebar-width: 10px
+      margin-width: 10px
+      body-width: 1900px
+---
+
+HydroATLAS data that can be used in gravel models to estimate gravel with the proper size for salmon spawning. Includes example predictions of gravel size.
+
+Click on a reach to see the data for each segment.
+
+```{r, library}
+#| include: false
+
+pacman::p_load(shiny,
+               bslib,
+               ggplot2,
+               ggtext,
+               shinythemes,
+               thematic,
+               tidyverse,
+               httr,
+               leaflet,
+               leafem,
+               terra,
+               htmltools,
+               glue,
+               cowplot,
+               grDevices)
+```
+
+```{r, import}
+#| include: false
+# import layers
+  ## river extent
+  rocky_drainage <- vect("data/spatial data/rocky_watershed.shp") |>  
+    project("EPSG:4326 - WGS 84")
+  
+  ## all rivers
+  rocky_river <- vect("data/spatial data/rocky_hydroatlas.shp") |>  
+    project("EPSG:4326 - WGS 84")
+  
+  ## lakes
+  lakes <- vect("data/spatial data/rocky_lakes.shp") |>  
+    project("EPSG:4326 - WGS 84")
+  
+  ## data from river reaches sampled
+  # field_reaches <- vect("data/spatial data/exploits_reaches_with_sites.shp") |>  
+  #   project("EPSG:4326 - WGS 84")
+  
+  # import arrow
+arrow <- "https://cdn.pixabay.com/photo/2013/07/12/17/54/arrow-152596_960_720.png"
+```
+
+```{r, predictions}
+#| include: false
+# use river reach data to predict outcomes
+
+# values from Ky's presentation
+ps <- 2650 # kg/m3, density of sediment
+p <- 2000 # kg/m3, density of water
+g <- 9.80665 # m/s2, acceleration by gravity
+n <- 0.04 # channel roughness coefficient
+t <- 0.04 # shields parameter
+
+## predict responses based on data from field at each reach
+rocky_river$width <- (rocky_river$ria_ha_csu/rocky_river$LENGTH_KM)*10
+
+rocky_river$tb <- p*g*(n^(3/5))*((rocky_river$DIS_AV_CMS/rocky_river$width)^(3/5))*((rocky_river$sgr_dk_rav/10000)^(7/10))  
+
+rocky_river$D50 <- (rocky_river$tb/((ps-p)*g*t))*1000 
+
+
+```
+
+```{r, palettes}
+#| include: false
+  # colour palette for discharge
+  discharge.pal <- colorNumeric(c("#dfdce3", "#8900a8"), domain = rocky_river$DIS_AV_CMS, na.color = "transparent")
+  
+  # colour palette for width
+  width.pal <- colorNumeric(c("#f2ca97", "#d4021d"), domain = rocky_river$width, na.color = "transparent") # 
+  
+  #width.pal <- colorFactor(c("#f2ca97", "#d4021d"), domain = TN_river$width*1000, na.color = "transparent") use this function for any categorical data you want to include in the map
+  
+  # colour palette for stream gradient
+  gradient.pal <- colorNumeric(c("#00D4FF", "#020024"), domain = rocky_river$sgr_dk_rav/10000, na.color = "transparent")
+  
+  # colour palette for D50, with 16-64 green
+  
+ D50.pal <- colorNumeric(c("#e9c602","#e9c602", "#e9c602","#FD602F"), domain = c(0,16,64,176), na.color = "transparent")
+ 
+D50.col <-  D50.pal(rocky_river$D50)
+D50.col[rocky_river$D50 >= 16 & rocky_river$D50 <= 64] <- "#0E7329"
+
+D50.col.leg <- D50.pal(seq(0, 176, by = 16))
+D50.col.leg[seq(0, 176, by = 16) >= 16 & seq(0, 176, by = 16) <= 64] <- "#0E7329"
+
+D50.pal.leg <- colorNumeric(D50.col.leg, domain = c(0,176), na.color = "transparent")
+```
+
+```{r, popup_labels}
+#| include: false
+# adds information to popups for each reach wehn it is selected
+
+  label_text <- glue("<b><u>{'Stream info:'}</u></b> <br/>",
+"<b>Segment discharge: </b> {rocky_river$DIS_AV_CMS}<br/>",
+"<b>Segment width: </b> {rocky_river$width}<br/>",
+"<b>Segment gradient: </b> {rocky_river$sgr_dk_rav}<br/>",
+"<b>Segment D50: </b> {rocky_river$D50}<br/>") |> 
+
+  lapply(htmltools::HTML)
+```
+
+```{r, map}
+#| echo: false
+
+rocky_map <- leaflet(width = 1900, height = 1900) |> 
+      addProviderTiles('Esri.WorldImagery') |> # adds base map
+
+      # open map to this screen
+      setView(-53.53256, 47.33589, zoom = 11) |> 
+
+      #can recenter to that location by clicking button
+      addHomeButton(ext = c(-53.70243, 47.43048, -53.36890, 47.22697), position = "topleft", group = "Recenter") |> 
+
+      # create layers to add vectors to
+      addMapPane("drainage", zIndex = 410) |> 
+      addMapPane("river", zIndex = 415) |> 
+      addMapPane("reaches", zIndex = 425) |> 
+      addMapPane("lakes", zIndex = 420) |>
+
+      # add polygons and lines
+      ## exploits drainage area
+      addPolygons(data = rocky_drainage, color = "#1f78b4", weight = 1.25, fillColor = "#1f78b4", fillOpacity = 0.2, options = pathOptions(pane = "drainage")) |>
+  
+      ## rivers of the rocky
+      addPolylines(data = rocky_river, color = "#1f78b4", weight = 3/rocky_river$ORD_CLAS, options = pathOptions(pane = "river"), group = "exploits") |>
+
+      ### discharge
+      addPolylines(data = rocky_river, color = ~discharge.pal(rocky_river$DIS_AV_CMS), weight = 3/rocky_river$ORD_CLAS, opacity = 1, options = pathOptions(pane = "reaches"), group = "Discharge", popup = ~label_text) |>
+      addLegend(pal = discharge.pal, values = rocky_river$DIS_AV_CMS,
+                title = "Discharge (m<sup>3</sup>/s)",
+                group = "Discharge", opacity = 1, bins = 7) |> 
+  
+      ### width
+      addPolylines(data = rocky_river, color = ~width.pal(rocky_river$width), weight = 3/rocky_river$ORD_CLAS, opacity = 1, options = pathOptions(pane = "reaches"), group = "Width", popup = ~label_text) |>
+      addLegend(pal = width.pal, values = rocky_river$width,
+                title = "Stream width (m)",
+                group = "Width", opacity = 1, bins = 7) |>
+  
+      ### gradient
+      addPolylines(data = rocky_river, color = ~gradient.pal(rocky_river$sgr_dk_rav/10000), weight = 3/rocky_river$ORD_CLAS, opacity = 1, options = pathOptions(pane = "reaches"), group = "Gradient", popup = ~label_text) |>
+      addLegend(pal = gradient.pal, values = rocky_river$sgr_dk_rav/10000,
+                title = "Stream gradient",
+                group = "Gradient", opacity = 1, bins = 7) |>
+  
+      ### D50
+      addPolylines(data = rocky_river, color = D50.col, weight = 3/rocky_river$ORD_CLAS, opacity = 1, options = pathOptions(pane = "reaches"), group = "D50", popup = ~label_text) |>
+      addLegend(pal = D50.pal.leg, values = rocky_river$D50,
+                title = "D50 gravel size (mm)",
+                group = "D50", opacity = 1) |>
+  
+      ## lakes of the exploits
+      addPolygons(data = lakes, color = "#1f78b4", stroke = FALSE, fillOpacity = 0.7, options = pathOptions(pane = "lakes"), group = "exploits") |>
+
+  
+      # ability to choose which layers to see
+      addLayersControl(overlayGroups = c("Discharge", "Width", "Gradient", "D50"), position = "topleft", options = layersControlOptions(collapsed = F)) |>
+      htmlwidgets::onRender("
+        function() {
+            $('.leaflet-control-layers-overlays').prepend('<label style=\"text-align:left\">Available layers</label>');
+        }
+    ")  |>
+  
+  addScaleBar(position = "bottomright") |> 
+  addLogo(arrow)
+
+rocky_map
+```
+
+
+HydroATLAS data:
+
+Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6
+
+Lehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z

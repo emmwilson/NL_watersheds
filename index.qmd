@@ -11,13 +11,15 @@ date: last-modified
 date-format: "DD/MM/YY"
 ---
 
+:::: {.columns}
+
+::: {.column width="40%"}
 Use the top navigation bar to explore the following outputs:
 
 Slider predictions: about...
 
-Map predictions: about...
+Map predictions: about... for various watersheds throughout NL
 
-------------------------------------------------------------------------
 
 Affiliated manuscript:
 
@@ -27,4 +29,91 @@ Affiliations:
 
 Funding:
 
-App developement: Emmerson Wilson
+App development: Emmerson Wilson
+:::
+
+::: {.column width="2%"}
+<!-- empty column to create gap -->
+:::
+
+
+```{r, library}
+#| include: false
+
+pacman::p_load(shiny,
+               bslib,
+               ggplot2,
+               ggtext,
+               shinythemes,
+               thematic,
+               tidyverse,
+               httr,
+               leaflet,
+               leafem,
+               terra,
+               htmltools,
+               glue,
+               cowplot)
+```
+
+```{r, import}
+#| include: false
+# import layers
+  ## river extent
+  exploits_watersheds <- vect("data/spatial data/exploits_watershed.shp") |>  
+    project("EPSG:4326 - WGS 84")
+  
+exploits_watersheds[["html"]] <- "Exploits_map2.html"
+exploits_watersheds[["ws"]] <- "Exploits River Watershed"
+  
+  rocky_watershed <- vect("data/spatial data/rocky_watershed.shp") |> 
+    project("EPSG:4326 - WGS 84")
+  
+rocky_watershed[["html"]] <- "Rocky_map.html" # eventually wtaersheds will come from same file which will already have html links
+rocky_watershed[["ws"]] <- "Rocky River Watershed"
+
+
+watersheds <- rbind(exploits_watersheds, rocky_watershed)
+
+  
+  # import arrow
+arrow <- "https://cdn.pixabay.com/photo/2013/07/12/17/54/arrow-152596_960_720.png"
+```
+
+```{r, popup_labels}
+#| include: false
+# adds information to popups for each reach wehn it is selected
+
+  label_text <- glue('<a href={watersheds$html}><b>{watersheds$ws}</b></a>')|> 
+ 
+  lapply(htmltools::HTML) 
+  
+```
+
+::: {.column width="58%"}
+
+```{r, map}
+#| echo: false
+#| warning: false
+  
+NL_map <- leaflet(width = 1900, height = 1900) |> 
+      addProviderTiles('Esri.WorldImagery') |> # adds base map
+
+      # open map to this screen
+      setView(-56.65499, 48.70449, zoom = 7) |> 
+  
+      #can recenter to that location by clicking button
+      addHomeButton(ext = c(-58.9311,47.9605, -53.830,49.3532), position = "topleft", group = "Recenter") |> 
+      
+      # create layers to add vectors to
+      addMapPane("drainage", zIndex = 410) |> 
+      
+      # add polygons and lines
+      ## exploits drainage area
+      addPolygons(data = watersheds, color = "#1f78b4", weight = 1.25, fillColor = "#1f78b4", fillOpacity = 0.2, options = pathOptions(pane = "drainage"), popup = ~label_text)  |>
+  
+  addScaleBar(position = "bottomright") |> 
+  addLogo(arrow)
+
+NL_map
+```

@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Salmon resource predictions",
     "section": "",
-    "text": "Use the top navigation bar to explore the following outputs:\nSlider predictions: about…\nMap predictions: about…\n\nAffiliated manuscript:\nAuthors:\nAffiliations:\nFunding:\nApp developement: Emmerson Wilson"
+    "text": "Use the top navigation bar to explore the following outputs:\nSlider predictions: about…\nMap predictions: about… for various watersheds throughout NL\nAffiliated manuscript:\nAuthors:\nAffiliations:\nFunding:\nApp development: Emmerson Wilson"
   },
   {
     "objectID": "about.html",
@@ -52,8 +52,8 @@
     "objectID": "tutorial.html#content",
     "href": "tutorial.html#content",
     "title": "Tutorial",
-    "section": "Content",
-    "text": "Content\nThis presentation will walk through using and customizing the “exploits_predictions” GitPage\n\nUsing Github\nParts of a Quarto Webpage\nThe website itself!\n\nHome tab\nSlider tab\nMap tab\n\nGetting it online"
+    "section": "",
+    "text": "This presentation will walk through using and customizing the “exploits_predictions” GitPage\n\nUsing Github\nParts of a Quarto Webpage\nThe website itself!\n\nHome tab\nSlider tab\nMap tab\n\nGetting it online"
   },
   {
     "objectID": "tutorial.html#qmd-files",
@@ -74,7 +74,7 @@
     "href": "tutorial.html#others",
     "title": "Tutorial",
     "section": "others",
-    "text": "others\nThere are also other files that are important to building a quarto webpage:\n\nstyles.css\n_extensions folder\n_site folder\netc…\n\n\nBut we don’t need to alter any of them so we will skip over"
+    "text": "others\nThere are also other files that are important to building a quarto webpage:\n\nstyles.css\n_extensions folder\n_site folder\netc…\n\n. . .\nBut we don’t need to alter any of them so we will skip over"
   },
   {
     "objectID": "tutorial.html#repositories",
@@ -284,7 +284,7 @@
     "href": "tutorial.html",
     "title": "Tutorial",
     "section": "",
-    "text": "This presentation will walk through using and customizing the “exploits_predictions” GitPage\n\nUsing Github\nParts of a Quorto Webpage\nThe website itself!\n\nHome tab\nSlider tab\nMap tab\n\nGetting it online"
+    "text": "This presentation will walk through using and customizing the “exploits_predictions” GitPage\n\nUsing Github\nParts of a Quarto Webpage\nThe website itself!\n\nHome tab\nSlider tab\nMap tab\n\nGetting it online"
   },
   {
     "objectID": "tutorial.html#a-few-things-you-need-first",
@@ -319,7 +319,7 @@
     "href": "tutorial.html#commit-and-push-1",
     "title": "Tutorial",
     "section": "Commit and Push",
-    "text": "Commit and Push\n\n\nCommit:\n\n\n\n\n\n\n\n\n\n\n\nSelect the files and folders that show up in the top left console\n\n\n\n\n\n\n\n\n\nAdd a commit message and select “Commit”\n\n\n\n\n\n** Important ** There is a limit to how much you can commit and push at one time!\nIf you are adding any spatial data, do a seperate commit and push for that file\nAnd be conservative about how much you commit at one time\n\n\nAfter it has finished with the commit click Push"
+    "text": "Commit and Push\n\n\nCommit:\n\n\n\n\n\n\n\n\nSelect the files and folders that show up in the top left console\n\n\n\n\n\n\n\n\n\nAdd a commit message and select “Commit”\n\n\n\n\n\n** Important ** There is a limit to how much you can commit and push at one time!\nIf you are adding any spatial data, do a seperate commit and push for that file\nAnd be conservative about how much you commit at one time\n\n\n\nAfter it has finished with the commit click Push"
   },
   {
     "objectID": "tutorial.html#commit-and-push-2",
@@ -347,7 +347,7 @@
     "href": "tutorial.html#extra-resources",
     "title": "Tutorial",
     "section": "extra resources",
-    "text": "extra resources\nQuarto:\nbasics of quarto pages: https://quarto.org/docs/websites/ info on using quarto and GitPages: https://quarto.org/docs/publishing/github-pages.html\nfor sliders\nusing observable js with quarto: https://quarto.org/docs/dashboards/interactivity/observable.html all the options available with Plot: https://observablehq.com/plot/what-is-plot going from ggplot to Plot: https://observablehq.com/@observablehq/plot-from-ggplot2\nusing leaflet\nhow to use leaflet to make maps in R: https://rstudio.github.io/leaflet/articles/leaflet.html"
+    "text": "extra resources\n\nQuarto:\nbasics of quarto pages: https://quarto.org/docs/websites/ info on using quarto and GitPages: https://quarto.org/docs/publishing/github-pages.html\n\n\nfor sliders\nusing observable js with quarto: https://quarto.org/docs/dashboards/interactivity/observable.html all the options available with Plot: https://observablehq.com/plot/what-is-plot going from ggplot to Plot: https://observablehq.com/@observablehq/plot-from-ggplot2\n\n\nusing leaflet\nhow to use leaflet to make maps in R: https://rstudio.github.io/leaflet/articles/leaflet.html"
   },
   {
     "objectID": "Sliders NLM.html",
@@ -376,5 +376,33 @@
     "title": "Sliders",
     "section": "Gravel and spawning estimates",
     "text": "Gravel and spawning estimates\n\n\nviewof DIS_AV_CMS = Inputs.range(\n  [0, 400], \n  {value: 200, step: 400/100, label: \"Discharge (units):\"}\n);\n// example: Stream width\nviewof wwidth2 = Inputs.range(\n  [0, 120], \n  {value: 60, step: 120/100, label: \"Stream width (m):\"}\n);\n// example: Stream gradient\nviewof sgr_dk_rav = Inputs.range(\n  [0, 0.1], \n  {value: 0.05, step: 0.1/100, label: \"Stream gradient:\"}\n);\n// example: fish length\nviewof fish = Inputs.range(\n  [0, 2], \n  {value: 1, step: 2/100, label: \"Fish length (m):\"}\n);\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nfunction gravelFunction(DIS_AV_CMS, wwidth2, sgr_dk_rav, fish) {\n  return aq.table({\n  'DIS_AV_CMS': [DIS_AV_CMS, DIS_AV_CMS], // repeat for each input\n  'wwidth2': [wwidth2, wwidth2],\n  'sgr_dk_rav':[sgr_dk_rav, sgr_dk_rav],\n  'fish': [fish, fish],\n  'response_type': [\"Gravel size D50\", \n                    \"Probability salmon spawn in predicted gravel size\" //not sure what this variable will be yet\n                    ], // ordered alphabetically\n                      \n  'response_predict': [(11150.46*((DIS_AV_CMS/wwidth2)^0.6)*(sgr_dk_rav^0.7)),\n                        (32*fish/(11150.46*((DIS_AV_CMS/wwidth2)^0.6)*(sgr_dk_rav^0.7)))\n                      ]\n  })\n}\n\n// create the table\npredictions_gravel = gravelFunction(DIS_AV_CMS, wwidth2, sgr_dk_rav, fish)\n\n// create a table that stores the image paths\nimages2 = aq.table({\n  'response_type': [\"Gravel size D50\", \n                    \"Probability salmon spawn in predicted gravel size\",\n                    ], // ordered alphabetically\n  'image_path': [imageURL_invert, \n                  imageURL_peri\n                  ] //order these to match alphabetically ordered response variables (response_type)\n})\n\n// create the bar plot based on predictions_ps\nPlot.plot({\n  width: Math.max(width, 550),\n  height: Math.floor(0.4 * width),\n  marginLeft: 0,\n  marginRight: 0,\n  colour: {legend: false},\n  marks:[\n    Plot.axisX({fontSize: 18}), \n    Plot.barY(predictions_gravel,\n     {x: \"response_type\",\n     y: \"response_predict\",\n     fill: \"response_type\"}), // create bar graph\n    Plot.text(predictions_gravel, {x: \"response_type\", y: \"response_predict\", text: \"response_predict\", dy: -7, dx: -200, lineAnchor: \"bottom\", fontSize: 25}) // write out predicted value\n   ]\n})\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPlot.plot({\n  width: Math.max(width, 550),\n  height: Math.floor(0.1 * width),\n  marginLeft: 0,\n  marginRight: 0,\n  colour: {legend: false},\n  y: {domain: [0,0], axis: null},\n  x: {label: \"Response type\", axis: null, fontSize: 22},\n  marks:[\n    Plot.image(images2, \n      {x: \"response_type\",\n      y: [0, 0, 0, 0],\n      src: \"image_path\",\n      width: 150,\n      axis: null\n      })\n   ]\n})"
+  },
+  {
+    "objectID": "index.html#section",
+    "href": "index.html#section",
+    "title": "Salmon resource predictions",
+    "section": "",
+    "text": "Use the top navigation bar to explore the following outputs:\nSlider predictions: about…\nMap predictions: about… for various watersheds throughout NL\nAffiliated manuscript:\nAuthors:\nAffiliations:\nFunding:\nApp development: Emmerson Wilson"
+  },
+  {
+    "objectID": "index.html#column",
+    "href": "index.html#column",
+    "title": "Salmon resource predictions",
+    "section": "",
+    "text": "Use the top navigation bar to explore the following outputs:\nSlider predictions: about…\nMap predictions: about… for various watersheds throughout NL\nAffiliated manuscript:\nAuthors:\nAffiliations:\nFunding:\nApp development: Emmerson Wilson"
+  },
+  {
+    "objectID": "index.html#column-1",
+    "href": "index.html#column-1",
+    "title": "Salmon resource predictions",
+    "section": "Column",
+    "text": "Column"
+  },
+  {
+    "objectID": "Rocky_map.html",
+    "href": "Rocky_map.html",
+    "title": "Rocky River watershed hydrological data",
+    "section": "",
+    "text": "HydroATLAS data that can be used in gravel models to estimate gravel with the proper size for salmon spawning. Includes example predictions of gravel size.\nClick on a reach to see the data for each segment.\n\n\n\n\n\n\nHydroATLAS data:\nLinke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6\nLehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z"
   }
 ]
