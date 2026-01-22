@@ -14,21 +14,17 @@ date-format: "DD/MM/YY"
 :::: {.columns}
 
 ::: {.column width="40%"}
-Use the top navigation bar to explore the following outputs:
+Project description paragraph..... 
 
-Slider predictions: about...
 
-Map predictions: about... for various watersheds throughout NL
+Use the map to explore predictions for watersheds across Newfoundland
+You can also use the top navigation bar to explore the watersheds and to investigate the relationships between input variable and predicted values in our Sliders page. 
 
 
 Affiliated manuscript:
-
 Authors:
-
 Affiliations:
-
 Funding:
-
 App development: Emmerson Wilson
 :::
 
