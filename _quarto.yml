@@ -10,10 +10,8 @@ website:
         href: index.qmd
       - text: "Watersheds"
         menu:
-        - text: "Exploits River Field Predictions"
-          href: Exploits_map.qmd 
         - text: "Exploits River Watershed"
-          href: Exploits_map2.qmd 
+          href: Exploits_map.qmd 
         - text: "Rocky River Watershed"
           href: Rocky_map.qmd
       - text: "Sliders"
