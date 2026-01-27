@@ -13,18 +13,17 @@ date-format: "DD/MM/YY"
 
 :::: {.columns}
 
-::: {.column width="40%"}
+::: {.column width="35%"}
 Project description paragraph..... 
 
 
-Use the map to explore predictions for watersheds across Newfoundland
-You can also use the top navigation bar to explore the watersheds and to investigate the relationships between input variable and predicted values in our Sliders page. 
+Use the map to explore predictions for watersheds across Newfoundland. You can also use the top navigation bar to explore predictions under the Watersheds tab, and to investigate the relationships between input variable and predicted values on our Sliders page. 
 
 
-Affiliated manuscript:
-Authors:
-Affiliations:
-Funding:
+Affiliated manuscript:  
+Authors:  
+Affiliations:  
+Funding:  
 App development: Emmerson Wilson
 :::
 
@@ -49,7 +48,9 @@ pacman::p_load(shiny,
                terra,
                htmltools,
                glue,
-               cowplot)
+               cowplot,
+               igraph )
+
 ```
 
 ```{r, import}
@@ -59,7 +60,7 @@ pacman::p_load(shiny,
   exploits_watersheds <- vect("data/spatial data/exploits_watershed.shp") |>  
     project("EPSG:4326 - WGS 84")
   
-exploits_watersheds[["html"]] <- "Exploits_map2.html"
+exploits_watersheds[["html"]] <- "Exploits_map.html"
 exploits_watersheds[["ws"]] <- "Exploits River Watershed"
   
   rocky_watershed <- vect("data/spatial data/rocky_watershed.shp") |> 
@@ -68,13 +69,37 @@ exploits_watersheds[["ws"]] <- "Exploits River Watershed"
 rocky_watershed[["html"]] <- "Rocky_map.html" # eventually wtaersheds will come from same file which will already have html links
 rocky_watershed[["ws"]] <- "Rocky River Watershed"
 
+  TN_watershed <- vect("data/spatial data/Terranova_basin.shp") |>  
+    project("EPSG:4326 - WGS 84")
+  
+TN_watershed[["html"]] <- "TerraNova_map.html" # eventually wtaersheds will come from same file which will already have html links
+TN_watershed[["ws"]] <- "Terra Nova River Watershed"
 
-watersheds <- rbind(exploits_watersheds, rocky_watershed)
+
+watersheds <- rbind(exploits_watersheds, rocky_watershed, TN_watershed)
 
   
   # import arrow
 arrow <- "https://cdn.pixabay.com/photo/2013/07/12/17/54/arrow-152596_960_720.png"
 ```
+
+
+```{r, palettes}
+#| include: false
+ #colour palettes for predictions
+  # invert.pal <- colorNumeric(c("#f47c3c", "#d9534f"), domain = predictions_reaches$invert, na.color = "transparent")
+  # embed.pal <- colorNumeric(c("#e9c602", "#93c54b"), domain =  predictions_reaches$embed, na.color = "transparent")
+library(sf)
+neighbors <- st_touches(st_as_sf(watersheds), st_as_sf(watersheds))
+graph <- graph_from_adj_list(neighbors)
+
+colors <- greedy_vertex_coloring(graph)
+watersheds$color_id <- as.factor(colors)
+
+pal <- colorFactor(palette = c("#caf0f8", "#90e0ef",  "#1f78b4", "#031D5E"), domain = watersheds$color_id)
+
+```
+  
 
 ```{r, popup_labels}
 #| include: false
@@ -86,17 +111,17 @@ arrow <- "https://cdn.pixabay.com/photo/2013/07/12/17/54/arrow-152596_960_720.pn
   
 ```
 
-::: {.column width="58%"}
+::: {.column width="63%"}
 
 ```{r, map}
 #| echo: false
 #| warning: false
   
-NL_map <- leaflet(width = 1900, height = 1900) |> 
+NL_map <- leaflet(width = 1900, height = 2250) |> 
       addProviderTiles('Esri.WorldImagery') |> # adds base map
 
       # open map to this screen
-      setView(-56.65499, 48.70449, zoom = 7) |> 
+      setView(-56.65499, 49.15, zoom = 7) |> 
   
       #can recenter to that location by clicking button
       addHomeButton(ext = c(-58.9311,47.9605, -53.830,49.3532), position = "topleft", group = "Recenter") |> 
@@ -106,7 +131,7 @@ NL_map <- leaflet(width = 1900, height = 1900) |>
       
       # add polygons and lines
       ## exploits drainage area
-      addPolygons(data = watersheds, color = "#1f78b4", weight = 1.25, fillColor = "#1f78b4", fillOpacity = 0.2, options = pathOptions(pane = "drainage"), popup = ~label_text)  |>
+      addPolygons(data = watersheds, color = ~pal(color_id), weight = 1.5, fillColor = ~pal(color_id), fillOpacity = 0.3, options = pathOptions(pane = "drainage"), popup = ~label_text)  |>
   
   addScaleBar(position = "bottomright") |> 
   addLogo(arrow)

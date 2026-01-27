@@ -124,7 +124,7 @@ rocky_map <- leaflet(width = 1900, height = 1900) |>
       addProviderTiles('Esri.WorldImagery') |> # adds base map
 
       # open map to this screen
-      setView(-53.53256, 47.33589, zoom = 11) |> 
+      setView(-53.53256, 47.33589, zoom = 10) |> 
 
       #can recenter to that location by clicking button
       addHomeButton(ext = c(-53.70243, 47.43048, -53.36890, 47.22697), position = "topleft", group = "Recenter") |> 

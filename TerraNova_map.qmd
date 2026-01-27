@@ -124,7 +124,7 @@ TN_map <- leaflet(width = 1900, height = 2100) |>
       addProviderTiles('Esri.WorldImagery') |> # adds base map
 
       # open map to this screen
-      setView(-54.51951,48.30108, zoom = 11) |> 
+      setView(-54.51951,48.30108, zoom = 10) |> 
       #can recenter to that location by clicking button
       addHomeButton(ext = c(-55.13126, 48.44568, -54.02385, 48.03565), position = "topleft", group = "Recenter") |> 
       # create layers to add vectors to
