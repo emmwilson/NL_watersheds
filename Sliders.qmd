@@ -17,7 +17,7 @@ Set the below variable values to see predictions of several response variables s
 ```{r, load}
 #| include: false
 #| warning: false
-#| error: false
+
 pacman::p_load(shiny,
                bslib,
                ggplot2,
@@ -33,12 +33,10 @@ pacman::p_load(shiny,
 ```{ojs}
 //| echo: false
 //| output: false
-//| warning: false
-//| error: false
 
 
 import {vl} from "@vega/vega-lite-api"
-import { aq, op } from '@uwdata/arquero'
+import { aq, op } from "@uwdata/arquero"
 
 vg = require('vega-lite')
 
@@ -63,8 +61,6 @@ function negativetozero(equation) {
 ```{ojs}
 //| echo: false
 //| panel: sidebar
-//| warning: false
-//| error: false
 
 // sliders for predictor variables
 
@@ -110,8 +106,6 @@ viewof pH = Inputs.range(
 ```{ojs}
 //| echo: false
 //| panel: fill
-//| warning: false
-//| error: false
 
 // prediction functions
 function invertbiomass(peri, temp, wwidth, flow) {
@@ -228,8 +222,6 @@ Plot.plot({
 ```{ojs}
 //| echo: false
 //| panel: sidebar
-//| warning: false
-//| error: false
 
 // sliders for predictor variables
 
@@ -260,8 +252,6 @@ viewof fish = Inputs.range(
 ```{ojs}
 //| echo: false
 //| panel: fill
-//| warning: false
-//| error: false
 
 // prediction functions
 function gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) {
