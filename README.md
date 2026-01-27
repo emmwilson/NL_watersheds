@@ -1,4 +1,5 @@
-Template code to create a GitPage for salmon resource predictions
+Webpage that hosts predictions for salmon habitat for each watershed in Newfoundland, CAN.
+Currently based off HydroATLAS data.
 
 Author/developer: Emmerson Wilson (emmerson.r.wilson@gmail.com)
 
