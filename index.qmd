@@ -130,7 +130,9 @@ NL_map <- leaflet(width = 1900, height = 2150) |>
       
       # add polygons and lines
       ## exploits drainage area
-      addPolygons(data = watersheds, color = ~pal(color_id), weight = 1.5, fillColor = ~pal(color_id), fillOpacity = 0.3, options = pathOptions(pane = "drainage"), popup = ~label_text)  |>
+      addPolygons(data = watersheds, color = ~pal(color_id), weight = 1.5, fillColor = ~pal(color_id), fillOpacity = 0.3, options = pathOptions(pane = "drainage"), popup = ~label_text, highlightOptions = highlightOptions(
+                color =  ~pal(color_id), weight = 1.5, fillOpacity = 0.5,
+                bringToFront = TRUE, sendToBack = TRUE))  |>
   
   addScaleBar(position = "bottomright") |> 
   addLogo(arrow)
