@@ -14,6 +14,8 @@ website:
           href: Exploits_map.qmd 
         - text: "Rocky River Watershed"
           href: Rocky_map.qmd
+        - text: "Terra Nova River Watershed"
+          href: TerraNova_map.qmd
       - text: "Sliders"
         href: Sliders.qmd
         
