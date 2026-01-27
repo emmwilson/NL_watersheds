@@ -11,7 +11,7 @@ Contents:
   - Exploits_map.qmd: Map with predictions of response variables for reaches sampled for Exploits watershed, NL
   - Exploits_map2.qmd: Map with predictions of response variables from HydroSHEDs data for Exploits watershed, NL
   - Rocky_map.qmd: Map with predictions of response variables from HydroSHEDs data for Rocky River watershed, NL
-  - TerraNova_map2.qmd: Map with predictions of response variables from HydroSHEDs data for Terra Nova watershed, NL
+  - TerraNova_map.qmd: Map with predictions of response variables from HydroSHEDs data for Terra Nova watershed, NL
   - _quarto.yml: Rendering source, which pages included in site, universal themes
 
   - Requirements:

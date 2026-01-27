@@ -117,15 +117,14 @@ pal <- colorFactor(palette = c("#caf0f8", "#90e0ef",  "#1f78b4", "#031D5E"), dom
 #| echo: false
 #| warning: false
   
-NL_map <- leaflet(width = 1900, height = 2250) |> 
+NL_map <- leaflet(width = 1900, height = 2150) |> 
       addProviderTiles('Esri.WorldImagery') |> # adds base map
 
       # open map to this screen
       setView(-56.65499, 49.15, zoom = 7) |> 
   
       #can recenter to that location by clicking button
-      addHomeButton(ext = c(-58.9311,47.9605, -53.830,49.3532), position = "topleft", group = "Recenter") |> 
-      
+      addHomeButton(ext = c(-60,48, -52, 50), position = "topleft", group = "Recenter") |> 
       # create layers to add vectors to
       addMapPane("drainage", zIndex = 410) |> 
       
