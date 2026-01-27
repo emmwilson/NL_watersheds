@@ -42,8 +42,7 @@ Contents:
     - Terranova_basin.shp: Terra Nova river watershed area
     - Terranova_lakes.shp: lakes in Terra Nova watershed
     - Terranova_rivers.shp: waterways created by HydroRivers, with HydroATLAS data for Terra Nova watershed  
-  
-  -/for webpage: pngs used in tutorial
+  - /for webpage: pngs used in tutorial
 
 - docs: created and updated upon render
 
