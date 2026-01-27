@@ -2,6 +2,7 @@
 title: "Sliders"
 engine: knitr
 theme: sandstone
+css: styles.css
 format: 
   live-html:
     grid: 

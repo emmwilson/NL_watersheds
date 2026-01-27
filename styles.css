@@ -1,4 +1,14 @@
 /* css styles */
 .observablehq--error {
-  display: none;
+  display: none !important;
+}
+
+/* Hide OJS runtime errors/warnings */
+.ojs-runtime-error {
+  display: none !important;
+}
+
+/* Alternative: Hide all default callouts if they are causing issues */
+.callout.callout-style-default {
+  display: none !important;
 }
