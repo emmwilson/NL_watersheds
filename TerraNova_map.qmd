@@ -168,11 +168,11 @@ TN_map <- leaflet(width = 1900, height = 2100) |>
   
       # ability to choose which predictions to see
       addLayersControl(overlayGroups = c("Discharge", "Width", "Gradient", "D50"), position = "topleft", options = layersControlOptions(collapsed = F)) |>
-      htmlwidgets::onRender("
-        function() {
-            $('.leaflet-control-layers-overlays').prepend('<label style=\"text-align:left\">Available layers</label>');
-        }
-    ")  |>
+    #   htmlwidgets::onRender("
+    #     function() {
+    #         $('.leaflet-control-layers-overlays').prepend('<label style=\"text-align:left\">Available layers</label>');
+    #     }
+    # ")  |>
   
   addScaleBar(position = "bottomright") |> 
   addLogo(arrow)
