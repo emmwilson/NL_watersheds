@@ -31,7 +31,8 @@ pacman::p_load(shiny,
                htmltools,
                glue,
                cowplot,
-               grDevices)
+               grDevices,
+               leaflegend)
 ```
 
 ```{r, import}
@@ -83,13 +84,23 @@ rocky_river$D50 <- (rocky_river$tb/((ps-p)*g*t))*1000
   # colour palette for discharge
   discharge.pal <- colorNumeric(c("#dfdce3", "#8900a8"), domain = rocky_river$DIS_AV_CMS, na.color = "transparent")
   
+  # colour palette for legend so high numbers at top
+   discharge.pal.leg <- colorNumeric(c("#8900a8", "#dfdce3"), domain = rocky_river$DIS_AV_CMS, na.color = "transparent")
+  
   # colour palette for width
   width.pal <- colorNumeric(c("#f2ca97", "#d4021d"), domain = rocky_river$width, na.color = "transparent") # 
   
+  # colour palette for legend so high numbers at top
+  width.pal.leg <- colorNumeric(c("#d4021d", "#f2ca97"), domain = rocky_river$width, na.color = "transparent") # 
+   
   #width.pal <- colorFactor(c("#f2ca97", "#d4021d"), domain = TN_river$width*1000, na.color = "transparent") use this function for any categorical data you want to include in the map
   
   # colour palette for stream gradient
-  gradient.pal <- colorNumeric(c("#00D4FF", "#020024"), domain = rocky_river$sgr_dk_rav/10000, na.color = "transparent")
+  gradient.pal <- colorNumeric(c("white", "grey20", "black"), domain = rocky_river$sgr_dk_rav/10000, na.color = "transparent")
+  
+  # colour palette for legend so high numbers at top
+  gradient.pal.leg <- colorNumeric(c("black", "grey20", "white"), domain = c(min(rocky_river$sgr_dk_rav/10000), median(rocky_river$sgr_dk_rav/10000), max(rocky_river$sgr_dk_rav/10000)), na.color = "transparent")  
+
   
   # colour palette for D50, with 16-64 green
   
@@ -101,7 +112,7 @@ D50.col[rocky_river$D50 >= 16 & rocky_river$D50 <= 64] <- "#0E7329"
 D50.col.leg <- D50.pal(seq(0, 176, by = 16))
 D50.col.leg[seq(0, 176, by = 16) >= 16 & seq(0, 176, by = 16) <= 64] <- "#0E7329"
 
-D50.pal.leg <- colorNumeric(D50.col.leg, domain = c(0,176), na.color = "transparent")
+D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,176), na.color = "transparent")
 ```
 
 ```{r, popup_labels}
@@ -144,27 +155,31 @@ rocky_map <- leaflet(width = 1900, height = 1900) |>
 
       ### discharge
       addPolylines(data = rocky_river, color = ~discharge.pal(rocky_river$DIS_AV_CMS), weight = 3/rocky_river$ORD_CLAS, opacity = 1, options = pathOptions(pane = "reaches"), group = "Discharge", popup = ~label_text) |>
-      addLegend(pal = discharge.pal, values = rocky_river$DIS_AV_CMS,
-                title = "Discharge (m<sup>3</sup>/s)",
-                group = "Discharge", opacity = 1, bins = 7) |> 
+        addLegendNumeric(pal = discharge.pal.leg, values = rocky_river$DIS_AV_CMS, title = htmltools::HTML("Discharge (m<sup>3</sup>/s)"),position = 'topright', group = "Discharge", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE , height = 150, width = 20 ) |> 
+      # addLegend(pal = discharge.pal, values = rocky_river$DIS_AV_CMS,
+      #           title = "Discharge (m<sup>3</sup>/s)",
+      #           group = "Discharge", opacity = 1, bins = 7) |> 
   
       ### width
       addPolylines(data = rocky_river, color = ~width.pal(rocky_river$width), weight = 3/rocky_river$ORD_CLAS, opacity = 1, options = pathOptions(pane = "reaches"), group = "Width", popup = ~label_text) |>
-      addLegend(pal = width.pal, values = rocky_river$width,
-                title = "Stream width (m)",
-                group = "Width", opacity = 1, bins = 7) |>
+          addLegendNumeric(pal = width.pal.leg, values = rocky_river$width, title = "Stream width (m)",position = 'topright', group = "Width", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE, height = 150, width = 20 ) |> 
+      # addLegend(pal = width.pal, values = rocky_river$width,
+      #           title = "Stream width (m)",
+      #           group = "Width", opacity = 1, bins = 7) |>
   
       ### gradient
       addPolylines(data = rocky_river, color = ~gradient.pal(rocky_river$sgr_dk_rav/10000), weight = 3/rocky_river$ORD_CLAS, opacity = 1, options = pathOptions(pane = "reaches"), group = "Gradient", popup = ~label_text) |>
-      addLegend(pal = gradient.pal, values = rocky_river$sgr_dk_rav/10000,
-                title = "Stream gradient",
-                group = "Gradient", opacity = 1, bins = 7) |>
+          addLegendNumeric(pal = gradient.pal.leg, values = rocky_river$sgr_dk_rav/10000, title = "Stream gradient",position = 'topright', group = "Gradient", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE, height = 150, width = 20 ) |> 
+      # addLegend(pal = gradient.pal, values = rocky_river$sgr_dk_rav/10000,
+      #           title = "Stream gradient",
+      #           group = "Gradient", opacity = 1, bins = 7) |>
   
       ### D50
       addPolylines(data = rocky_river, color = D50.col, weight = 3/rocky_river$ORD_CLAS, opacity = 1, options = pathOptions(pane = "reaches"), group = "D50", popup = ~label_text) |>
-      addLegend(pal = D50.pal.leg, values = rocky_river$D50,
-                title = "D50 gravel size (mm)",
-                group = "D50", opacity = 1) |>
+      addLegendNumeric(pal = D50.pal.leg, values = rocky_river$D50, title = "D50 gravel size (mm)", position = 'topright', group = "D50", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE, height = 150, width = 20 ) |> 
+      # addLegend(pal = D50.pal.leg, values = rocky_river$D50,
+      #           title = "D50 gravel size (mm)",
+      #           group = "D50", opacity = 1) |>
   
       ## lakes of the exploits
       addPolygons(data = lakes, color = "#1f78b4", stroke = FALSE, fillOpacity = 0.7, options = pathOptions(pane = "lakes"), group = "exploits") |>
