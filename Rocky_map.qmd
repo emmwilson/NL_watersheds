@@ -107,10 +107,10 @@ rocky_river$D50 <- (rocky_river$tb/((ps-p)*g*t))*1000
  D50.pal <- colorNumeric(c("#e9c602","#e9c602", "#e9c602","#FD602F"), domain = c(0,16,64,176), na.color = "transparent")
  
 D50.col <-  D50.pal(rocky_river$D50)
-D50.col[rocky_river$D50 >= 16 & rocky_river$D50 <= 64] <- "#0E7329"
+D50.col[rocky_river$D50 > 16 & rocky_river$D50 < 64] <- "#0E7329"
 
 D50.col.leg <- D50.pal(seq(0, 176, by = 16))
-D50.col.leg[seq(0, 176, by = 16) >= 16 & seq(0, 176, by = 16) <= 64] <- "#0E7329"
+D50.col.leg[seq(0, 176, by = 16) > 16 & seq(0, 176, by = 16) < 64] <- "#0E7329"
 
 D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,176), na.color = "transparent")
 ```
