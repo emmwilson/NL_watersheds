@@ -169,7 +169,7 @@ TN_map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoo
           addLegendNumeric(pal = gradient.pal.leg, values = TN_river$sgr_dk_rav/10000, title = "Stream gradient",position = 'topright', group = "Gradient", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE, height = 150, width = 20 ) |> 
 
       ## lakes of the exploits
-      addPolygons(data = TN_lakes, color = "#236D9E", stroke = FALSE, fillOpacity = 0.7, options = pathOptions(pane = "lakes"), group = "TN") |>
+      addPolygons(data = TN_lakes, color = "#236D9E", stroke = FALSE,  options = pathOptions(pane = "lakes"), group = "TN", fillOpacity = 0.9) |>
   
       # ability to choose which predictions to see
       addLayersControl(overlayGroups = c("D50", "Discharge", "Width", "Gradient"), position = "topleft", options = layersControlOptions(collapsed = F, autoZIndex = TRUE)) |>
