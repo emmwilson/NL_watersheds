@@ -1,1 +1,43 @@
 /* css styles */
+.quarto-title-block h1.title {
+  font-size: 1.25em; /* Adjust the value as needed (e.g., 1.5em, 24px) */
+  margin-top: -15px !important;
+  padding-top: 0px !important;
+  margin-bottom: -5px !important;
+  padding-bottom: 0px !important;
+}
+
+.panel-tabset .tab-content {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+  padding-top: 5px !important;
+  margin-top: 5px !important;
+  font-size: 0.9em; /* Adjust the value as needed (e.g., 1.5em, 24px) */
+}
+
+.panel-tabset .tab-content .line-block {
+  padding-bottom: 10px;
+}
+
+.panel-tabset .nav-tabs .nav-link {
+  padding: 4px;
+  padding-left: 7px;
+  padding-right: 7px;
+  font-size: 0.7em;
+}
+
+.title-block-header {
+  position: relative;
+  z-index: 1; /* Keep title text behind or in front as needed */
+}
+
+
+.column .cell-output-display {
+  position: relative;
+  margin-top: -100px; /* Adjust this value to overlap */
+  z-index: 10; /* Ensure map is above title */
+}
+
+

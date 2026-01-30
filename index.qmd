@@ -1,8 +1,9 @@
 ---
-title: "Salmon resource predictions"
+title: "NL Salmon resource predictions"
 theme: sandstone
 format:
   html:
+    css: styles.css
     grid:
       sidebar-width: 10px
       margin-width: 10px
@@ -13,7 +14,7 @@ date-format: "DD/MM/YY"
 
 :::: {.columns}
 
-::: {.column width="35%"}
+::: {.column width="40%"}
 Project description paragraph..... 
 
 
@@ -96,7 +97,7 @@ graph <- graph_from_adj_list(neighbors)
 colors <- greedy_vertex_coloring(graph)
 watersheds$color_id <- as.factor(colors)
 
-pal <- colorFactor(palette = c("#caf0f8", "#90e0ef",  "#1f78b4", "#031D5E"), domain = watersheds$color_id)
+pal <- colorFactor(palette = c("#caf0f8", "#90e0ef",  "#236D9E", "#031D5E"), domain = watersheds$color_id)
 
 ```
   
@@ -111,20 +112,20 @@ pal <- colorFactor(palette = c("#caf0f8", "#90e0ef",  "#1f78b4", "#031D5E"), dom
   
 ```
 
-::: {.column width="63%"}
+::: {.column width="58%"}
 
 ```{r, map}
 #| echo: false
 #| warning: false
   
-NL_map <- leaflet(width = 1900, height = 2150) |> 
+NL_map <- leaflet(height = "85vh", width = "54vw", options = leafletOptions(zoomSnap = 0.25)) |> 
       addProviderTiles('Esri.WorldImagery') |> # adds base map
 
       # open map to this screen
-      setView(-56.65499, 49.15, zoom = 7) |> 
+      setView(-56, 49.25, zoom = 6.75) |> 
   
       #can recenter to that location by clicking button
-      addHomeButton(ext = c(-60,48, -52, 50), position = "topleft", group = "Recenter") |> 
+      addHomeButton(ext = c(-63, 46, -49, 52), position = "topleft", group = "Recenter") |> 
       # create layers to add vectors to
       addMapPane("drainage", zIndex = 410) |> 
       
@@ -139,3 +140,5 @@ NL_map <- leaflet(width = 1900, height = 2150) |>
 
 NL_map
 ```
+:::
+:::

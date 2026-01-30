@@ -4,13 +4,18 @@ engine: knitr
 theme: sandstone
 format: 
   live-html:
+    css: styles.css
     grid: 
-      body-width: 3000px
+      sidebar-width: 10px
+      margin-width: 10px
+      body-width: 1900px
 execute:
   echo: false
   warning: false
   error: false
 ---
+
+
 {{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
 Set the below variable values to see predictions of several response variables shown in the bar graph
 ```{r, load}
@@ -52,7 +57,6 @@ function negativetozero(equation) {
 
 ```
 
-
 ::: {.panel-tabset}
 
 ## Invertebrate, periphyton and juvenile salmon estimates
@@ -60,7 +64,6 @@ function negativetozero(equation) {
 ```{ojs}
 //| echo: false
 //| panel: sidebar
-
 // sliders for predictor variables
 
 // example: periphyton biomass (mean - 1 outlier)
@@ -233,7 +236,7 @@ Plot.plot({
   y: {domain: [0,10], axis: null},
   x: {label: null},
   marks:[
-    Plot.axisX({fontSize: 18}), 
+    Plot.axisX({fontSize: 20}), 
     Plot.barY(predictions_ps,
      {x: "response_type",
      y: "response_predict",
