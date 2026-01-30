@@ -194,8 +194,6 @@ rocky_map
 ```
 
 \
-HydroATLAS data:
-
 [Download the Rocky River HydroATLAS data shapefile](https://github.com/emmwilson/NL_watersheds/blob/0d9a7a8e31f9d6fc5a61aac211dbf85ce949138c/data/spatial%20data/rocky_hydroatlas.shp?raw=true)
 
 Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6
