@@ -432,5 +432,19 @@
     "title": "Salmon resource predictions",
     "section": "",
     "text": "&lt;!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’&gt;     dataset\n\n\n       GEOGCRS[“WGS 84”,ENSEMBLE[“World Geodetic System 1984 ensemble”,MEMBER[“World Geodetic System 1984 (Transit)”],MEMBER[“World Geodetic System 1984 (G730)”],MEMBER[“World Geodetic System 1984 (G873)”],MEMBER[“World Geodetic System 1984 (G1150)”],MEMBER[“World Geodetic System 1984 (G1674)”],MEMBER[“World Geodetic System 1984 (G1762)”],MEMBER[“World Geodetic System 1984 (G2139)”],MEMBER[“World Geodetic System 1984 (G2296)”],ELLIPSOID[“WGS 84”,6378137,298.257223563,LENGTHUNIT[“metre”,1]],ENSEMBLEACCURACY[2.0]],PRIMEM[“Greenwich”,0,ANGLEUNIT[“degree”,0.0174532925199433]],CS[ellipsoidal,2],AXIS[“geodetic latitude (Lat)”,north,ORDER[1],ANGLEUNIT[“degree”,0.0174532925199433]],AXIS[“geodetic longitude (Lon)”,east,ORDER[2],ANGLEUNIT[“degree”,0.0174532925199433]],USAGE[SCOPE[“Horizontal component of 3D system.”],AREA[“World.”],BBOX[-90,-180,90,180]],ID[“EPSG”,4326]] +proj=longlat +datum=WGS84 +no_defs 3452 4326 EPSG:4326 WGS 84 longlat EPSG:7030 true"
+  },
+  {
+    "objectID": "Exploits_map copy.html",
+    "href": "Exploits_map copy.html",
+    "title": "Exploits River watershed predictions",
+    "section": "",
+    "text": "Field data predictionsHydroATLAs predictions\n\n\n  Example predictions of gravel size based on field data and underlying data.\n  Click on a reach that has been sampled (highlighted based on legends) to see the predictions and underlying characteristics. Link to download shapefile is below map.\n\n\n\n\n\n\n\nClick here to download the Exploits River field data shapefile\n\n\n\n\n\n  HydroATLAS data that can be used in gravel models to estimate gravel with the proper size for salmon spawning. Includes example predictions of gravel size.\n  Click on a reach to see the data for each segment. Link to download shapefile is below map.\n\n\n\n\n\n\n\nClick here to download the Exploits River HydroATLAS data shapefile\nHydroATLAS data:\nLinke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6\nLehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z"
+  },
+  {
+    "objectID": "Example_map .html",
+    "href": "Example_map .html",
+    "title": "Rocky River watershed predictions",
+    "section": "",
+    "text": "HydroATLAS data that can be used in gravel models to estimate gravel with the proper size for salmon spawning. Includes example predictions of gravel size. Click on a reach to see the data for each segment. Link to download shapefiles is below map.\n\n\n\n\n\n\n\n\nClick here to download the Rocky River HydroATLAS data shapefile\nLinke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6\nLehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z"
   }
 ]
