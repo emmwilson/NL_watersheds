@@ -11,7 +11,7 @@ format:
 ---
 
 HydroATLAS data that can be used in gravel models to estimate gravel with the proper size for salmon spawning. Includes example predictions of gravel size.  
-Click on a reach to see the data for each segment. Links to download shapefiles are below map. 
+Click on a reach to see the data for each segment. Link to download shapefile is [below map](#bottom). 
 
 ::: {.column-screen}
 ```{r, library}
@@ -31,7 +31,8 @@ pacman::p_load(shiny,
                htmltools,
                glue,
                cowplot,
-               leaflegend)
+               leaflegend,
+               smoothr)
 ```
 
 ```{r, import}
@@ -49,7 +50,10 @@ pacman::p_load(shiny,
   TN_lakes <- vect("data/spatial data/Terranova_lakes.shp") |>  
     project("EPSG:4326 - WGS 84")
   
-  
+  ## shape of NL
+  NL <- vect("data/spatial data/NL_boundaries.shp") |>  
+    project("EPSG:4326 - WGS 84")  
+
   # import arrow
 arrow <- "https://cdn.pixabay.com/photo/2013/07/12/17/54/arrow-152596_960_720.png"
 ```
@@ -106,10 +110,10 @@ TN_river$D50 <- (TN_river$tb/((ps-p)*g*t))*1000
  D50.pal <- colorNumeric(c("#e9c602","#e9c602", "#e9c602","#FD602F"), domain = c(0,16,64,640), na.color = "transparent")
  
 D50.col <-  D50.pal(TN_river$D50)
-D50.col[TN_river$D50 >= 16 & TN_river$D50 <= 64] <- "#0E7329"
+D50.col[TN_river$D50 >= 16 & TN_river$D50 <= 64] <- "#00D458"
 
 D50.col.leg <- D50.pal(seq(0, 640, by = 16))
-D50.col.leg[seq(0, 640, by = 16) >= 16 & seq(0, 640, by = 16) <= 64] <- "#0E7329"
+D50.col.leg[seq(0, 640, by = 16) >= 16 & seq(0, 640, by = 16) <= 64] <- "#00D458"
 
 D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,640), na.color = "transparent")
 ```
@@ -118,17 +122,19 @@ D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,640), na.color = "tra
 #| include: false
 # adds information to popups for each reach wehn it is selected
 
-  label_text <- glue("<b><u>{'Stream info:'}</u></b> <br/>",
-"<b>Segment discharge: </b> {TN_river$DIS_AV_CMS}<br/>",
-"<b>Segment width: </b> {TN_river$width}<br/>",
-"<b>Segment gradient: </b> {TN_river$sgr_dk_rav}<br/>",
-"<b>Segment D50: </b> {TN_river$D50}<br/>") |> 
+  label_text <- glue("<b><u>{'River segment:'}</u></b> <br/>",
+"<b>Predicted gravel size (D50): </b> {TN_river$D50}<br/>",
+"<b>Discharge: </b> {TN_river$DIS_AV_CMS}<br/>",
+"<b>Width: </b> {TN_river$width}<br/>",
+"<b>Gradient: </b> {TN_river$sgr_dk_rav}<br/>") |> 
  
   lapply(htmltools::HTML)
+
 ```
 
 ```{r, map}
 #| echo: false
+#| warning: false
 
 TN_map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSnap = 0.25)) |> 
       addProviderTiles('Esri.WorldImagery') |> # adds base map
@@ -138,38 +144,41 @@ TN_map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoo
       #can recenter to that location by clicking button
       addHomeButton(ext = c(-55.13126, 48.45, -54.02385, 48.1), position = "topleft", group = "Recenter") |> 
       # create layers to add vectors to
+      addMapPane("NL", zIndex = 400) |> 
       addMapPane("drainage", zIndex = 410) |> 
       addMapPane("river", zIndex = 415) |> 
       addMapPane("data_D50", zIndex = 450) |> 
       addMapPane("data_disch", zIndex = 445) |> 
       addMapPane("data_width", zIndex = 440) |> 
       addMapPane("data_grad", zIndex = 435) |>
-      addMapPane("lakes", zIndex = 455) |>
+      addMapPane("lakes", zIndex = 420) |>
       # add polygons and lines
+      addPolygons(data = NL, color = "#82797F", weight = 1.5, fillColor = "#82797F", fillOpacity = 0.4, options = pathOptions(pane = "NL")) |> ## need a new NL file
+  
       ## exploits drainage area
-      addPolygons(data = TN_drainage, color = "#236D9E", weight = 1.5, fillColor = "#236D9E", fillOpacity = 0.2, options = pathOptions(pane = "drainage")) |>
+      addPolygons(data = smooth(TN_drainage, method = "ksmooth", smoothness = 0.5), color = "#236D9E", weight = 1.5, fillColor = "#236D9E", fillOpacity = 0.2, options = pathOptions(pane = "drainage")) |>
   
       ## rivers of the rocky
-      addPolylines(data = TN_river, color = "#236D9E", weight = 3/TN_river$ORD_CLAS, options = pathOptions(pane = "river"), group = "TN", opacity = 0.8) |>
+      addPolylines(data = smooth(TN_river, method = "ksmooth", smoothness = 0.5), color = "#236D9E", weight = 4/(TN_river$ORD_CLAS+1), options = pathOptions(pane = "river"), group = "TN", opacity = 0.8) |>
 
       ### D50
-      addPolylines(data = TN_river, color = D50.col, weight = 3/TN_river$ORD_CLAS, opacity = 1, options = pathOptions(pane = "data_D50"), group = "D50", popup = ~label_text) |>
+      addPolylines(data = smooth(TN_river, method = "ksmooth", smoothness = 0.5), color = D50.col, weight = 4/(TN_river$ORD_CLAS+1), opacity = 1, options = pathOptions(pane = "data_D50"), group = "D50", popup = ~label_text, smoothFactor = 0.5) |>
       addLegendNumeric(pal = D50.pal.leg, values = TN_river$D50, title = "D50 gravel size (mm)", position = 'topright', group = "D50", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE, height = 150, width = 20 ) |> 
   
       ### discharge
-      addPolylines(data = TN_river, color = ~discharge.pal(TN_river$DIS_AV_CMS), weight = 3/TN_river$ORD_CLAS, opacity = 1, options = pathOptions(pane = "data_disch"), group = "Discharge", popup = ~label_text) |>
+      addPolylines(data = smooth(TN_river, method = "ksmooth", smoothness = 0.5), color = ~discharge.pal(TN_river$DIS_AV_CMS), weight = 4/(TN_river$ORD_CLAS+1), opacity = 1, options = pathOptions(pane = "data_disch"), group = "Discharge", popup = ~label_text) |>
         addLegendNumeric(pal = discharge.pal.leg, values = TN_river$DIS_AV_CMS, title = htmltools::HTML("Discharge (m<sup>3</sup>/s)"),position = 'topright', group = "Discharge", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE , height = 150, width = 20 ) |> 
   
       ### width
-      addPolylines(data = TN_river, color = ~width.pal(TN_river$width), weight = 3/TN_river$ORD_CLAS, opacity = 1, options = pathOptions(pane = "data_width"), group = "Width", popup = ~label_text) |>
+      addPolylines(data = smooth(TN_river, method = "ksmooth", smoothness = 0.5), color = ~width.pal(TN_river$width), weight = 4/(TN_river$ORD_CLAS+1), opacity = 1, options = pathOptions(pane = "data_width"), group = "Width", popup = ~label_text) |>
           addLegendNumeric(pal = width.pal.leg, values = TN_river$width, title = "Stream width (m)",position = 'topright', group = "Width", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE, height = 150, width = 20 ) |> 
   
       ### gradient
-      addPolylines(data = TN_river, color = ~gradient.pal(TN_river$sgr_dk_rav/10000), weight = 3/TN_river$ORD_CLAS, opacity = 1, options = pathOptions(pane = "data_grad"), group = "Gradient", popup = ~label_text) |>
+      addPolylines(data = smooth(TN_river, method = "ksmooth", smoothness = 0.5), color = ~gradient.pal(TN_river$sgr_dk_rav/10000), weight = 4/(TN_river$ORD_CLAS+1), opacity = 1, options = pathOptions(pane = "data_grad"), group = "Gradient", popup = ~label_text) |>
           addLegendNumeric(pal = gradient.pal.leg, values = TN_river$sgr_dk_rav/10000, title = "Stream gradient",position = 'topright', group = "Gradient", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE, height = 150, width = 20 ) |> 
 
       ## lakes of the exploits
-      addPolygons(data = TN_lakes, color = "#236D9E", stroke = FALSE,  options = pathOptions(pane = "lakes"), group = "TN", fillOpacity = 0.9) |>
+      addPolygons(data = smooth(TN_lakes, method = "ksmooth", smoothness = 0.5), color = "#242B42", stroke = FALSE,  options = pathOptions(pane = "lakes"), group = "TN", fillOpacity = 0.9) |>
   
       # ability to choose which predictions to see
       addLayersControl(overlayGroups = c("D50", "Discharge", "Width", "Gradient"), position = "topleft", options = layersControlOptions(collapsed = F, autoZIndex = TRUE)) |>
@@ -181,9 +190,10 @@ TN_map
 ```
 
 \
-[Download the Terra Nova River HydroATLAS data shapefile](https://github.com/emmwilson/NL_watersheds/blob/0d9a7a8e31f9d6fc5a61aac211dbf85ce949138c/data/spatial%20data/Terranova_rivers.shp?raw=true)
+[Click here to download the Terra Nova River HydroATLAS data shapefile](https://github.com/emmwilson/NL_watersheds/blob/0d9a7a8e31f9d6fc5a61aac211dbf85ce949138c/data/spatial%20data/Terranova_rivers.shp?raw=true)
 
-Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6
-
+Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6  
 Lehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z
+
+<div id="bottom"></div>
 :::
