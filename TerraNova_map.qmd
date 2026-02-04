@@ -153,10 +153,10 @@ TN_map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoo
       addMapPane("data_grad", zIndex = 435) |>
       addMapPane("lakes", zIndex = 420) |>
       # add polygons and lines
-      addPolygons(data = NL, color = "#82797F", weight = 1.5, fillColor = "#82797F", fillOpacity = 0.4, options = pathOptions(pane = "NL")) |> ## need a new NL file
+      addPolygons(data = NL, color = "#ADA1A1", weight = 1.5, fillColor = "#ADA1A1", fillOpacity = 0.35, options = pathOptions(pane = "NL")) |> ## need a new NL file
   
       ## exploits drainage area
-      addPolygons(data = smooth(TN_drainage, method = "ksmooth", smoothness = 0.5), color = "#236D9E", weight = 1.5, fillColor = "#236D9E", fillOpacity = 0.2, options = pathOptions(pane = "drainage")) |>
+      addPolygons(data = smooth(TN_drainage, method = "ksmooth", smoothness = 0.5), color = "#32B1DB", opacity = 0.4, weight = 1.25, fillColor = "#236D9E", fillOpacity = 0.3, options = pathOptions(pane = "drainage")) |>
   
       ## rivers of the rocky
       addPolylines(data = smooth(TN_river, method = "ksmooth", smoothness = 0.5), color = "#236D9E", weight = 4/(TN_river$ORD_CLAS+1), options = pathOptions(pane = "river"), group = "TN", opacity = 0.8) |>

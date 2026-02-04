@@ -50,7 +50,9 @@ pacman::p_load(shiny,
                htmltools,
                glue,
                cowplot,
-               igraph )
+               igraph,
+               magick,
+               png)
 
 ```
 
@@ -58,28 +60,31 @@ pacman::p_load(shiny,
 #| include: false
 # import layers
   ## river extent
-  exploits_watersheds <- vect("data/spatial data/exploits_watershed.shp") |>  
-    project("EPSG:4326 - WGS 84")
-  
-exploits_watersheds[["html"]] <- "Exploits_map.html"
-exploits_watersheds[["ws"]] <- "Exploits River Watershed"
-  
-  rocky_watershed <- vect("data/spatial data/rocky_watershed.shp") |> 
-    project("EPSG:4326 - WGS 84")
-  
-rocky_watershed[["html"]] <- "Rocky_map.html" # eventually wtaersheds will come from same file which will already have html links
-rocky_watershed[["ws"]] <- "Rocky River Watershed"
+#   exploits_watersheds <- vect("data/spatial data/exploits_watershed.shp") |>  
+#     project("EPSG:4326 - WGS 84")
+#   
+# exploits_watersheds[["html"]] <- "Exploits_map.html"
+# exploits_watersheds[["ws"]] <- "Exploits River Watershed"
+#   
+#   rocky_watershed <- vect("data/spatial data/rocky_watershed.shp") |> 
+#     project("EPSG:4326 - WGS 84")
+#   
+# rocky_watershed[["html"]] <- "Rocky_map.html" # eventually wtaersheds will come from same file which will already have html links
+# rocky_watershed[["ws"]] <- "Rocky River Watershed"
+# 
+#   TN_watershed <- vect("data/spatial data/Terranova_basin.shp") |>  
+#     project("EPSG:4326 - WGS 84")
+#   
+# TN_watershed[["html"]] <- "TerraNova_map.html" # eventually wtaersheds will come from same file which will already have html links
+# TN_watershed[["ws"]] <- "Terra Nova River Watershed"
+# 
+# 
+# watersheds <- rbind(exploits_watersheds, rocky_watershed, TN_watershed)
 
-  TN_watershed <- vect("data/spatial data/Terranova_basin.shp") |>  
-    project("EPSG:4326 - WGS 84")
-  
-TN_watershed[["html"]] <- "TerraNova_map.html" # eventually wtaersheds will come from same file which will already have html links
-TN_watershed[["ws"]] <- "Terra Nova River Watershed"
+watersheds <- vect("data/spatial data/NL_subsubbasins.shp") |>  
+     project("EPSG:4326 - WGS 84") 
 
 
-watersheds <- rbind(exploits_watersheds, rocky_watershed, TN_watershed)
-
-  
   # import arrow
 arrow <- "https://cdn.pixabay.com/photo/2013/07/12/17/54/arrow-152596_960_720.png"
 ```
@@ -97,7 +102,7 @@ graph <- graph_from_adj_list(neighbors)
 colors <- greedy_vertex_coloring(graph)
 watersheds$color_id <- as.factor(colors)
 
-pal <- colorFactor(palette = c("#caf0f8", "#90e0ef",  "#236D9E", "#031D5E"), domain = watersheds$color_id)
+pal <- colorFactor(palette = c("#32B1DB","#007BBD"), domain = watersheds$color_id)
 
 ```
   
@@ -131,7 +136,7 @@ NL_map <- leaflet(height = "85vh", width = "54vw", options = leafletOptions(zoom
       
       # add polygons and lines
       ## exploits drainage area
-      addPolygons(data = watersheds, color = ~pal(color_id), weight = 1.5, fillColor = ~pal(color_id), fillOpacity = 0.3, options = pathOptions(pane = "drainage"), popup = ~label_text, highlightOptions = highlightOptions(
+      addPolygons(data = watersheds, color = ~pal(color_id), weight = 1, fillColor = ~pal(color_id), opacity = 0.7, fillOpacity = 0.3, options = pathOptions(pane = "drainage"), popup = ~label_text, highlightOptions = highlightOptions(
                 color =  ~pal(color_id), weight = 1.5, fillOpacity = 0.5,
                 bringToFront = TRUE, sendToBack = TRUE))  |>
   

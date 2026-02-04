@@ -443,8 +443,29 @@
   {
     "objectID": "Example_map .html",
     "href": "Example_map .html",
-    "title": "Rocky River watershed predictions",
+    "title": "Example watershed predictions",
     "section": "",
-    "text": "HydroATLAS data that can be used in gravel models to estimate gravel with the proper size for salmon spawning. Includes example predictions of gravel size. Click on a reach to see the data for each segment. Link to download shapefiles is below map.\n\n\n\n\n\n\n\n\nClick here to download the Rocky River HydroATLAS data shapefile\nLinke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6\nLehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z"
+    "text": "HydroATLAS data that can be used in gravel models to estimate gravel with the proper size for salmon spawning. Includes example predictions of gravel size. Click on a reach to see the data for each segment. Link to download shapefiles is below map.\n\n\n\nfunction (.x, .f, ..., .progress = FALSE) \n{\n    map_(\"list\", .x, .f, ..., .progress = .progress)\n}\n&lt;bytecode: 0x7fef3785b318&gt;\n&lt;environment: namespace:purrr&gt;\n\n\n\n\nLinke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6\nLehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z"
+  },
+  {
+    "objectID": "Example_map.html",
+    "href": "Example_map.html",
+    "title": "Annotated example watershed predictions",
+    "section": "",
+    "text": "HydroATLAS data that can be used in gravel models to estimate gravel with the proper size for salmon spawning. Includes example predictions of gravel size. Click on a reach to see the data for each segment.\n\n\n\n\n\n\n\n\n\nLinke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6\nLehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z"
+  },
+  {
+    "objectID": "data/spatial data/NL_subsubbasins.html",
+    "href": "data/spatial data/NL_subsubbasins.html",
+    "title": "NL Salmon resource predictions",
+    "section": "",
+    "text": "&lt;!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’&gt;     \n\n\n         0 0     false"
+  },
+  {
+    "objectID": "param_maps.html",
+    "href": "param_maps.html",
+    "title": "Annotated example watershed predictions",
+    "section": "",
+    "text": "HydroATLAS data that can be used in gravel models to estimate gravel with the proper size for salmon spawning. Includes example predictions of gravel size. Click on a reach to see the data for each segment.\n\n\n\n\n\n\n\n\n\nLinke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6\nLehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z"
   }
 ]

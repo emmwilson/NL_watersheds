@@ -157,8 +157,9 @@ rocky_map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(
       
       addPolygons(data = NL, color = "#82797F", weight = 1.5, fillColor = "#82797F", fillOpacity = 0.5, options = pathOptions(pane = "NL")) |> ## need a new NL file
       # add polygons and lines
+  
       ## exploits drainage area
-      addPolygons(data = rocky_drainage, color = "#236D9E", weight = 1.25, fillColor = "#236D9E", fillOpacity = 0.2, options = pathOptions(pane = "drainage")) |>
+      addPolygons(data = rocky_drainage, color = "#236D9E", weight = 1.25, fillColor = "#236D9E", opacity = 0.4, fillOpacity = 0.3, options = pathOptions(pane = "drainage")) |>
   
       ## rivers of the rocky
       addPolylines(data = smooth(rocky_river, method = "ksmooth", smoothness = 0.5), color = "#236D9E", weight = 3/rocky_river$ORD_CLAS, options = pathOptions(pane = "river"), group = "exploits", opacity = 0.8) |>
