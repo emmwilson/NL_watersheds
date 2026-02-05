@@ -61,7 +61,7 @@ img[src*=".png"] {
   width: 300px;
   height: 70vh;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   align-content: stretch;
   justify-content: flex-start;
   flex-direction: column;
