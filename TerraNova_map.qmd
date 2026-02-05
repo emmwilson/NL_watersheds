@@ -184,7 +184,7 @@ TN_map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoo
       addLayersControl(overlayGroups = c("D50", "Discharge", "Width", "Gradient"), position = "topleft", options = layersControlOptions(collapsed = F, autoZIndex = TRUE)) |>
   
   addScaleBar(position = "bottomleft") |> 
-  addLogo(arrow)
+  addLogo(arrow, position = "bottomleft", offset.x = 2, offset.y = 40)
 
 TN_map
 ```

@@ -62,10 +62,10 @@ img[src*=".png"] {
   height: 70vh;
   display: flex;
   align-items: flex-end;
-  align-items: stretch;
+  align-content: stretch;
   justify-content: flex-start;
   flex-direction: column;
-  flex-wrap: wrap;
+  flex-wrap: wrap-reverse;
 }
 
 .info.legend.leaflet-control.leaflegend-group-D50 {

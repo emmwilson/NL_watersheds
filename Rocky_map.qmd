@@ -193,7 +193,7 @@ rocky_map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(
       # ability to choose which layers to see
       addLayersControl(overlayGroups = c("D50", "Discharge", "Width", "Gradient"), position = "topleft", options = layersControlOptions(collapsed = F, autoZIndex = TRUE)) |>
   addScaleBar(position = "bottomleft") |> 
-  addLogo(arrow)
+  addLogo(arrow, position = "bottomleft", offset.x = 2, offset.y = 40)
   
 
 rocky_map
