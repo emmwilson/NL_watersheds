@@ -51,8 +51,7 @@ pacman::p_load(shiny,
                glue,
                cowplot,
                igraph,
-               magick,
-               png)
+               tidyterra)
 
 ```
 
@@ -82,7 +81,8 @@ pacman::p_load(shiny,
 # watersheds <- rbind(exploits_watersheds, rocky_watershed, TN_watershed)
 
 watersheds <- vect("data/spatial data/NL_subsubbasins.shp") |>  
-     project("EPSG:4326 - WGS 84") 
+    project("EPSG:4326 - WGS 84") |> 
+    tidyterra::mutate(html = paste0("map_", watershed, ".html"))
 
 
   # import arrow
@@ -111,7 +111,7 @@ pal <- colorFactor(palette = c("#32B1DB","#007BBD"), domain = watersheds$color_i
 #| include: false
 # adds information to popups for each reach wehn it is selected
 
-  label_text <- glue('<a href={watersheds$html}><b>{watersheds$ws}</b></a>')|> 
+  label_text <- glue('<a href={watersheds$html}> <b>{watersheds$watershed}</b></a>')|> 
  
   lapply(htmltools::HTML) 
   

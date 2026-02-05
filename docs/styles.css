@@ -43,35 +43,13 @@
   z-index: 10; /* Ensure map is above title */
 }
 
-.info.legend.leaflet-control.leaflegend-group-D50 {
-  margin-right: 150px;
-}
-
-.info.legend.leaflet-control.leaflegend-group-Discharge  {
-  margin-right: 10px;
-  margin-top: -194px;
-  position: static;
-  width: 130px;
-}
-
-.info.legend.leaflet-control.leaflegend-group-Width {
-  margin-right: 150px;
-  margin-top: 10px;
-}
-
-.info.legend.leaflet-control.leaflegend-group-Gradient {
-  margin-right: 10px;
-  margin-top: -194px;
-  width: 130px;
-}
-
 img[src*=".png"] {
   width: 40px;
   height: 55px;
   border-radius: 5px;
   padding: 6px 6px 6px 6px;
   color: #333;
-  background: #fff;
+  background: rgba(255,255,255,0.5);
   margin-top: 2px;
   margin-left:2px;
   border: 2px solid rgba(0,0,0,0.2);
@@ -79,5 +57,30 @@ img[src*=".png"] {
 }
 
 
-   
+.leaflet-control-container .leaflet-top.leaflet-right{
+  width: 300px;
+  height: 70vh;
+  display: flex;
+  align-items: flex-end;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.info.legend.leaflet-control.leaflegend-group-D50 {
+  width: 45%;
+}
+
+.info.legend.leaflet-control.leaflegend-group-Width {
+  width: 45%;
+}
+
+.info.legend.leaflet-control.leaflegend-group-Discharge {
+  width: 45%;
+}
+
+.info.legend.leaflet-control.leaflegend-group-Gradient {
+  width: 45%;
+}
 

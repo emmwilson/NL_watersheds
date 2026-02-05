@@ -107,7 +107,7 @@ TN_river$D50 <- (TN_river$tb/((ps-p)*g*t))*1000
 
   # colour palette for D50, with 16-64 green
   
- D50.pal <- colorNumeric(c("#e9c602","#e9c602", "#e9c602","#FD602F"), domain = c(0,16,64,640), na.color = "transparent")
+ D50.pal <- colorNumeric(c("#e9c602","#e9c602", "#e9c602","#FD602F"), domain = c(0,16,64,ceiling(max(TN_river$D50)/16)*16), na.color = "transparent")
  
 D50.col <-  D50.pal(TN_river$D50)
 D50.col[TN_river$D50 >= 16 & TN_river$D50 <= 64] <- "#00D458"
