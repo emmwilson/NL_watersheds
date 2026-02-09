@@ -1,5 +1,5 @@
 ---
-title: "Annotated example watershed predictions"
+title: "`r params$watershed` watershed predictions"
 theme: sandstone
 params:
     watershed: "Gander"
@@ -15,7 +15,7 @@ engine: knitr
 
 
 HydroATLAS data that can be used in gravel models to estimate gravel with the proper size for salmon spawning. Includes example predictions of gravel size.
-Click on a reach to see the data for each segment. 
+Click on a reach to see the data for each segment. Link to download shapefiles is [below map](#bottom).
 
 ::: {.column-screen}
 ```{r, library}

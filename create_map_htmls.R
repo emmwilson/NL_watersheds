@@ -1,13 +1,18 @@
 pacman::p_load(shiny,
                tidyverse,
-               quarto)
+               quarto,
+               terra,
+               purrr,
+               glue)
 
 watersheds <- vect("data/spatial data/NL_subsubbasins.shp") |>  
   project("EPSG:4326 - WGS 84") 
 
-watershed_df <- data.frame(output_format = "html",
-                   output_file = paste0("map_", watersheds$watershed, ".html"),
-                   execute_params = paste0('watershed = "', watersheds$watershed, '"'))
+watershed_df <- tibble(
+  output_format = "html",
+  output_file = paste0("map_", gsub(" ", "%20", watersheds$watershed), ".html"),
+  execute_params = map(watersheds$watershed, ~list(watershed = .x))
+)
 
 
 purrr::pwalk(
@@ -17,11 +22,11 @@ purrr::pwalk(
   .progress = TRUE              # Optionally, show a progress bar
 )
 
-quarto::quarto_render(
-  input = "param_maps.qmd",
-  execute_params = list(
-    watershed = "Gander"
-  ),
-  output_file = "map_Gander.html",
-  output_format = "html"
-)
+# quarto::quarto_render(
+#   input = "param_maps.qmd",
+#   execute_params = list(
+#     watershed = "Gander"
+#   ),
+#   output_file = "map_Gander.html",
+#   output_format = "html"
+# )

@@ -82,7 +82,7 @@ pacman::p_load(shiny,
 
 watersheds <- vect("data/spatial data/NL_subsubbasins.shp") |>  
     project("EPSG:4326 - WGS 84") |> 
-    tidyterra::mutate(html = paste0("map_", watershed, ".html"))
+    tidyterra::mutate(html = paste0("map_", gsub(" ", "%20", watershed), ".html"))
 
 
   # import arrow
