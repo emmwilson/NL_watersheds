@@ -10,7 +10,7 @@ watersheds <- vect("data/spatial data/NL_subsubbasins.shp") |>
 
 watershed_df <- tibble(
   output_format = "html",
-  output_file = paste0("map_", gsub(" ", "%20", watersheds$watershed), ".html"),
+  output_file = paste0("map_", watersheds$watershed, ".html"),
   execute_params = map(watersheds$watershed, ~list(watershed = .x))
 )
 
