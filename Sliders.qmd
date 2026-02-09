@@ -70,81 +70,29 @@ function negativetozero(equation) {
 viewof peri = {
   const form = Inputs.range(
   [0, 0.5], 
-  {value: 0.25, step: (0.5)/100, label: "Periphyton biomass (units):"}
+  {value: 0.25, step: (0.5)/100, label: "Periphyton density (μg cm⁻²):"}
 );
-  form.range.style.cssText += "accent-color: #1f78b4";
+  form.range.style.cssText += "accent-color: #1f78b4; width: 500px";
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
-  return form;
-}
-
-
-//Inputs.range(
- // [0, 0.5], 
- // {value: 0.25, step: (0.5)/100, label: "Periphyton biomass (units):"}
-//);
-// example: Water temp
-viewof temp = {
-  const form = Inputs.range(
-  [10, 40], 
-  {value: 10, step: (40-10)/100, label: "Water temperature (c):"}
-);
-  form.range.style.cssText += "accent-color: #1f78b4";
-  form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
-  return form;
-}
-
-// example: Wetted width
-viewof wwidth = {
-  const form = Inputs.range(
-  [0, 40], 
-  {value: 10, step: 40/100, label: "Wetted width (m):"}
-);
-  form.range.style.cssText += "accent-color: #1f78b4";
-  form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
-  return form;
-}
-
-// example:Flow
-viewof flow = {
-  const form = Inputs.range(
-  [0, 4], 
-  {value: 0.05, step: 4/100, label: "Flow (ft/s):"}
-);
-  form.range.style.cssText += "accent-color: #1f78b4";
-  form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
-  return form;
-}
-
-// example: invbio
-viewof invbio = {
-  const form = Inputs.range(
-  [0, 4000], 
-  {value: 2000, step: 4000/100, label: "Invertebrate density (units):"}
-);
-  form.range.style.cssText += "accent-color: #1f78b4";
-  form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
+    
+  const label = form.querySelector("label");
+  label.style.cssText += "width: 100%";
+  
   return form;
 }
 
 // example: EPT
 viewof EPT = {
   const form = Inputs.range(
-  [0, 0.5], 
-  {value: 0.25, step: 0.5/100, label: "EPT (units):"}
+  [0, 60], 
+  {value: 30, step: 60/100, label: "Density of Ephemeroptera, Plecoptera, and Trichoptera (g m⁻²):"}
 );
-  form.range.style.cssText += "accent-color: #1f78b4";
+  form.range.style.cssText += "accent-color: #1f78b4; width: 500px";
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
-  return form;
-}
+  
+  const label = form.querySelector("label");
+  label.style.cssText += "width: 100%; margin-top: 10px";
 
-// example: pH
-viewof pH = {
-  const form = Inputs.range(
-  [5, 8], 
-  {value: 2, step: (8-5)/100, label: "pH:"}
-);
-  form.range.style.cssText += "accent-color: #1f78b4";
-  form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
   return form;
 }
 
@@ -157,64 +105,59 @@ viewof pH = {
 //| panel: fill
 
 // prediction functions
-function invertbiomass(peri, temp, wwidth, flow) {
-  return negativetozero(0+4.773*peri+0.072*temp-0.084*wwidth-4.291*flow)
+function invertbiomass(peri) {
+  return negativetozero(1.133+5.50*peri)
 }
 
-function peribiomass(invbio, EPT, pH) {
-  return negativetozero(0.034 + 0.0000117984*invbio + 0.023*EPT + 0.020*pH) 
+function peribiomass(EPT) {
+  return negativetozero(0.01 + 0.08*EPT) 
 }
 
 // error bar functions
-function inverthigh(peri, temp, wwidth, flow) {
-  return negativetozero(0+0.274+(4.773+3.379)*peri+(0.072+0.07)*temp-(0.084-0.036)*wwidth-(4.291-3.920)*flow)
+function inverthigh(peri) {
+  return negativetozero(1.133+0.19+(5.50+1.89)*peri)
 }
 
-function invertlow(peri, temp, wwidth, flow) {
-  return negativetozero(0-0.274+(4.773-3.379)*peri+(0.072-0.07)*temp-(0.084+0.036)*wwidth-(4.291+3.920)*flow)
+function invertlow(peri) {
+  return negativetozero(1.133-0.19+(5.50-1.89)*peri)
 }
 
-function perihigh(invbio, EPT, pH) {
-  return negativetozero((0.034+0.006) + (0.0000117984+0.0000080939)*invbio + (0.023+0.009)*EPT + (0.020+0.016)*pH) 
+function perihigh(EPT) {
+  return negativetozero((0.01+0.02)  + (0.08+0.02)*EPT) 
 }
 
-function perilow(invbio, EPT, pH) {
-  return negativetozero((0.034-0.006) + (0.0000117984-0.0000080939)*invbio + (0.023-0.009)*EPT + (0.020-0.016)*pH) 
+function perilow(EPT) {
+  return negativetozero((0.01-0.02) + (0.08-0.02)*EPT) 
 }
 
 
 // function that takes input from sliders and creates prediction of each response variable
-function myFunction(peri, temp, wwidth, flow, invbio, EPT, pH) {
+function myFunction(peri, EPT) {
   return aq.table({
   'peri': [peri, peri], // repeat for each input
-  'temp': [temp, temp],
-  'wwidth': [wwidth, wwidth],
-  'flow':[flow, flow],
-  'invbio': [invbio, invbio],
   'EPT': [EPT, EPT],
-  'pH': [pH, pH],
-  'response_type': ["Invertebrate biomass (units)", 
-                    "Periphyton biomass (units)",
+  'response_type': ["Invertebrate density (g m⁻²)", 
+                    "Periphyton density (μg cm⁻²)",
                     ], // ordered alphabetically
-  'response_predict': [invertbiomass(peri, temp, wwidth, flow),
-                      peribiomass(invbio, EPT, pH) // keep label normal
+  'response_predict': [invertbiomass(peri),
+                      peribiomass(EPT) // keep label normal
                       ],
-  'response_errorhigh': [inverthigh(peri, temp, wwidth, flow) ,
-                        perihigh(invbio, EPT, pH) 
+  'response_errorhigh': [inverthigh(peri) ,
+                        perihigh(EPT) 
                         ],
-  'response_errorlow': [invertlow(peri, temp, wwidth, flow) ,
-                        perilow(invbio, EPT, pH)
+  'response_errorlow': [invertlow(peri) ,
+                        perilow(EPT)
                         ]
   })
 }
 
 // create the table
-predictions_ps = myFunction(peri, temp, wwidth, flow, invbio, EPT, pH)
+predictions_ps = myFunction(peri, EPT)
 
 // create a table that stores the image paths
 images = aq.table({
-  'response_type': ["Invertebrate biomass (units)", 
-                    "Periphyton biomass (units)",
+  'response_type': ["Invertebrate biomass (g m⁻²)", 
+                    "Periphyton biomass (μg cm⁻²)",
                     //"Invertebrate diversity", 
                     //"Par length (cm)"
                     ], // ordered alphabetically
@@ -236,12 +179,12 @@ Plot.plot({
   y: {domain: [0,10], axis: null},
   x: {label: null},
   marks:[
-    Plot.axisX({fontSize: 20}), 
+    Plot.axisX({fontSize: 25}), 
     Plot.barY(predictions_ps,
      {x: "response_type",
      y: "response_predict",
      fill: "response_type"}), // create bar graph
-    Plot.text(predictions_ps, {x: "response_type", y: "response_predict", text: "response_predict", dy: -7, dx: -200, lineAnchor: "bottom", fontSize: 25}), // write out predicted value
+    Plot.text(predictions_ps, {x: "response_type", y: "response_predict", text: "response_predict", dy: -7, dx: -200, lineAnchor: "bottom", fontSize: 30}), // write out predicted value
     Plot.ruleX(predictions_ps, {x: "response_type", y1: 'response_errorlow', y2: 'response_errorhigh', strokeWidth: 3}) // add error bars
    ]
 })
@@ -283,6 +226,10 @@ viewof DIS_AV_CMS = {
 );
   form.range.style.cssText += "accent-color: #1f78b4";
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
+    
+  const label = form.querySelector("label");
+  label.style.cssText += "width: 100%";
+
   return form;
 }
 // example: Stream width
@@ -291,8 +238,12 @@ viewof swidth = {
   [0, 100], 
   {value: 20, step: 100/100, label: "Stream width (m):"}
 );
-  form.range.style.cssText += "accent-color: #1f78b4";
+  form.range.style.cssText += "accent-color: #1f78b4; width: 500px";
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
+  
+  const label = form.querySelector("label");
+  label.style.cssText += "width: 100%; margin-top: 10px";
+
   return form;
 }
 // example: Stream gradient
@@ -301,8 +252,12 @@ viewof sgr_dk_rav = {
   [0, 0.05], 
   {value: 0.01, step: 0.05/100, label: "Stream gradient:"}
 );
-  form.range.style.cssText += "accent-color: #1f78b4";
+  form.range.style.cssText += "accent-color: #1f78b4; width: 500px";
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
+  
+  const label = form.querySelector("label");
+  label.style.cssText += "width: 100%; margin-top: 10px";
+
   return form;
 }
 // example: fish length
@@ -311,8 +266,12 @@ viewof fish = {
   [0, 2], 
   {value: 1, step: 2/100, label: "Fish length (m):"}
 );
-  form.range.style.cssText += "accent-color: #1f78b4";
+  form.range.style.cssText += "accent-color: #1f78b4; width: 500px";
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
+  
+  const label = form.querySelector("label");
+  label.style.cssText += "width: 100%; margin-top: 10px";
+
   return form;
 }
 
@@ -379,12 +338,12 @@ Plot.plot({
   y: {domain: [0, 2000], label: null},
   x: {label: null},
   marks:[
-    Plot.axisX({fontSize: 18}),
+    Plot.axisX({fontSize: 25}),
     Plot.barY(predictions_gravel,
      {x: "response_type",
      y: "response_predict",
      fill: "response_type"}), // create bar graph
-    Plot.text(predictions_gravel, {x: "response_type", y: "response_predict", text: "response_predict_label", dy: -7, dx: -200, lineAnchor: "bottom", fontSize: 25}) // write out predicted value
+    Plot.text(predictions_gravel, {x: "response_type", y: "response_predict", text: "response_predict_label", dy: -7, dx: -200, lineAnchor: "bottom", fontSize: 30}) // write out predicted value
    ]
 })
 
