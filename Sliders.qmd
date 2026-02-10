@@ -332,13 +332,13 @@ Plot.plot({
   height: Math.floor(0.45 * width),
   marginLeft: 0,
   marginRight: 0,
-  marginBottom: 50,
+  marginBottom: 70,
   color: {scheme: "dark2" ,
   legend: false},
   y: {domain: [0, 2000], label: null},
   x: {label: null},
   marks:[
-    Plot.axisX({fontSize: 25}),
+    Plot.axisX({fontSize: 25, marginBottom: 40}),
     Plot.barY(predictions_gravel,
      {x: "response_type",
      y: "response_predict",
@@ -351,6 +351,7 @@ Plot.plot({
 Plot.plot({
   width: Math.max(width, 550),
   height: Math.floor(0.1 * width),
+  marginTop: 20,
   marginLeft: 0,
   marginRight: 0,
   colour: {legend: false},
