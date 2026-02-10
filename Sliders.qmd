@@ -224,7 +224,7 @@ viewof DIS_AV_CMS = {
   [0, 300], 
   {value: 1, step: 300/1000, label: "Discharge (units):"}
 );
-  form.range.style.cssText += "accent-color: #1f78b4";
+  form.range.style.cssText += "accent-color: #1f78b4; width: 500px";
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
     
   const label = form.querySelector("label");
