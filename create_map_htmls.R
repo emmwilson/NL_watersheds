@@ -14,6 +14,7 @@ watershed_df <- tibble(
   execute_params = map(watersheds$watershed, ~list(watershed = .x))
 )
 
+# i think this may need to be rerun everytime I change things?
 
 purrr::pwalk(
   .l = watershed_df,            # Dataframe to map over
@@ -25,8 +26,8 @@ purrr::pwalk(
 # quarto::quarto_render(
 #   input = "param_maps.qmd",
 #   execute_params = list(
-#     watershed = "Gander"
+#     watershed = "Strait of Belle Isle - South Shore"
 #   ),
-#   output_file = "map_Gander.html",
+#   output_file = "map_Strait of Belle Isle - South Shore.html",
 #   output_format = "html"
 # )

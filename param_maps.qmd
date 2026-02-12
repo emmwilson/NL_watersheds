@@ -75,6 +75,9 @@ arrow <- "https://cdn.pixabay.com/photo/2013/07/12/17/54/arrow-152596_960_720.pn
 
 ```{r, predictions}
 #| include: false
+#| warning: false
+#| echo: false
+
 # use river reach data to predict outcomes
 
 # values from Ky's presentation
@@ -96,39 +99,64 @@ rivers$D50 <- (rivers$tb/((ps-p)*g*t))*1000
 
 ```{r, palettes}
 #| include: false
-  # colour palette for discharge
-  discharge.pal <- colorNumeric(c("#dfdce3", "#8900a8"), domain = rivers$DIS_AV_CMS, na.color = "transparent")
-  
-  # colour palette for legend so high numbers at top
-   discharge.pal.leg <- colorNumeric(c("#8900a8", "#dfdce3"), domain = rivers$DIS_AV_CMS, na.color = "transparent")
-  
-  # colour palette for width
-  width.pal <- colorNumeric(c("#f2ca97", "#d4021d"), domain = rivers$width, na.color = "transparent") # 
-  
-  # colour palette for legend so high numbers at top
-  width.pal.leg <- colorNumeric(c("#d4021d", "#f2ca97"), domain = rivers$width, na.color = "transparent") # 
-   
-  #width.pal <- colorFactor(c("#f2ca97", "#d4021d"), domain = TN_rivers$width*1000, na.color = "transparent") use this function for any categorical data you want to include in the map
-  
-  # colour palette for stream gradient
-  gradient.pal <- colorNumeric(c("white", "grey20", "black"), domain = rivers$sgr_dk_rav/10000, na.color = "transparent")
-  
-  # colour palette for legend so high numbers at top
-  gradient.pal.leg <- colorNumeric(c("black", "grey20", "white"), domain = c(min(rivers$sgr_dk_rav/10000), median(rivers$sgr_dk_rav/10000), max(rivers$sgr_dk_rav/10000)), na.color = "transparent")  
+#| warning: false
+#| echo: false
+ #colour palettes for predictions
+  # invert.pal <- colorNumeric(c("#f47c3c", "#d9534f"), domain = predictions_reaches$invert, na.color = "transparent")
+  # embed.pal <- colorNumeric(c("#e9c602", "#93c54b"), domain =  predictions_reaches$embed, na.color = "transparent")
+top_discharge <- quantile(rivers$DIS_AV_CMS, 0.9, na.rm = T)
 
+discharge.pal <- colorNumeric(c("#dfdce3", "#8900a8"), domain = c(0, top_discharge), na.color = "transparent")
+discharge.col <- discharge.pal(rivers$DIS_AV_CMS)
+
+# colour palette for legend so high numbers at top
+discharge.col.leg <- discharge.pal(seq(0, top_discharge, by = top_discharge/7))
+discharge.pal.leg <- colorNumeric(rev(discharge.col.leg), domain = c(0, top_discharge), na.color = "transparent")  
+
+# colour palette for width
+# make top 90th percentile one colour
+top_width <- quantile(rivers$width, 0.9, na.rm = T)
+
+width.pal <- colorNumeric(c("#f2ca97", "#d4021d"), domain = c(0, top_width), na.color = "transparent") # 
+width.col <- width.pal(rivers$width)
   
-  # colour palette for D50, with 16-64 green
+# colour palette for legend so high numbers at top
+width.col.leg <- width.pal(seq(0, top_width, by = top_width/7))
+width.pal.leg <- colorNumeric(rev(width.col.leg), domain = c(0, top_width), na.color = "transparent")  
+
+#width.pal <- colorFactor(c("#f2ca97", "#d4021d"), domain = exploits_river$width*1000, na.color = "transparent") use this function for any categorical data you want to include in the map
   
- D50.pal <- colorNumeric(c("#e9c602","#e9c602", "#e9c602","#FD602F"), domain = c(0,16,64, ceiling(max(rivers$D50)/16)*16), na.color = "transparent")
+# colour palette for stream gradient
+
+# make top 90th percentile one colour
+top_gradient <- quantile(rivers$sgr_dk_rav/10000, 0.9, na.rm = T)
+
+gradient.pal <- colorNumeric(colorRamp(c("white", "black")), domain = c(0, top_gradient), na.color = "transparent") 
+gradient.col <- gradient.pal(rivers$sgr_dk_rav/10000)
+
+  # colour palette for legend so high numbers at top
+gradient.col.leg <- gradient.pal(seq(0, top_gradient, by = top_gradient/7))
+gradient.pal.leg <- colorNumeric(rev(gradient.col.leg), domain = c(0, top_gradient), na.color = "transparent")  
+
+  # colour palette for D50, with 16-64 green and over 90 orange
+  
+D50.pal <- colorNumeric(c("#e9c602","#e9c602", "#e9c602","#FD602F"), domain = c(0, 16, 64, ceiling(max(rivers$D50, na.rm = T)/16)*16), na.color = "brown")
  
+ # if D50s reach over 200 then use 200 as cap, but if not then use closest multiple of 10 to max D50 as cap
+top_D50 <- ifelse(max(rivers$D50, na.rm = T) >= 200, 200, ceiling(max(rivers$D50, na.rm = T)/10)*10)
+
+ 
+ # map colours
 D50.col <-  D50.pal(rivers$D50)
-D50.col[rivers$D50 > 16 & rivers$D50 < 64] <- "#00D458"
+D50.col[rivers$D50 >= 16 & rivers$D50 <= 64] <- "#00D458"
+D50.col[rivers$D50 >= top_D50] <- "#FD602F" 
 
-D50.col.leg <- D50.pal(seq(0, ceiling(max(rivers$D50)/16)*16, by = 16))  
-D50.col.leg[seq(0, ceiling(max(rivers$D50)/16)*16, by = 16) > 16 & seq(0, ceiling(max(rivers$D50)/16)*16, by = 16) < 64] <- "#00D458"   
+  #legend
+D50.col.leg <- D50.pal(seq(0, top_D50, by = top_D50/10))
+D50.col.leg[seq(0, top_D50, by = top_D50/10) >= 16 & seq(0, top_D50, by = top_D50/10) <= 64] <- "#00D458"
+D50.col.leg[seq(0, top_D50, by = top_D50/10) >= top_D50] <- "#FD602F"
 
-D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,ceiling(max(rivers$D50)/16)*16), na.color = "transparent")  
-
+D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,top_D50), na.color = "brown")
 
 ```
 
@@ -141,7 +169,7 @@ D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,ceiling(max(rivers$D5
 "<b>Predicted rgavel size (D50): </b> {rivers$D50}<br/>",
 "<b>Discharge: </b> {rivers$DIS_AV_CMS}<br/>",
 "<b>Width: </b> {rivers$width}<br/>",
-"<b>Gradient: </b> {rivers$sgr_dk_rav}<br/>") |> 
+"<b>Gradient: </b> {rivers$sgr_dk_rav/10000}<br/>") |> 
 
   lapply(htmltools::HTML)
 ```
@@ -176,25 +204,43 @@ map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSn
       addPolygons(data = river_drainage, color = "#32B1DB", weight = 1.25, fillColor = "#236D9E", opacity = 0.4, fillOpacity = 0.3, options = pathOptions(pane = "drainage")) |>
   
       ## rivers of the rocky
-      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = "#236D9E", weight = 3/rivers$ORD_CLAS, options = pathOptions(pane = "rivers"), group = "exploits", opacity = 0.8) |>
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = "#236D9E", weight = 4/(rivers$ORD_CLAS+1), options = pathOptions(pane = "rivers"), group = "exploits", opacity = 0.8) |>
 
         ### D50
-      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = D50.col, weight = 3/rivers$ORD_CLAS, opacity = 1, options = pathOptions(pane = "data_D50"), group = "D50", popup = ~label_text) |>
-      addLegendNumeric(pal = D50.pal.leg, values = rivers$D50, title = "D50 gravel size (mm)", position = 'topright', group = "D50", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE, height = 150, width = 20) |> 
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = D50.col, weight = 4/(rivers$ORD_CLAS+1), fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_D50"), group = "D50", popup = ~label_text) |>
+      
+      addLegend(pal = D50.pal.leg, values = seq(0, top_D50, by = top_D50/10), title = "D50 gravel size (mm)", position = 'topright', group = "D50", opacity = 1, labFormat = function(type, cuts, p) {
+      paste0(rev(c(as.character(seq(0, top_D50-top_D50/10, by = top_D50/10)), ifelse(top_D50 >= 200, "≥200", paste0('≥ ', top_D50))))) 
+    }) |>  
   
   
       ### discharge
-      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~discharge.pal(rivers$DIS_AV_CMS), weight = 3/rivers$ORD_CLAS, opacity = 1, options = pathOptions(pane = "data_disch"), group = "Discharge", popup = ~label_text) |>
-        addLegendNumeric(pal = discharge.pal.leg, values = rivers$DIS_AV_CMS, title = htmltools::HTML("Discharge (m<sup>3</sup>/s)"),position = 'topright', group = "Discharge", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE , height = 150, width = 20 ) |> 
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~discharge.pal(rivers$DIS_AV_CMS), weight = 4/(rivers$ORD_CLAS+1), fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_disch"), group = "Discharge", popup = ~label_text) |>
+       
+      addLegend(pal = discharge.pal.leg, values = round(seq(0, top_discharge, by = top_discharge/7), 4), title = "Stream discharge (m<sup>3</sup>/s)", position = 'topright', group = "Discharge", opacity = 1, labFormat = function(type, cuts, p) {
+      paste0(rev(c(as.character(round(seq(0, top_discharge-top_discharge/7, by = top_discharge/7), 4)), paste0('≥ ', round(top_discharge, 4)))))
+        }) |>
+   
+       addPolylines(data = smooth(tidyterra::filter(rivers, DIS_AV_CMS >= top_discharge), method = "ksmooth", smoothness = 0.5), color = "#8900a8", weight = 4/(rivers$ORD_CLAS+1), fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_disch"), group = "Discharge", popup = ~label_text)  |># add in values above top quantile
   
       ### width
-      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~width.pal(rivers$width), weight = 3/rivers$ORD_CLAS, opacity = 1, options = pathOptions(pane = "data_width"), group = "Width", popup = ~label_text) |>
-          addLegendNumeric(pal = width.pal.leg, values = rivers$width, title = "Stream width (m)",position = 'topright', group = "Width", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE, height = 150, width = 20 ) |> 
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~width.pal(rivers$width), weight = 4/(rivers$ORD_CLAS+1), fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_width"), group = "Width", popup = ~label_text) |>
+
+      addLegend(pal = width.pal.leg, values = round(seq(0, top_width, by = top_width/7), 2), title = "Stream width (m)", position = 'topright', group = "Width", opacity = 1, labFormat = function(type, cuts, p) {
+      paste0(rev(c(as.character(round(seq(0, top_width-top_width/7, by = top_width/7),2)), paste0('≥ ', round(top_width, 2)))))
+        }) |> 
+      
+      addPolylines(data = smooth(tidyterra::filter(rivers, width >= top_width), method = "ksmooth", smoothness = 0.5), color = "#d4021d", weight = 4/(rivers$ORD_CLAS+1), fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_width"), group = "Width", popup = ~label_text)  |># add in values above top quantile
 
   
       ### gradient
-      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~gradient.pal(rivers$sgr_dk_rav/10000), weight = 3/rivers$ORD_CLAS, opacity = 1, options = pathOptions(pane = "data_grad"), group = "Gradient", popup = ~label_text) |>
-      addLegendNumeric(pal = gradient.pal.leg, values = rivers$sgr_dk_rav/10000, title = "Stream gradient",position = 'topright', group = "Gradient", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE, height = 150, width = 20 ) |> 
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~gradient.pal(rivers$sgr_dk_rav/10000), weight = 4/(rivers$ORD_CLAS+1), fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_grad"), group = "Gradient", popup = ~label_text) |>
+      
+      addLegend(pal = gradient.pal.leg, values = round(seq(0, top_gradient, by = top_gradient/7), 4), title = "Stream gradient", position = 'topright', group = "Gradient", opacity = 1, labFormat = function(type, cuts, p) {
+      paste0(rev(c(as.character(round(seq(0, top_gradient-top_gradient/7, by = top_gradient/7), 4)), paste0('≥ ', round(top_gradient, 4)))))
+        }) |> 
+      
+      addPolylines(data = smooth(tidyterra::filter(rivers, sgr_dk_rav/10000 >= top_gradient), method = "ksmooth", smoothness = 0.5), color = "black", weight = 4/(rivers$ORD_CLAS+1), fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_grad"), group = "Gradient", popup = ~label_text)  |># add in values above top quantile
   
       ## lakes of the exploits
       addPolygons(data = lakes, color = "#242B42", stroke = FALSE, fillOpacity = 0.9, options = pathOptions(pane = "lakes"), group = "exploits") |>
@@ -209,11 +255,31 @@ map
 ```
 
 \
-[Click here to download the `r params$watershed` HydroATLAS data shapefile](`r paste0("https://github.com/emmwilson/NL_watersheds/blob/0d9a7a8e31f9d6fc5a61aac211dbf85ce949138c/data/spatial%20data/watersheds/river_",params$watershed,".shp?raw=true")`)
 
-Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6  
-Lehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z
-
+| **Desciption of map contents:**  
+|  
+| D50: Gravel size was predicted based on the following calculations (Wilkins & Snyder 2011)  
+|  
+| D50 = 𝛕<sub>b</sub> / (𝛒<sub>s</sub> - 𝛒) * g * 𝛕<sup>*</sup>   
+|  
+| Parameters:  
+| 𝛕<sub>b</sub> = 𝛒 * g * n<sup>3/5</sup> * [Q/W]<sup>3/5</sup> * S<sup>7/10</sup>  
+| 𝛒 = density of water = 1000 kg/m<sup>3</sup>  
+| g = acceleration by gravity = 9.80665 m/s<sup>2</sup>  
+| n = channel roughness coefficient = n = 0.04 as estimate for gravel bed rivers from Barnes 1967  
+| 𝛒<sub>s</sub> = sediment density = 2650 kg/m<sup>3</sup>  
+| 𝛕<sup>*</sup>  =  Shields parameter = 0.04 to follow Wilkins & Snyder 2011  
+|  
+| Variables to retreive from HydroSHEDs:  
+| S = channel gradient, Calculated as the ratio between the elevation drop within the river reach (i.e. the difference between min. and max. elevation along the reach) and the length of the reach.  
+| Q = Discharge (m<sup>3</sup>/s), Average long-term discharge estimate for river reach, in cubic meters per second.    
+| W = channel width (m), Calculated as the surface river area of the river reach segment divided by length of the river reach segment.    
+|  
+| [Click here to download the `r params$watershed` HydroATLAS data shapefile](`r paste0("https://github.com/emmwilson/NL_watersheds/blob/0d9a7a8e31f9d6fc5a61aac211dbf85ce949138c/data/spatial%20data/watersheds/river_",params$watershed,".shp?raw=true")`)
+|  
+| Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6  
+| Lehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z
+|  
 <div id="bottom"></div>
 
 :::

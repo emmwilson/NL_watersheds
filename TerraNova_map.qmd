@@ -32,7 +32,9 @@ pacman::p_load(shiny,
                glue,
                cowplot,
                leaflegend,
-               smoothr)
+               smoothr,
+               grDevices,
+               tidyterra)
 ```
 
 ```{r, import}
@@ -91,6 +93,8 @@ TN_river$D50 <- (TN_river$tb/((ps-p)*g*t))*1000
   discharge.pal.leg <- colorNumeric(c("#8900a8", "#dfdce3"), domain = TN_river$DIS_AV_CMS, na.color = "transparent")
   
   # colour palette for width
+  
+  
   width.pal <- colorNumeric(c("#f2ca97", "#d4021d"), domain = TN_river$width, na.color = "transparent") 
   
   # colour palette for legend so high numbers at top
@@ -99,23 +103,42 @@ TN_river$D50 <- (TN_river$tb/((ps-p)*g*t))*1000
   #width.pal <- colorFactor(c("#f2ca97", "#d4021d"), domain = TN_river$width*1000, na.color = "transparent") use this function for any categorical data you want to include in the map
   
   # colour palette for stream gradient
-  gradient.pal <- colorNumeric(c("white", "grey20", "black"), domain = TN_river$sgr_dk_rav/10000, na.color = "transparent")  
+  
+  # use top quartile as cap
+top_gradient <- quantile(TN_river$sgr_dk_rav/10000, 0.75)
+ 
+gradient.pal <- colorNumeric(colorRamp(c("white", "black")), domain = c(0, top_gradient), na.color = "transparent") 
+
+  
+gradient.col <- gradient.pal(TN_river$sgr_dk_rav/10000)
+gradient.col[TN_river$sgr_dk_rav/10000 >= top_gradient] <- "black" 
 
   # colour palette for legend so high numbers at top
-  gradient.pal.leg <- colorNumeric(c("black", "grey20", "white"), domain = c(min(TN_river$sgr_dk_rav/10000), median(TN_river$sgr_dk_rav/10000), max(TN_river$sgr_dk_rav/10000)), na.color = "transparent")  
+gradient.col.leg <- gradient.pal(seq(0, top_gradient, by = top_gradient/10))
+gradient.col.leg[seq(0, top_gradient, by = top_gradient/10) >= top_gradient] <- "black"
+
+gradient.pal.leg <- colorNumeric(rev(gradient.col.leg), domain = c(0, top_gradient), na.color = "transparent")  
 
 
-  # colour palette for D50, with 16-64 green
+  # colour palette for D50, with 16-64 green and over 90 orange
   
- D50.pal <- colorNumeric(c("#e9c602","#e9c602", "#e9c602","#FD602F"), domain = c(0,16,64,ceiling(max(TN_river$D50)/16)*16), na.color = "transparent")
+D50.pal <- colorNumeric(c("#e9c602","#e9c602", "#e9c602","#FD602F"), domain = c(0,16,64,ceiling(max(TN_river$D50)/16)*16), na.color = "transparent")
  
+ # if D50s reach over 200 then use 200 as cap, but if not then use closest multiple of 10 to max D50 as cap
+top_D50 <- ifelse(max(TN_river$D50) >= 200, 200, ceiling(max(TN_river$D50)/10)*10)
+
+ 
+ # map colours
 D50.col <-  D50.pal(TN_river$D50)
 D50.col[TN_river$D50 >= 16 & TN_river$D50 <= 64] <- "#00D458"
+D50.col[TN_river$D50 >= top_D50] <- "#FD602F" 
 
-D50.col.leg <- D50.pal(seq(0, 640, by = 16))
-D50.col.leg[seq(0, 640, by = 16) >= 16 & seq(0, 640, by = 16) <= 64] <- "#00D458"
+  #legend
+D50.col.leg <- D50.pal(seq(0, top_D50, by = top_D50/10))
+D50.col.leg[seq(0, top_D50, by = top_D50/10) >= 16 & seq(0, top_D50, by = top_D50/10) <= 64] <- "#00D458"
+D50.col.leg[seq(0, top_D50, by = top_D50/10) >= top_D50] <- "#FD602F"
 
-D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,640), na.color = "transparent")
+D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,top_D50), na.color = "transparent")
 ```
 
 ```{r, popup_labels}
@@ -126,7 +149,7 @@ D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,640), na.color = "tra
 "<b>Predicted gravel size (D50): </b> {TN_river$D50}<br/>",
 "<b>Discharge: </b> {TN_river$DIS_AV_CMS}<br/>",
 "<b>Width: </b> {TN_river$width}<br/>",
-"<b>Gradient: </b> {TN_river$sgr_dk_rav}<br/>") |> 
+"<b>Gradient: </b> {TN_river$sgr_dk_rav/10000}<br/>") |> 
  
   lapply(htmltools::HTML)
 
@@ -163,11 +186,13 @@ TN_map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoo
 
       ### D50
       addPolylines(data = smooth(TN_river, method = "ksmooth", smoothness = 0.5), color = D50.col, weight = 4/(TN_river$ORD_CLAS+1), opacity = 1, options = pathOptions(pane = "data_D50"), group = "D50", popup = ~label_text, smoothFactor = 0.5) |>
-      addLegendNumeric(pal = D50.pal.leg, values = TN_river$D50, title = "D50 gravel size (mm)", position = 'topright', group = "D50", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE, height = 150, width = 20 ) |> 
+      addLegend(pal = D50.pal.leg, values = seq(0, top_D50, by = top_D50/10), title = "D50 gravel size (mm)", position = 'topright', group = "D50", opacity = 1, labFormat = function(type, cuts, p) {
+      paste0(rev(c(as.character(seq(0, top_D50-top_D50/10, by = top_D50/10)), ifelse(top_D50 >= 200, "≥200", paste0('≥ ', top_D50))))) 
+    }) |> 
   
       ### discharge
       addPolylines(data = smooth(TN_river, method = "ksmooth", smoothness = 0.5), color = ~discharge.pal(TN_river$DIS_AV_CMS), weight = 4/(TN_river$ORD_CLAS+1), opacity = 1, options = pathOptions(pane = "data_disch"), group = "Discharge", popup = ~label_text) |>
-        addLegendNumeric(pal = discharge.pal.leg, values = TN_river$DIS_AV_CMS, title = htmltools::HTML("Discharge (m<sup>3</sup>/s)"),position = 'topright', group = "Discharge", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE , height = 150, width = 20 ) |> 
+      addLegendNumeric(pal = discharge.pal.leg, values = TN_river$DIS_AV_CMS, title = htmltools::HTML("Discharge (m<sup>3</sup>/s)"), position = 'topright', group = "Discharge", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE , height = 150, width = 20 ) |> 
   
       ### width
       addPolylines(data = smooth(TN_river, method = "ksmooth", smoothness = 0.5), color = ~width.pal(TN_river$width), weight = 4/(TN_river$ORD_CLAS+1), opacity = 1, options = pathOptions(pane = "data_width"), group = "Width", popup = ~label_text) |>
@@ -175,7 +200,10 @@ TN_map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoo
   
       ### gradient
       addPolylines(data = smooth(TN_river, method = "ksmooth", smoothness = 0.5), color = ~gradient.pal(TN_river$sgr_dk_rav/10000), weight = 4/(TN_river$ORD_CLAS+1), opacity = 1, options = pathOptions(pane = "data_grad"), group = "Gradient", popup = ~label_text) |>
-          addLegendNumeric(pal = gradient.pal.leg, values = TN_river$sgr_dk_rav/10000, title = "Stream gradient",position = 'topright', group = "Gradient", fillOpacity = 1, bins = 7, shape = "stadium", decreasing = TRUE, height = 150, width = 20 ) |> 
+      addLegend(pal = gradient.pal.leg, values = seq(0, top_gradient, by = top_gradient/10), title = "Stream gradient", position = 'topright', group = "Gradient", opacity = 1, labFormat = function(type, cuts, p) {
+      paste0(rev(c(as.character(seq(0, top_gradient-top_gradient/10, by = top_gradient/10)), paste0('≥ ', top_gradient)))) 
+    }) |> 
+    addPolylines(data = smooth(tidyterra::filter(TN_river, sgr_dk_rav/10000 > top_gradient), method = "ksmooth", smoothness = 0.5), color = "black", weight = 4/(TN_river$ORD_CLAS+1), opacity = 1, options = pathOptions(pane = "data_grad"), group = "Gradient", popup = ~label_text)  |># add in values above top quantile
 
       ## lakes of the exploits
       addPolygons(data = smooth(TN_lakes, method = "ksmooth", smoothness = 0.5), color = "#242B42", stroke = FALSE,  options = pathOptions(pane = "lakes"), group = "TN", fillOpacity = 0.9) |>

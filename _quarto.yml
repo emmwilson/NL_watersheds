@@ -11,7 +11,7 @@ website:
       - text: "Watersheds"
         menu:
         - text: "Strait of Belle Isle - South Shore watershed"
-          href: "map_Strait%20of%20Belle Isle%20-5South Shore.html"
+          href: "map_Strait%20of%20Belle%20Isle%20-%20South%20Shore.html"
         - text: "Hare Bay watershed"
           href: "map_Hare%20Bay.html"
         - text: "St. John Bay watershed"
@@ -47,7 +47,7 @@ website:
         - text: "Southern and Eastern Bonavista Bay watershed"
           href: "map_Southern%20and%20Eastern%20Bonavista%20Bay.html"
         - text: "St. George's Bay watershed"
-          href: "map_St.%20George's%20Bay.html"
+          href: "map_St.%20George%27s%20Bay.html"
         - text: "Poile Bay watershed"
           href: "map_La%20Poile%20Bay.html"
         - text: "White Bear Bay watershed"
@@ -65,15 +65,15 @@ website:
         - text: "Trinity Bay watershed"
           href: "map_Trinity%20Bay.html"
         - text: "Eastern Placentia and Western St. Mary's Bays watershed"
-          href: "map_Eastern%20Placentia%20and%20Western%20St.%20Mary's%20Bays.html"
+          href: "map_Eastern%20Placentia%20and%20Western%20St.%20Mary%27s%20Bays.html"
         - text: "Conception Bay watershed"
           href: "map_Conception%20Bay.html"
         - text: "Eastern Coast Newfoundland watershed"
           href: "map_Eastern%20Coast%20Newfoundland.html"
         - text: "Eastern St. Mary's Bay watershed"
-          href: "map_Eastern%20St.%20Mary's%20Bay.html"
+          href: "map_Eastern%20St.%20Mary%27s%20Bay.html"
       - text: "Sliders"
-        href: Sliders.qmd
+        href: Sliders.qmd 
         
 format:
   html:
