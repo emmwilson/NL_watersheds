@@ -1,4 +1,6 @@
 /* css styles */
+
+/* make title smaller*/
 .quarto-title-block h1.title {
   font-size: 1.25em; /* Adjust the value as needed (e.g., 1.5em, 24px) */
   margin-top: -15px !important;
@@ -7,10 +9,12 @@
   padding-bottom: 0px !important;
 }
 
+/* make date smaller*/
 .quarto-title-meta {
   font-size: 0.9em; /* Adjust the value as needed (e.g., 1.5em, 24px) */
 }
 
+/* make tab content margins smaller*/
 .panel-tabset .tab-content {
   padding-left: 0px !important;
   padding-right: 0px !important;
@@ -20,10 +24,12 @@
   margin-top: 5px !important;
 }
 
+/* make spacing smaller*/
 .panel-tabset .tab-content .line-block {
   padding-bottom: 10px;
 }
 
+/* make tabs smaller*/
 .panel-tabset .nav-tabs .nav-link {
   padding: 4px;
   padding-left: 7px;
@@ -31,18 +37,21 @@
   font-size: 0.7em;
 }
 
+/*bring something to the front*/
 .title-block-header {
   position: relative;
   z-index: 1; /* Keep title text behind or in front as needed */
 }
 
 
+/*bring home page map up in line with title*/
 .column .cell-output-display {
   position: relative;
   margin-top: -90px; /* Adjust this value to overlap */
   z-index: 10; /* Ensure map is above title */
 }
 
+/* edit appearance of north arrow*/
 img[src*=".png"] {
   width: 40px;
   height: 55px;
@@ -57,6 +66,7 @@ img[src*=".png"] {
 }
 
 
+/* edit legend layout*/
 .leaflet-control-container .leaflet-top.leaflet-right{
   width: 300px;
   height: 70vh;
@@ -90,7 +100,6 @@ img[src*=".png"] {
   max-height: 70vh; /* Set a fixed height */
   overflow-y: auto;  /* Enable vertical scrolling when content exceeds height */
 }
-
 
 .line-block {
   margin-left: 20px;

@@ -17,7 +17,8 @@ execute:
 
 
 {{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
-Set the below variable values to see predictions of several response variables shown in the bar graph
+Set the below variable values to see predictions of several response variables shown in the bar graph.  
+Description of the models can be found at the [bottom](#bottom) of each page.
 ```{r, load}
 #| include: false
 #| warning: false
@@ -42,6 +43,7 @@ pacman::p_load(shiny,
 import {vl} from "@vega/vega-lite-api"
 import { aq, op } from "@uwdata/arquero"
 
+
 vg = require('vega-lite')
 
 // references to images stored in data folder for each response variable
@@ -65,6 +67,7 @@ function negativetozero(equation) {
 //| echo: false
 //| panel: sidebar
 // sliders for predictor variables
+
 
 // example: periphyton biomass (mean - 1 outlier)
 viewof peri = {
@@ -94,8 +97,7 @@ viewof EPT = {
   label.style.cssText += "width: 100%; margin-top: 10px";
 
   return form;
-}
-
+}   
 
 ```
 
@@ -209,6 +211,12 @@ Plot.plot({
    ]
 })
 ```
+ 
+\
+
+| The predictor variables, measured in field, were assessed for their correlation to invertebrate and periphyton biomass, using general linear models compared using Akaike’s Information Criterion corrected for small sample sizes.  
+
+<div id="bottom"></div>
 
 ## Gravel and spawning estimates
 
@@ -250,7 +258,7 @@ viewof swidth = {
 viewof sgr_dk_rav = {
   const form = Inputs.range(
   [0, 0.05], 
-  {value: 0.01, step: 0.05/100, label: "Stream gradient:"}
+  {value: 0.0035, step: 0.05/100, label: "Stream gradient:"}
 );
   form.range.style.cssText += "accent-color: #1f78b4; width: 500px";
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
@@ -275,6 +283,7 @@ viewof fish = {
   return form;
 }
 
+
 ```
 
 
@@ -284,16 +293,51 @@ viewof fish = {
 
 // prediction functions
 function gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) {
-  return (2000*op.pow(0.04,(3/5))*op.pow((DIS_AV_CMS/swidth),(3/5))*op.pow(sgr_dk_rav,(7/10))/(650*0.04))*1000 ;
+  return (2000 * op.pow(0.04, (3 / 5)) * op.pow((DIS_AV_CMS / swidth), (3 / 5)) * op.pow(sgr_dk_rav, (7 / 10)) / (650 * 0.04)) * 1000 ;
 }
+
+
+// to get normal distribution that skews at limits of suitable gravel
+
+//function f(x) { 
+//  return op.exp(((-1 / 2) * op.pow(((x) /4), 2)))
+//}
+
+//erf = (await import("https://cdn.jsdelivr.net/npm/@stdlib/esm@0.0.3/math/base/special/erf.js"))
+//  .default
+
+//function P(x) { 
+//  return (1/2) * (1 + erf(x / op.sqrt(2)))
+//}
+
+// shape of curve responds to ideal gravel size for fish length (linear function)
+//function a(i) {
+//  return (((-2/48)*i)+1.67)*10
+//}
+
+// ideal fish size as exponential growth, where 16 is ideal for 0.1 m fish and 64 is ideal for 2m fish
+
+function idealsize(fish) {
+  return 109 * (op.pow(1.26, fish) - 1)
+}
+
+//function spawningprob(DIS_AV_CMS, swidth, sgr_dk_rav, fish) {
+//  return f((gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) - idealsize(fish)) / 2) * P(a(idealsize(fish)) * ((gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) - idealsize(fish)) / 2));
+//}
 
 
 function spawningprob(DIS_AV_CMS, swidth, sgr_dk_rav, fish) {
-  return op.abs(1-(op.abs(32*fish/gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav)-1)));
+  if(16 <= gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) <=64) {
+  return op.exp((-1/2) * (op.pow((gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) - idealsize(fish))/8, 2)));
+  } else {
+  return 0
+  }
 }
 
 
+
 // function that takes input from sliders and creates prediction of each response variable
+
 function gravelFunction(DIS_AV_CMS, swidth, sgr_dk_rav, fish) {
   return aq.table({
   'DIS_AV_CMS': [DIS_AV_CMS, DIS_AV_CMS], // repeat for each input
@@ -368,5 +412,38 @@ Plot.plot({
    ]
 })
 ```
+
+
+\
+
+| Gravel size was predicted based on the following calculations (Wilkins & Snyder 2011)
+| 
+| D50 = 𝛕<sub>b</sub> / (𝛒<sub>s</sub> - 𝛒) * g * 𝛕<sup>* </sup>
+| 
+| Parameters:
+| 𝛕<sub>b</sub> = 𝛒 * g * n<sup>3/5</sup> * [Q/W]<sup>3/5</sup> * S<sup>7/10</sup>
+| 𝛒 = density of water = 1000 kg/m<sup>3</sup>
+| g = acceleration by gravity = 9.80665 m/s<sup>2</sup>
+| n = channel roughness coefficient = n = 0.04 as estimate for gravel bed rivers from Barnes 1967
+| 𝛒<sub>s</sub> = sediment density = 2650 kg/m<sup>3</sup>
+| <sup>*</sup>  =  Shields parameter = 0.04 to follow Wilkins & Snyder 2011
+| 
+| Variables to retreive from HydroSHEDs:
+| S = channel gradient, Calculated as the ratio between the elevation drop within the river reach (i.e. the difference between min. and max. elevation along the reach) and the length of the reach.
+| Q = Discharge (m<sup>3</sup>/s), Average long-term discharge estimate for river reach, in cubic meters per second.
+| W = channel width (m), Calculated as the surface river area of the river reach segment divided by length of the river reach segment.
+|  
+| 
+| Spawning suitability in predicted gravel size  for fish of chosen length (m) calculated using the following equation:
+| 
+| Suitability = e<sup>((-1/2) * ((D50 - ideal.fish.gravel)/8)<sup>2</sup>)</sup>
+| 
+| Ideal.fish.gravel = 109 * (1.26<sup>fish.length</sup> - 1)
+| 
+| This equation associates a higher probability of spawning in larger gravel for longer fish, and a higher probability of spawning in smaller gravel for smaller fish.  
+| Assumes the ideal spawning gravel for a fish of 2m is 64 mm,  for a fish of 1 m is 32 mm, for a fish of 0 m is 16 mm etc, with a bell shaped distribution of suitability around the ideal gravel size with a standard deviation of 8. If D50 is lower than 16 or higher than 64, the suitability is 0.
+|
+
+<div id="bottom"></div>
 
 :::
