@@ -217,7 +217,7 @@ Plot.plot({
 
 | The predictor variables, measured in field, were assessed for their correlation to invertebrate and periphyton biomass, using general linear models compared using Akaike’s Information Criterion corrected for small sample sizes.  
 
-<div id="bottom"></div>
+
 
 ## Gravel and spawning estimates
 
@@ -445,6 +445,5 @@ Plot.plot({
 | Assumes the ideal spawning gravel for a fish of 2m is 64 mm,  for a fish of 1 m is 32 mm, for a fish of 0 m is 16 mm etc, with a bell shaped distribution of suitability around the ideal gravel size with a standard deviation of 8. If D50 is lower than 16 or higher than 64, the suitability is 0.
 |
 
-<div id="bottom"></div>
-
 :::
+<div id="bottom"></div>
