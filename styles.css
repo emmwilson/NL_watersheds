@@ -65,6 +65,22 @@ img[src*=".png"] {
   background-clip: padding-box;
 }
 
+.panel-tabset img[src*=".png"] {
+  position: absolute;
+  bottom: 18px;
+  right: 5px;
+  width: 40px;
+  height: 55px;
+  border-radius: 5px;
+  padding: 6px 6px 6px 6px;
+  color: #333;
+  background: rgba(255,255,255,0.5);
+  margin-top: 2px;
+  margin-left: -5px;
+  margin-bottom: 10px;
+  border: 2px solid rgba(0,0,0,0.2);
+  background-clip: padding-box;
+}
 
 /* edit legend layout*/
 .leaflet-control-container .leaflet-top.leaflet-right{
