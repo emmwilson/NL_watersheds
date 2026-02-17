@@ -138,8 +138,8 @@ function myFunction(peri, EPT) {
   return aq.table({
   'peri': [peri, peri], // repeat for each input
   'EPT': [EPT, EPT],
-  'response_type': ["Invertebrate density (g m⁻²)", 
-                    "Periphyton density (μg cm⁻²)",
+  'response_type': ["Predicted invertebrate density (g m⁻²)", 
+                    "Predicted periphyton density (μg cm⁻²)",
                     ], // ordered alphabetically
   'response_predict': [invertbiomass(peri),
                       peribiomass(EPT) // keep label normal
@@ -345,8 +345,8 @@ function gravelFunction(DIS_AV_CMS, swidth, sgr_dk_rav, fish) {
   'swidth': [swidth, swidth],
   'sgr_dk_rav':[sgr_dk_rav, sgr_dk_rav],
   'fish': [fish, fish],
-  'response_type': ["Gravel size D50", 
-                    "Probability salmon spawn in predicted gravel size \n for fish of chosen length" //not sure what this variable will be yet
+  'response_type': ["Predicted gravel size (D50; mm)", 
+                    "Suitability of predicted gravel size for \nspawning by salmon of given length" //not sure what this variable will be yet
                     ], // ordered alphabetically
                       
   'response_predict': [gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav),
