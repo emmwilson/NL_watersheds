@@ -20,7 +20,7 @@ execute:
 Set the below variable values to see predictions of several response variables shown in the bar graph.  
 Description of the models can be found at the [bottom](#bottom) of each page.
 ```{r, load}
-#| include: false
+#| include: false 
 #| warning: false
 
 pacman::p_load(shiny,
@@ -138,7 +138,7 @@ function myFunction(peri, EPT) {
   return aq.table({
   'peri': [peri, peri], // repeat for each input
   'EPT': [EPT, EPT],
-  'response_type': ["Predicted invertebrate density (g m⁻²)", 
+  'response_type': ["Predicted invertebrate density (g m⁻²) ", 
                     "Predicted periphyton density (μg cm⁻²)",
                     ], // ordered alphabetically
   'response_predict': [invertbiomass(peri),
