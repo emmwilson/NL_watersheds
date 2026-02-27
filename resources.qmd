@@ -1,0 +1,17 @@
+---
+title: "Resources"
+theme: sandstone
+format:
+  html:
+    css: styles.css
+    grid:
+      sidebar-width: 10px
+      margin-width: 10px
+      body-width: 1900px
+date: last-modified
+date-format: "DD/MM/YY"
+---
+
+Give descriptions of affiliated manuscripts.
+
+List of other useful resources...

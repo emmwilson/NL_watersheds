@@ -15,12 +15,11 @@ engine: knitr
 
 
 HydroATLAS data that can be used in gravel models to estimate gravel with the proper size for salmon spawning. Includes example predictions of gravel size.
-Click on a reach to see the data for each segment. Link to download shapefiles is [below map](#bottom).
+Click on a reach to see the data for each segment. Description of map contents and a link to download  map shapefile are [below map](#bottom).
 
 ::: {.column-screen}
 ```{r, library}
 #| include: false
-# packages necessary to run maps
 pacman::p_load(shiny,
                bslib,
                ggplot2,
@@ -37,7 +36,15 @@ pacman::p_load(shiny,
                cowplot,
                grDevices,
                leaflegend,
-               smoothr)
+               smoothr,
+               htmlwidgets)
+
+if (!requireNamespace("leaflet.extras", quietly = TRUE)) {
+  remotes::install_github("trafficonese/leaflet.extras")
+}
+library(leaflet.extras)
+
+knitr::read_chunk('addGroupedLayersControl.R')
 
 ```
 
@@ -68,7 +75,15 @@ lakes <- vect(file_lakes) |>
 ## bounding rectangle for NL
 NL <- vect("data/spatial data/NL_boundaries.shp") |>  
   project("EPSG:4326 - WGS 84")  
-  
+
+## areas blocked by CABD 
+file_barriers <- paste0("data/spatial data/watersheds/barriers_", params$watershed, ".shp")
+barriers <- vect(file_barriers)
+
+file_inaccess <- paste0("data/spatial data/watersheds/inaccess_", params$watershed, ".shp")
+inaccess <- vect(file_inaccess)
+
+
   # import arrow
 arrow <- "https://cdn.pixabay.com/photo/2013/07/12/17/54/arrow-152596_960_720.png"
 ```
@@ -106,19 +121,26 @@ rivers$D50 <- (rivers$tb/((ps-p)*g*t))*1000
   # embed.pal <- colorNumeric(c("#e9c602", "#93c54b"), domain =  predictions_reaches$embed, na.color = "transparent")
 top_discharge <- quantile(rivers$DIS_AV_CMS, 0.9, na.rm = T)
 
-discharge.pal <- colorNumeric(c("#dfdce3", "#8900a8"), domain = c(0, top_discharge), na.color = "transparent")
+discharge.pal <- colorNumeric(c("#dfdce3", "#600075"), domain = c(0, top_discharge), na.color = "transparent")
 discharge.col <- discharge.pal(rivers$DIS_AV_CMS)
+
+discharge.pal90 <- colorNumeric(c("#600075"), domain = c(top_discharge, max(rivers$DIS_AV_CMS)), na.color = "transparent") 
+discharge.col90 <- discharge.pal90(rivers$DIS_AV_CMS)
 
 # colour palette for legend so high numbers at top
 discharge.col.leg <- discharge.pal(seq(0, top_discharge, by = top_discharge/7))
 discharge.pal.leg <- colorNumeric(rev(discharge.col.leg), domain = c(0, top_discharge), na.color = "transparent")  
 
+
 # colour palette for width
 # make top 90th percentile one colour
 top_width <- quantile(rivers$width, 0.9, na.rm = T)
 
-width.pal <- colorNumeric(c("#f2ca97", "#d4021d"), domain = c(0, top_width), na.color = "transparent") # 
+width.pal <- colorNumeric(c("#F5DAEA", "#B50061"), domain = c(0, top_width), na.color = "transparent") # 
 width.col <- width.pal(rivers$width)
+
+width.pal90 <- colorNumeric(colorRamp(c("#B50061")), domain = c(top_width, max(rivers$width)), na.color = "transparent") 
+width.col90 <- width.pal90(rivers$width)
   
 # colour palette for legend so high numbers at top
 width.col.leg <- width.pal(seq(0, top_width, by = top_width/7))
@@ -131,14 +153,18 @@ width.pal.leg <- colorNumeric(rev(width.col.leg), domain = c(0, top_width), na.c
 # make top 90th percentile one colour
 top_gradient <- quantile(rivers$sgr_dk_rav/10000, 0.9, na.rm = T)
 
-gradient.pal <- colorNumeric(colorRamp(c("white", "black")), domain = c(0, top_gradient), na.color = "transparent") 
+gradient.pal <- colorNumeric(colorRamp(c("white", "#1C1C1C")), domain = c(0, top_gradient), na.color = "transparent") 
 gradient.col <- gradient.pal(rivers$sgr_dk_rav/10000)
 
-  # colour palette for legend so high numbers at top
+gradient.pal90 <- colorNumeric(colorRamp(c("#1C1C1C")), domain = c(top_gradient, max(rivers$sgr_dk_rav/10000)), na.color = "transparent") 
+gradient.col90 <- gradient.pal90(rivers$sgr_dk_rav/10000)
+
+
+# colour palette for legend so high numbers at top
 gradient.col.leg <- gradient.pal(seq(0, top_gradient, by = top_gradient/7))
 gradient.pal.leg <- colorNumeric(rev(gradient.col.leg), domain = c(0, top_gradient), na.color = "transparent")  
 
-  # colour palette for D50, with 16-64 green and over 90 orange
+# colour palette for D50, with 16-64 green and over 90 orange
   
 D50.pal <- colorNumeric(c("#e9c602","#e9c602", "#e9c602","#FD602F"), domain = c(0, 16, 64, ceiling(max(rivers$D50, na.rm = T)/16)*16), na.color = "brown")
  
@@ -166,10 +192,10 @@ D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,top_D50), na.color = 
 # adds information to popups for each reach wehn it is selected
 
   label_text <- glue("<b><u>{'Segment info:'}</u></b> <br/>",
-"<b>Predicted rgavel size (D50): </b> {rivers$D50}<br/>",
-"<b>Discharge: </b> {rivers$DIS_AV_CMS}<br/>",
-"<b>Width: </b> {rivers$width}<br/>",
-"<b>Gradient: </b> {rivers$sgr_dk_rav/10000}<br/>") |> 
+"<b>Predicted gravel size (D50): </b> {rivers$D50} mm<br/>",
+"<b>Discharge: </b> {round(rivers$DIS_AV_CMS, 1)} m<sup>3</sup>/s<br/>",
+"<b>Width: </b> {round(rivers$width,1)} m<br/>",
+"<b>Gradient: </b> {round(rivers$sgr_dk_rav/10,1)} mm/m<br/>") |> 
 
   lapply(htmltools::HTML)
 ```
@@ -180,8 +206,12 @@ D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,top_D50), na.color = 
 
 
 map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSnap = 0.25)) |> 
-      addProviderTiles('Esri.WorldImagery') |> 
-        # open map to this screen
+  # registerPlugin(groupedLayerControlPlugin) |> 
+
+  addProviderTiles('Esri.WorldImagery', group = "Satellite") |> # add base map options
+  addProviderTiles('Esri.WorldTopoMap', group = "Topographic") |> # adds base map
+  addProviderTiles('Esri.WorldGrayCanvas', group = "White & Grey") |> 
+
       # open map to this screen
       fitBounds(as.numeric(bbox[1]), as.numeric(bbox[3]), as.numeric(bbox[2]), as.numeric(bbox[4])) |> 
 
@@ -192,22 +222,38 @@ map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSn
       addMapPane("NL", zIndex = 400) |> 
       addMapPane("drainage", zIndex = 410) |> 
       addMapPane("rivers", zIndex = 415) |> 
+      addMapPane("lakes", zIndex = 420) |>
       addMapPane("data_D50", zIndex = 450) |> 
       addMapPane("data_disch", zIndex = 445) |> 
+      addMapPane("data_disch90", zIndex = 444) |> 
       addMapPane("data_width", zIndex = 440) |> 
+      addMapPane("data_width90", zIndex = 439) |> 
       addMapPane("data_grad", zIndex = 435) |>
-      addMapPane("lakes", zIndex = 420) |>
+      addMapPane("data_grad90", zIndex = 434) |>
+      addMapPane("inaccess", zIndex = 455) |> 
+      addMapPane("barriers", zIndex = 460) |> 
+  
       
-      addPolygons(data = NL, color = "#82797F", weight = 1.5, fillColor = "#82797F", fillOpacity = 0.5, options = pathOptions(pane = "NL")) |> ## need a new NL file
+      #addPolygons(data = NL, color = "#82797F", weight = 1.5, fillColor = "#82797F", fillOpacity = 0.5, options = pathOptions(pane = "NL")) |> ## need a new NL file
       # add polygons and lines
       ## exploits drainage area
-      addPolygons(data = river_drainage, color = "#32B1DB", weight = 1.25, fillColor = "#236D9E", opacity = 0.4, fillOpacity = 0.3, options = pathOptions(pane = "drainage")) |>
+      addPolygons(data = river_drainage, color = "#32B1DB", weight = 1.25, fillColor = "#236D9E", opacity = 0.4, fillOpacity = 0.1, options = pathOptions(pane = "drainage")) |>
   
       ## rivers of the rocky
-      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = "#236D9E", weight = 4/(rivers$ORD_CLAS+1), options = pathOptions(pane = "rivers"), group = "exploits", opacity = 0.8) |>
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = "#588BAD", weight = rivers$width^(1/3), options = pathOptions(pane = "rivers"), group = "exploits", opacity = 0.8) |>
 
-        ### D50
-      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = D50.col, weight = 4/(rivers$ORD_CLAS+1), fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_D50"), group = "D50", popup = ~label_text) |>
+  ## lakes of the exploits
+      addPolygons(data = lakes, color = "#234667", stroke = FALSE, fillOpacity = 0.9, options = pathOptions(pane = "lakes"), group = "exploits") |>
+
+  ## add barriers  
+  addPolylines(data = smooth(inaccess, method = "ksmooth", smoothness = 0.5), color = "#C41F02", weight = 2.5, options = pathOptions(pane = "inaccess"), group = "CABD barriers and areas past", opacity = 1, popup = ~label_text) |>
+  
+  addCircleMarkers(data = barriers, color = "#720F0F", weight = 1, fillColor = "#720F0F", radius = 3.5, fillOpacity = 1, fill = T, opacity = 1, options = pathOptions(pane = "inaccess"), group = "CABD barriers and areas past", popup = ~label_text) |> 
+  
+  addLegend(colors = "#C41F02", opacity = 1, labels = "<b>CABD barriers and areas past</b>", group = "CABD barriers and areas past", position = "topright") |> 
+  
+  ### D50
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = D50.col, weight = rivers$width^(1/3), fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_D50"), group = "D50", popup = ~label_text) |>
       
       addLegend(pal = D50.pal.leg, values = seq(0, top_D50, by = top_D50/10), title = "D50 gravel size (mm)", position = 'topright', group = "D50", opacity = 1, labFormat = function(type, cuts, p) {
       paste0(rev(c(as.character(seq(0, top_D50-top_D50/10, by = top_D50/10)), ifelse(top_D50 >= 200, "≥200", paste0('≥ ', top_D50))))) 
@@ -215,54 +261,73 @@ map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSn
   
   
       ### discharge
-      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~discharge.pal(rivers$DIS_AV_CMS), weight = 4/(rivers$ORD_CLAS+1), fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_disch"), group = "Discharge", popup = ~label_text) |>
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~discharge.pal(rivers$DIS_AV_CMS), weight = rivers$width^(1/3)-0.05, fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_disch"), group = "Discharge", popup = ~label_text) |>
        
-      addLegend(pal = discharge.pal.leg, values = round(seq(0, top_discharge, by = top_discharge/7), 4), title = "Stream discharge (m<sup>3</sup>/s)", position = 'topright', group = "Discharge", opacity = 1, labFormat = function(type, cuts, p) {
-      paste0(rev(c(as.character(round(seq(0, top_discharge-top_discharge/7, by = top_discharge/7), 4)), paste0('≥ ', round(top_discharge, 4)))))
+      addLegend(pal = discharge.pal.leg, values = seq(0, top_discharge, by = top_discharge/7), title = "Stream discharge (m<sup>3</sup>/s)", position = 'topright', group = "Discharge", opacity = 1, labFormat = function(type, cuts, p) {
+      paste0(rev(c(as.character(round(seq(0, top_discharge-top_discharge/7, by = top_discharge/7), 1)), paste0('≥ ', round(top_discharge, 1)))))
         }) |>
    
-       addPolylines(data = smooth(tidyterra::filter(rivers, DIS_AV_CMS >= top_discharge), method = "ksmooth", smoothness = 0.5), color = "#8900a8", weight = 4/(rivers$ORD_CLAS+1), fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_disch"), group = "Discharge", popup = ~label_text)  |># add in values above top quantile
+       addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~discharge.pal90(rivers$DIS_AV_CMS), weight = rivers$width^(1/3)-0.05, fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_disch90"), group = "Discharge", popup = ~label_text)  |># add in values above top quantile
   
       ### width
-      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~width.pal(rivers$width), weight = 4/(rivers$ORD_CLAS+1), fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_width"), group = "Width", popup = ~label_text) |>
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~width.pal(rivers$width), weight = rivers$width^(1/3)-0.1, fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_width"), group = "Width", popup = ~label_text) |>
 
-      addLegend(pal = width.pal.leg, values = round(seq(0, top_width, by = top_width/7), 2), title = "Stream width (m)", position = 'topright', group = "Width", opacity = 1, labFormat = function(type, cuts, p) {
-      paste0(rev(c(as.character(round(seq(0, top_width-top_width/7, by = top_width/7),2)), paste0('≥ ', round(top_width, 2)))))
+      addLegend(pal = width.pal.leg, values = seq(0, top_width, by = top_width/7), title = "Stream width (m)", position = 'topright', group = "Width", opacity = 1, labFormat = function(type, cuts, p) {
+      paste0(rev(c(as.character(round(seq(0, top_width-top_width/7, by = top_width/7),1)), paste0('≥ ', round(top_width, 1)))))
         }) |> 
       
-      addPolylines(data = smooth(tidyterra::filter(rivers, width >= top_width), method = "ksmooth", smoothness = 0.5), color = "#d4021d", weight = 4/(rivers$ORD_CLAS+1), fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_width"), group = "Width", popup = ~label_text)  |># add in values above top quantile
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~width.pal90(rivers$width), weight = rivers$width^(1/3)-0.1, fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_width90"), group = "Width", popup = ~label_text)  |># add in values above top quantile
 
   
       ### gradient
-      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~gradient.pal(rivers$sgr_dk_rav/10000), weight = 4/(rivers$ORD_CLAS+1), fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_grad"), group = "Gradient", popup = ~label_text) |>
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~gradient.pal(rivers$sgr_dk_rav/10000), weight = rivers$width^(1/3)-0.15,  opacity = 1, options = pathOptions(pane = "data_grad"), group = "Gradient", popup = ~label_text) |>
       
-      addLegend(pal = gradient.pal.leg, values = round(seq(0, top_gradient, by = top_gradient/7), 4), title = "Stream gradient", position = 'topright', group = "Gradient", opacity = 1, labFormat = function(type, cuts, p) {
-      paste0(rev(c(as.character(round(seq(0, top_gradient-top_gradient/7, by = top_gradient/7), 4)), paste0('≥ ', round(top_gradient, 4)))))
+      addLegend(pal = gradient.pal.leg, values = seq(0, top_gradient, by = top_gradient/7), title = "Stream gradient (mm/m)", position = 'topright', group = "Gradient", opacity = 1, labFormat = function(type, cuts, p) {
+      paste0(rev(c(as.character(round(seq(0, (top_gradient*1000)-(top_gradient*1000)/7, by = (top_gradient*1000)/7), 1)), paste0('≥ ', round(top_gradient*1000, 1)))))
         }) |> 
       
-      addPolylines(data = smooth(tidyterra::filter(rivers, sgr_dk_rav/10000 >= top_gradient), method = "ksmooth", smoothness = 0.5), color = "black", weight = 4/(rivers$ORD_CLAS+1), fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_grad"), group = "Gradient", popup = ~label_text)  |># add in values above top quantile
-  
-      ## lakes of the exploits
-      addPolygons(data = lakes, color = "#242B42", stroke = FALSE, fillOpacity = 0.9, options = pathOptions(pane = "lakes"), group = "exploits") |>
+  addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~gradient.pal90(rivers$sgr_dk_rav/10000), weight = rivers$width^(1/3)-0.15, opacity = 1, options = pathOptions(pane = "data_grad90"), group = "Gradient", popup = ~label_text)  |># add in values above top quantile
   
       # ability to choose which layers to see
-      addLayersControl(overlayGroups = c("D50", "Discharge", "Width", "Gradient"), position = "topleft", options = layersControlOptions(collapsed = F, autoZIndex = TRUE)) |>
+  addGroupedLayersControl(
+    baseGroups = c("Satellite", "Topographic", "White & Grey"),
+    overlayGroups = list(
+      "Predictions and HydroSHEDs data" = c("D50", "Discharge", "Width", "Gradient"),
+      "Barriers" = c("CABD barriers and areas past")
+    ),
+    position = "topleft",
+    options = groupedLayersControlOptions(
+      groupCheckboxes = FALSE,
+      collapsed = FALSE,
+      groupsCollapsable = FALSE,
+      sortLayers = FALSE,
+      sortGroups = FALSE,
+      sortBaseLayers = FALSE,
+    )
+  ) |> 
+  
+  hideGroup("CABD barriers and areas past") |> 
+  
   addScaleBar(position = "bottomleft") |> 
+  
   addLogo(arrow, position = "bottomleft", offset.x = 2, offset.y = 40)
   
 
 map
 ```
-
-\
-
-| **Desciption of map contents:**  
+<div id="bottom"></div>
 |  
-| D50: Gravel size was predicted based on the following calculations (Wilkins & Snyder 2011)  
+| <u><b>Description of map contents:</b></u> 
+|  
+| <b>D50 Gravel size:</b>
+|  
+| Gravel size is important to the Atlantic Salmon spawning; too fine or too coarse, and the salmon will either not spawn or have poor egg survival (Purchase 2018). We considered 16 - 64 mm to be the most suitable substrate size, and this is represented as green on th D50 map. However, salmon may spawn in substrate that isn't ideal, represented by yellow on the map. Finally, unsuitable substrate is represented by orange.
+| 
+| D50 was predicted based on the following calculations (Wilkins & Snyder 2011)  
 |  
 | D50 = 𝛕<sub>b</sub> / (𝛒<sub>s</sub> - 𝛒) * g * 𝛕<sup>*</sup>   
 |  
-| Parameters:  
+| <u>Parameters:</u>   
 | 𝛕<sub>b</sub> = 𝛒 * g * n<sup>3/5</sup> * [Q/W]<sup>3/5</sup> * S<sup>7/10</sup>  
 | 𝛒 = density of water = 1000 kg/m<sup>3</sup>  
 | g = acceleration by gravity = 9.80665 m/s<sup>2</sup>  
@@ -270,16 +335,21 @@ map
 | 𝛒<sub>s</sub> = sediment density = 2650 kg/m<sup>3</sup>  
 | 𝛕<sup>*</sup>  =  Shields parameter = 0.04 to follow Wilkins & Snyder 2011  
 |  
-| Variables to retreive from HydroSHEDs:  
+| <u>Variables to retreive from HydroSHEDs:</u>  
 | S = channel gradient, Calculated as the ratio between the elevation drop within the river reach (i.e. the difference between min. and max. elevation along the reach) and the length of the reach.  
 | Q = Discharge (m<sup>3</sup>/s), Average long-term discharge estimate for river reach, in cubic meters per second.    
 | W = channel width (m), Calculated as the surface river area of the river reach segment divided by length of the river reach segment.    
 |  
-| [Click here to download the `r params$watershed` HydroATLAS data shapefile](`r paste0("https://github.com/emmwilson/NL_watersheds/blob/0d9a7a8e31f9d6fc5a61aac211dbf85ce949138c/data/spatial%20data/watersheds/river_",params$watershed,".shp?raw=true")`)
+| <b>CABD barriers and areas past:</b>
+| Potential barriers to upstream salmon movement were taken from the Canadian Aquatic Barriers Database. Barriers were filtered to remove barriers that are insufficient to impede movement: a fishway exists, barrier has been decommissioned/removed, barrier was a dam less than 5 m high, or barrier's Used for Network Analysis field was false. Any stream segment upstream of the barrier is considered potentially inaccessible.   
 |  
-| Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6  
-| Lehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z
-|  
-<div id="bottom"></div>
-
+| <b> Data and citations: </b>
+| [Click here to download the `r params$watershed` HydroATLAS data shapefile](`r paste0("https://github.com/emmwilson/NL_watersheds/blob/0d9a7a8e31f9d6fc5a61aac211dbf85ce949138c/data/spatial%20data/watersheds/river_",params$watershed,".shp?raw=true")`)  
+| 
+| Barnes, H. 1967. Roughness Characteristics of Natural Channels. United States Geological Survey: Publications.  
+| Canadian Wildlife Federation. (2024). Canadian Aquatic Barriers Database (CABD). Retrieved from https://aquaticbarriers.ca/  
+| Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6   
+| Lehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z   
+| Purchase, C. (2018). A systematic review on the effectiveness of salmonid spawning habitat improvements, and recommendations to potentially increase productivity of depressed Newfoundland Atlantic salmon (Salmo salar) populations.  
+| Wilkins, and Snyder. 2011. Geomorphic comparison of two Atlantic coastal rivers: Toward an understanding of physical controls on Atlantic salmon habitat. River Research and Applications.  
 :::

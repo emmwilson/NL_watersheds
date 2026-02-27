@@ -35,9 +35,9 @@ website:
         - text: "Western Notre Dame Bay watershed"
           href: "map_Western%20Notre%20Dame%20Bay.html"
         - text: "Red Indian Lake watershed"
-          href: "Exploits_map.html"
+          href: "map_Red%20Indian%20Lake.html"
         - text: "Exploits watershed"
-          href: "Exploits_map.html"
+          href: "map_Exploits.html"
         - text: "Southwestern Notre Dame Bay watershed"
           href: "map_Southwestern%20Notre%20Dame%20Bay.html"
         - text: "Gander watershed"
@@ -72,9 +72,12 @@ website:
           href: "map_Eastern%20Coast%20Newfoundland.html"
         - text: "Eastern St. Mary's Bay watershed"
           href: "map_Eastern%20St.%20Mary%27s%20Bay.html"
+      - text: "Field data"
+        href: Exploits_map.qmd 
       - text: "Sliders"
         href: Sliders.qmd 
-        
+      - text: "Resources"
+        href: resources.qmd         
 format:
   html:
     theme: sandstone

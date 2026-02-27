@@ -15,10 +15,21 @@ execute:
   error: false
 ---
 
+```{r, instruct}
+#| include: false 
+#| warning: false
+#| eval: false
+
+`lines with // are instructions or descriptions
+lines with //** are code and you just need to delete the //**s to make that chunk of code work, and in some cases put your own values in
+lines with //| are specific too ojs so do not alter`
+
+```
 
 {{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
 Set the below variable values to see predictions of several response variables shown in the bar graph.  
 Description of the models can be found at the [bottom](#bottom) of each page.
+
 ```{r, load}
 #| include: false 
 #| warning: false
@@ -42,6 +53,8 @@ pacman::p_load(shiny,
 
 import {vl} from "@vega/vega-lite-api"
 import { aq, op } from "@uwdata/arquero"
+import {Plot} from "@mkfreeman/plot-tooltip"
+import {addTooltips} from "@mkfreeman/plot-tooltip"
 
 
 vg = require('vega-lite')
@@ -50,7 +63,10 @@ vg = require('vega-lite')
 imageURL_invert = FileAttachment("/data/invert 2.png").url()
 imageURL_peri = FileAttachment("/data/periphyton.png").url()
 imageURL_gravel = FileAttachment("/data/gravel.png").url()
-imageURL_par_len = FileAttachment("/data/par_len.png").url()
+imageURL_parr = FileAttachment("/data/par_len.png").url()
+imageURL_salmon = FileAttachment("/data/NOAA_atlantic_salmon.png").url()
+//** imageURL_response = FileAttachment("/data/response_file_name.png").url() 
+
 
 // function to convert all predictions that are negative to 0
 function negativetozero(equation) { 
@@ -65,40 +81,53 @@ function negativetozero(equation) {
 
 ```{ojs}
 //| echo: false
-//| panel: sidebar
+//| panel: input
+//| layout-ncol: 2
+
 // sliders for predictor variables
 
-
-// example: periphyton biomass (mean - 1 outlier)
+// Periphyton biomass 
 viewof peri = {
   const form = Inputs.range(
-  [0, 0.5], 
-  {value: 0.25, step: (0.5)/100, label: "Periphyton density (μg cm⁻²):"}
-);
-  form.range.style.cssText += "accent-color: #1f78b4; width: 500px";
+  [0, 0.5], // minimum and maximum values 
+  {value: 0.25, //starting value
+  step: (0.5)/100, //amount step by
+  label: "Measured periphyton density (μg/cm²):"} //label above slider
+); //below is formatting so do not alter
+  form.range.style.cssText += "accent-color: #1f78b4; width: 110%"; 
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
-    
-  const label = form.querySelector("label");
-  label.style.cssText += "width: 100%";
   
   return form;
 }
 
-// example: EPT
+
+
+// EPT
 viewof EPT = {
   const form = Inputs.range(
   [0, 60], 
-  {value: 30, step: 60/100, label: "Density of Ephemeroptera, Plecoptera, and Trichoptera (g m⁻²):"}
+  {value: 30, step: 60/100, label: "Measured Ephemeroptera, Plecoptera, and Trichoptera density (g/m²):"}
 );
-  form.range.style.cssText += "accent-color: #1f78b4; width: 500px";
+  form.range.style.cssText += "accent-color: #1f78b4; width: 110%";
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
   
-  const label = form.querySelector("label");
-  label.style.cssText += "width: 100%; margin-top: 10px";
-
   return form;
 }   
 
+
+// add other varaibles here (put in own values and remove "//**")
+// this example for parr
+
+//** viewof variable1 = {
+//**   const form = Inputs.range(
+//**   [min, max], 
+//**   {value: start, step: step, label: "label (units):"}
+//** ); //don't change below here
+//**   form.range.style.cssText += "accent-color: #1f78b4; width: 110%";
+//**   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
+  
+//**   return form;
+//** } 
 ```
 
 
@@ -107,13 +136,18 @@ viewof EPT = {
 //| panel: fill
 
 // prediction functions
-function invertbiomass(peri) {
-  return negativetozero(1.133+5.50*peri)
+function invertbiomass(peri) { //returns predicted invert based on 
+  return negativetozero(1.133+5.50*peri) //numbers here are intercept and slope
 }
 
 function peribiomass(EPT) {
   return negativetozero(0.01 + 0.08*EPT) 
 }
+
+// example adding predicitons for parr 
+//** function parrbiomass(variable1) {
+//**   return negativetozero(0.22 + 0.74*variable1) 
+//** }
 
 // error bar functions
 function inverthigh(peri) {
@@ -132,63 +166,95 @@ function perilow(EPT) {
   return negativetozero((0.01-0.02) + (0.08-0.02)*EPT) 
 }
 
+// example adding error bars for parr 
+//** function parrhigh(variable1) {
+//**   return negativetozero((0.22+0.003) + (0.74+0.2)*variable1) 
+//** }
 
-// function that takes input from sliders and creates prediction of each response variable
-function myFunction(peri, EPT) {
+//** function parrlow(variable1) {
+//**   return negativetozero((0.22-0.003) + (0.74-0.2)*variable1) 
+//** }
+
+
+// function that takes input from sliders and creates prediction of each response variable based on functions above
+function myFunction(peri,
+                    //** parr,
+                    EPT) { 
   return aq.table({
-  'peri': [peri, peri], // repeat for each input
-  'EPT': [EPT, EPT],
-  'response_type': ["Predicted invertebrate density (g m⁻²) ", 
-                    "Predicted periphyton density (μg cm⁻²)",
-                    ], // ordered alphabetically
-  'response_predict': [invertbiomass(peri),
-                      peribiomass(EPT) // keep label normal
+  'peri': [peri,
+           //** peri,
+           peri], // repeat for each input (so if adding parr you would add the third rep of each peri and EPT
+  'EPT': [EPT,
+          //** EPT,
+          EPT],
+  //** 'variable1': [variable1, variable1, variable1],
+  'response_type': ["Predicted invertebrate density (g/m²)", 
+                    "Predicted periphyton density (μg/cm²)",
+                    //** "Predicted parr density (g m⁻²)"
+                    ],
+  'response_predict': [invertbiomass(peri), // order same as response type
+                      peribiomass(EPT),
+                      //** parrbiomass(variable1)
                       ],
-  'response_errorhigh': [inverthigh(peri) ,
-                        perihigh(EPT) 
+  'response_errorhigh': [inverthigh(peri), // order same as response type
+                        perihigh(EPT),
+                      //** parrhigh(variable1)
                         ],
-  'response_errorlow': [invertlow(peri) ,
-                        perilow(EPT)
+  'response_errorlow': [invertlow(peri), // order same as response type
+                        perilow(EPT),
+                      //** parrlow(variable1)
                         ]
   })
 }
 
 // create the table
-predictions_ps = myFunction(peri, EPT)
+predictions_ps = myFunction(peri, 
+                            EPT,
+                            //** parr,
+                            ) 
+
 
 // create a table that stores the image paths
 images = aq.table({
-  'response_type': ["Invertebrate biomass (g m⁻²)", 
-                    "Periphyton biomass (μg cm⁻²)",
-                    //"Invertebrate diversity", 
-                    //"Par length (cm)"
-                    ], // ordered alphabetically
-  'image_path': [imageURL_invert, 
+  'response_type': ["Predicted invertebrate density (g/m²)",
+                    "Predicted periphyton density (μg/cm²)",
+                    //** "Predicted parr density (g m⁻²)",
+                    ],
+  'image_path': [imageURL_invert, //order these to match  ordered response variables (response_type)
                   imageURL_peri
-                  //imageURL_invert_div, 
-                  //imageURL_par_len
-                  ] //order these to match alphabetically ordered response variables (response_type)
+                  //** imageURL_parr,
+                  ] 
 })
+
 
 // create the bar plot based on predictions_ps
 Plot.plot({
   width: Math.max(width, 550),
-  height: Math.floor(0.45 * width),
+  height: Math.floor(0.25 * width),
   marginLeft: 0,
   marginRight: 0,
   marginBottom: 70,
   color: {scheme: "dark2" ,
   legend: false},
-  y: {domain: [0,10], axis: null},
-  x: {label: null},
+  y: {domain: [0,8], axis: null},
+  x: {label: null, domain: ["Predicted invertebrate density (g/m²)", 
+                            "Predicted periphyton density (μg/cm²)",
+                            //** "Predicted parr density (g m⁻²) "
+                            ]},
+  
+  // create bar graph
   marks:[
-    Plot.axisX({fontSize: 25}), 
+    Plot.axisX({fontSize: Math.max(16, width / 80)}), 
     Plot.barY(predictions_ps,
      {x: "response_type",
      y: "response_predict",
-     fill: "response_type"}), // create bar graph
-    Plot.text(predictions_ps, {x: "response_type", y: "response_predict", text: "response_predict", dy: -7, dx: -200, lineAnchor: "bottom", fontSize: 30}), // write out predicted value
-    Plot.ruleX(predictions_ps, {x: "response_type", y1: 'response_errorlow', y2: 'response_errorhigh', strokeWidth: 3}) // add error bars
+     fill: "response_type"}), 
+    
+     // write out predicted value
+    Plot.text(predictions_ps, {x: "response_type", y: "response_predict", text: "response_predict", dy: -7, dx: -width/8, lineAnchor: "bottom", fontSize: Math.max(16, width / 80)}), 
+    
+    // add error bars
+    Plot.ruleX(predictions_ps, {x: "response_type", y1: 'response_errorlow', y2: 'response_errorhigh', strokeWidth: 3}) 
    ]
 })
 
@@ -200,7 +266,11 @@ Plot.plot({
   marginRight: 0,
   colour: {legend: false},
   y: {domain: [0,0], axis: null},
-  x: {label: "Response type", axis: null, fontSize: 22},
+  x: {label: "Response type", axis: null, fontSize: 22, 
+      domain: ["Predicted invertebrate density (g/m²)", // match this order to above
+              "Predicted periphyton density (μg/cm²)",
+               //** "Predicted parr density (g m⁻²) "
+               ]},
   marks:[
     Plot.image(images, 
       {x: "response_type",
@@ -211,29 +281,45 @@ Plot.plot({
       })
    ]
 })
+
+
 ```
  
 \
 
-| The predictor variables, measured in field, were assessed for their correlation to invertebrate and periphyton biomass, using general linear models compared using Akaike’s Information Criterion corrected for small sample sizes.  
+| <u><b>Desciption of models and variables:</b></u> 
 
+| A suite of predictor variables, measured in field, were assessed for their correlation to invertebrate and periphyton biomass, using general linear models (GLMs) compared using Akaike’s Information Criterion corrected for small sample sizes. The variables we included in the final models are represented as sliders above.  
 
+| <b>Sliders</b>: 
+
+| Periphyton density (μg cm⁻²): The density of algae, microbes, bacteria, and detritus attached to substrate. 
+
+| Ephemeroptera, Plecoptera, and Trichoptera density (g m⁻²): The density of  invertebrates on the families Ephemeroptera, Plecoptera, and Trichoptera. 
+
+| <b>Predicted values</b>: 
+
+| Invertebrate density (g cm⁻²): The density of all invertebrates predicted to occur based on GLMs.
+
+| Periphyton density (μg cm⁻²): The density of algae, microbes, bacteria, and detritus attached to substrate, predicted to occur based on GLMs.   
 
 ## Gravel and spawning estimates
-
+:::{.outer-container}
 ```{ojs}
 //| echo: false
 //| panel: sidebar
 
 // sliders for predictor variables
 
-// example: discharge
-viewof DIS_AV_CMS = {
+//discharge
+viewof DIS_AV_CMS = {  //name slider
   const form = Inputs.range(
-  [0, 300], 
-  {value: 1, step: 300/1000, label: "Discharge (units):"}
-);
-  form.range.style.cssText += "accent-color: #1f78b4; width: 500px";
+  [0, 300],  // put minimum values and maximum
+  {value: 1, // starting value
+   step: 300/1000, // amount able to step by
+   label: "Discharge (m³/s):"} // label above slider
+);  // below is all styling
+  form.range.style.cssText += "accent-color: #1f78b4; width: 110%";
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
     
   const label = form.querySelector("label");
@@ -241,13 +327,14 @@ viewof DIS_AV_CMS = {
 
   return form;
 }
-// example: Stream width
+
+// Stream width
 viewof swidth = {
   const form = Inputs.range(
   [0, 100], 
   {value: 20, step: 100/100, label: "Stream width (m):"}
 );
-  form.range.style.cssText += "accent-color: #1f78b4; width: 500px";
+  form.range.style.cssText += "accent-color: #1f78b4; width: 110%";
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
   
   const label = form.querySelector("label");
@@ -255,13 +342,14 @@ viewof swidth = {
 
   return form;
 }
-// example: Stream gradient
+
+// Stream gradient
 viewof sgr_dk_rav = {
   const form = Inputs.range(
-  [0, 0.05], 
-  {value: 0.0035, step: 0.05/100, label: "Stream gradient:"}
+  [0, 50], 
+  {value: 3.5, step: 50/100, label: "Stream gradient (mm/m):"}
 );
-  form.range.style.cssText += "accent-color: #1f78b4; width: 500px";
+  form.range.style.cssText += "accent-color: #1f78b4; width: 110%";
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
   
   const label = form.querySelector("label");
@@ -269,13 +357,14 @@ viewof sgr_dk_rav = {
 
   return form;
 }
-// example: fish length
+
+// Fish length
 viewof fish = {
   const form = Inputs.range(
-  [0, 2], 
-  {value: 1, step: 2/100, label: "Fish length (m):"}
+  [40, 200], 
+  {value: 100, step: (200-40)/100, label: "Fish length (cm):"}
 );
-  form.range.style.cssText += "accent-color: #1f78b4; width: 500px";
+  form.range.style.cssText += "accent-color: #1f78b4; width: 110%";
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
   
   const label = form.querySelector("label");
@@ -287,46 +376,26 @@ viewof fish = {
 
 ```
 
-
 ```{ojs}
 //| echo: false
 //| panel: fill
 
 // prediction functions
+
+// gravel model
 function gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) {
-  return (2000 * op.pow(0.04, (3 / 5)) * op.pow((DIS_AV_CMS / swidth), (3 / 5)) * op.pow(sgr_dk_rav, (7 / 10)) / (650 * 0.04)) * 1000 ;
+  return (2000 * op.pow(0.04, (3 / 5)) * op.pow((DIS_AV_CMS / swidth), (3 / 5)) * op.pow(sgr_dk_rav/1000, (7 / 10)) / (650 * 0.04)) * 1000 ;
 }
 
 
-// to get normal distribution that skews at limits of suitable gravel
 
-//function f(x) { 
-//  return op.exp(((-1 / 2) * op.pow(((x) /4), 2)))
-//}
-
-//erf = (await import("https://cdn.jsdelivr.net/npm/@stdlib/esm@0.0.3/math/base/special/erf.js"))
-//  .default
-
-//function P(x) { 
-//  return (1/2) * (1 + erf(x / op.sqrt(2)))
-//}
-
-// shape of curve responds to ideal gravel size for fish length (linear function)
-//function a(i) {
-//  return (((-2/48)*i)+1.67)*10
-//}
-
-// ideal fish size as exponential growth, where 16 is ideal for 0.1 m fish and 64 is ideal for 2m fish
+// ideal fish size as exponential curve, where 16 is ideal for 0.1 m fish and 64 is ideal for 2m fish
 
 function idealsize(fish) {
-  return 109 * (op.pow(1.26, fish) - 1)
+  return 109 * (op.pow(1.26, fish/100) - 1)
 }
 
-//function spawningprob(DIS_AV_CMS, swidth, sgr_dk_rav, fish) {
-//  return f((gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) - idealsize(fish)) / 2) * P(a(idealsize(fish)) * ((gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) - idealsize(fish)) / 2));
-//}
-
-
+// spawning suitability that responds to fish length
 function spawningprob(DIS_AV_CMS, swidth, sgr_dk_rav, fish) {
   if(16 <= gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) <=64) {
   return op.exp((-1/2) * (op.pow((gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) - idealsize(fish))/8, 2)));
@@ -337,11 +406,11 @@ function spawningprob(DIS_AV_CMS, swidth, sgr_dk_rav, fish) {
 
 
 
-// function that takes input from sliders and creates prediction of each response variable
+// function that takes input from sliders and creates prediction of each response variable based on above functions
 
 function gravelFunction(DIS_AV_CMS, swidth, sgr_dk_rav, fish) {
   return aq.table({
-  'DIS_AV_CMS': [DIS_AV_CMS, DIS_AV_CMS], // repeat for each input
+  'DIS_AV_CMS': [DIS_AV_CMS, DIS_AV_CMS], // repeat for each value predicting
   'swidth': [swidth, swidth],
   'sgr_dk_rav':[sgr_dk_rav, sgr_dk_rav],
   'fish': [fish, fish],
@@ -361,14 +430,19 @@ function gravelFunction(DIS_AV_CMS, swidth, sgr_dk_rav, fish) {
 // create the table
 predictions_gravel = gravelFunction(DIS_AV_CMS, swidth, sgr_dk_rav, fish)
 
-// create a table that stores the image paths
-images2 = aq.table({
-  'response_type': ["Gravel size D50 (m)", 
-                    "Probability salmon spawn in predicted gravel size",
-                    ], // ordered alphabetically
-  'image_path': [imageURL_gravel, 
-                  imageURL_par_len
-                  ] //order these to match alphabetically ordered response variables (response_type)
+// create a tables that stores the image paths
+image_gravel = aq.table({ //split gravel and salmon so I could specify the image sizes better
+  'response_type': ["Gravel size D50 (m)"
+                    ], 
+  'image_path': [imageURL_gravel
+                  ] 
+})
+
+image_salmon = aq.table({ 
+  'response_type': ["Probability salmon spawn in predicted gravel size",
+                    ],
+  'image_path': [imageURL_salmon
+                  ] 
 })
 
 // create the bar plot based on predictions_ps
@@ -380,15 +454,15 @@ Plot.plot({
   marginBottom: 70,
   color: {scheme: "dark2" ,
   legend: false},
-  y: {domain: [0, 2000], label: null},
+  y: {domain: [0, 2100], label: null},
   x: {label: null},
   marks:[
-    Plot.axisX({fontSize: 25, marginBottom: 40}),
+    Plot.axisX({fontSize: Math.max(16, width / 60), marginBottom: 40}),
     Plot.barY(predictions_gravel,
      {x: "response_type",
      y: "response_predict",
      fill: "response_type"}), // create bar graph
-    Plot.text(predictions_gravel, {x: "response_type", y: "response_predict", text: "response_predict_label", dy: -7, dx: -200, lineAnchor: "bottom", fontSize: 30}) // write out predicted value
+    Plot.text(predictions_gravel, {x: "response_type", y: "response_predict", text: "response_predict_label", dy: -7, dx: -width/8, lineAnchor: "bottom", fontSize: Math.max(16, width / 60)}) // write out predicted value
    ]
 })
 
@@ -403,25 +477,49 @@ Plot.plot({
   y: {domain: [0,0], axis: null},
   x: {label: "Response type", axis: null, fontSize: 22},
   marks:[
-    Plot.image(images2, 
+    Plot.image(image_gravel, 
       {x: "response_type",
       y: [0, 0],
       src: "image_path",
-      width: 150,
+      width: width/8,
+      axis: null
+      }),
+    Plot.image(image_salmon, 
+      {x: "response_type",
+      y: [0, 0],
+      src: "image_path",
+      width: 200,
       axis: null
       })
    ]
 })
+
 ```
 
+<!-- optional to add popup descriptions -->
+<!-- :::{.left-popcontainer} --> 
+<!-- :::{.left-popup} -->
+<!-- Text to popup left -->
+<!-- ::: -->
+<!-- ::: -->
 
+<!-- :::{.right-popcontainer} -->
+<!-- :::{.right-popup} -->
+<!-- Text to popup right -->
+<!-- ::: -->
+<!-- ::: -->
+<!-- ::: -->
 \
 
-| Gravel size was predicted based on the following calculations (Wilkins & Snyder 2011)
+| <u><b>Desciption of models and variables:</b></u> 
+
+| 
+
+| <b>D50 Gravel size:</b> was predicted based on the following calculations (Wilkins & Snyder 2011)
 | 
 | D50 = 𝛕<sub>b</sub> / (𝛒<sub>s</sub> - 𝛒) * g * 𝛕<sup>* </sup>
 | 
-| Parameters:
+| <u>Parameters:</u>
 | 𝛕<sub>b</sub> = 𝛒 * g * n<sup>3/5</sup> * [Q/W]<sup>3/5</sup> * S<sup>7/10</sup>
 | 𝛒 = density of water = 1000 kg/m<sup>3</sup>
 | g = acceleration by gravity = 9.80665 m/s<sup>2</sup>
@@ -429,13 +527,13 @@ Plot.plot({
 | 𝛒<sub>s</sub> = sediment density = 2650 kg/m<sup>3</sup>
 | <sup>*</sup>  =  Shields parameter = 0.04 to follow Wilkins & Snyder 2011
 | 
-| Variables to retreive from HydroSHEDs:
+| <u>Variables to retreive from HydroSHEDs:</u>
 | S = channel gradient, Calculated as the ratio between the elevation drop within the river reach (i.e. the difference between min. and max. elevation along the reach) and the length of the reach.
 | Q = Discharge (m<sup>3</sup>/s), Average long-term discharge estimate for river reach, in cubic meters per second.
 | W = channel width (m), Calculated as the surface river area of the river reach segment divided by length of the river reach segment.
 |  
 | 
-| Spawning suitability in predicted gravel size  for fish of chosen length (m) calculated using the following equation:
+| <b>Spawning suitability:</b> in predicted gravel size  for fish of chosen length (m) calculated using the following equation:
 | 
 | Suitability = e<sup>((-1/2) * ((D50 - ideal.fish.gravel)/8)<sup>2</sup>)</sup>
 | 
