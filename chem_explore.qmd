@@ -1,0 +1,369 @@
+---
+title: "chem_explore"
+format:
+  html:
+    css: styles.css
+    grid:
+      sidebar-width: 0px
+      margin-width: 0px
+      body-width: 2500px
+---
+
+```{r, library}
+#| include: false
+
+pacman::p_load(shiny,
+               bslib,
+               ggplot2,
+               ggtext,
+               shinythemes,
+               thematic,
+               tidyverse,
+               httr,
+               leaflet,
+               leafem,
+               terra,
+               htmltools,
+               glue,
+               cowplot,
+               leaflegend,
+               smoothr,
+               leaflet.providers,
+               janitor,
+               openxlsx,
+               bsicons)
+
+if (!requireNamespace("leaflet.extras", quietly = TRUE)) {
+  remotes::install_github("trafficonese/leaflet.extras")
+}
+library(leaflet.extras)
+
+knitr::read_chunk('addGroupedLayersControl.R')
+```
+
+```{r, import}
+#| include: false
+# import layers
+
+## river extent
+exploits_drainage <- vect("data/spatial data/exploits_watershed.shp") |>  
+    project("EPSG:4326 - WGS 84")
+  
+## all rivers
+exploits_river <- vect("data/spatial data/exploits_river_field_data.shp") |>  
+  project("EPSG:4326 - WGS 84")
+  
+## lakes
+lakes <- vect("data/spatial data/Exploits_lakes.shp") |>  
+  project("EPSG:4326 - WGS 84")
+  
+## data from river reaches sampled
+field_reaches <- vect("data/spatial data/exploits_reaches_with_sites.shp") |>  # to be updated with 2025 sites
+  project("EPSG:4326 - WGS 84")
+  
+## shape of NL
+NL <- vect("data/spatial data/NL_boundaries.shp") |>  
+  project("EPSG:4326 - WGS 84")  
+
+## areas blocked by CABD 
+file_barriers <- paste0("data/spatial data/exploits_barriers.shp")
+barriers <- vect(file_barriers)
+
+file_inaccess <- paste0("data/spatial data/exploits_inaccess.shp")
+inaccess <- vect(file_inaccess)
+   
+# import arrow
+arrow <- "https://cdn.pixabay.com/photo/2013/07/12/17/54/arrow-152596_960_720.png"
+```
+
+```{r, basemap}
+#| include: false
+
+# base map gets specific layers added in each tab to it to make unique maps but with same base
+
+exploits_map <- leaflet(width = "100vw", height = "72vh", options = leafletOptions(zoomSnap = 0.25)) |> 
+  addProviderTiles('Esri.WorldImagery', group = "Satellite") |> # add base map options
+  addProviderTiles('Esri.WorldTopoMap', group = "Topographic") |> # adds base map
+  addProviderTiles('Esri.WorldGrayCanvas', group = "White & Grey") |> 
+
+# open map to this screen
+  setView(-56.65499, 48.70449, zoom = 8.5) |> 
+  
+#can recenter to that location by clicking button
+  addHomeButton(ext = c(-58.2,48.1, -55.45,49.3), position = "topleft", group = "Recenter") |> 
+
+# create layers to add vectors to
+  addMapPane("NL", zIndex = 400) |> 
+  addMapPane("drainage", zIndex = 410) |> 
+  addMapPane("river", zIndex = 415) |> 
+  addMapPane("lakes", zIndex = 420) |>
+  addMapPane("inaccess", zIndex = 455) |> 
+  addMapPane("barriers", zIndex = 460) |>   
+      
+  # addPolygons(data = NL, color = "#A1929B", weight = 1.5, fillColor = "#A1929B", fillOpacity = 0.25, options = pathOptions(pane = "NL")) |>
+      
+# add polygons and lines
+## exploits drainage area
+  addPolygons(data = exploits_drainage, color = "#32B1DB", weight = 1.25, fillColor = "#236D9E", opacity = 0.4, fillOpacity = 0.2, options = pathOptions(pane = "drainage")) |>
+  
+## rivers of the exploits
+  addPolylines(data = exploits_river, color = "#588BAD", weight = 1.5, options = pathOptions(pane = "river"), group = "exploits", opacity = 0.8) |>
+  
+## lakes of the exploits
+  addPolygons(data = lakes, color = "#234667", stroke = FALSE, fillOpacity = 0.9, options = pathOptions(pane = "lakes"), group = "exploits") |>
+  
+  addScaleBar(position = "bottomleft") |> 
+  addLogo(arrow, position = "bottomleft")
+
+
+
+```
+
+
+
+
+### Water chemistry
+
+Describe data here...   
+  
+Click on a reach to see the data for each segment. Link to download shapefile is [below map](#bottom4).   
+
+```{r}
+#| echo: false
+#| include: false
+
+chem <- read.xlsx("/Users/emmersonEmmerson/Documents/Master\'s/Water_Quality_data_explore.xlsx", sheet = "Data") |> 
+  clean_names() |> 
+  mutate(x = as.numeric(x)*-1) |> 
+  mutate(year_trib = paste0(year, "-", trib_size)) |> 
+  group_by(year, site_code, trib_size, year_trib, x, y) |> 
+  summarise(across(.cols = c(p_h, ec, dissolved_solids_ppm, alkalinity_ppm, doc, tdn, tdn_100), .fns = ~ mean(.x, na.rm = TRUE))) |>
+  ungroup()
+  
+chem$year <- as.factor(chem$year)
+chem$trib_size <- as.factor(chem$trib_size)
+chem$year_trib <- as.factor(chem$year_trib)
+chem$y <- as.numeric(chem$y)
+chem$x <- as.numeric(chem$x)
+
+ojs_define(chem_data = chem)
+```
+
+```{r, palettes_chem}
+#| include: false
+
+pal.ph <- colorNumeric(palette = "inferno", domain = chem$p_h)
+
+pal.ec <- colorNumeric(palette = "inferno", domain = chem$ec)
+
+pal.ds <- colorNumeric(palette = "inferno", domain = chem$dissolved_solids_ppm)
+
+pal.ak <- colorNumeric(palette = "inferno", domain = chem$alkalinity_ppm)
+
+pal.dc <- colorNumeric(palette = "inferno", domain = chem$doc)
+
+pal.dn <- colorNumeric(palette = "inferno", domain = chem$tdn)
+```
+
+
+
+```{r, icons}
+#| include: false
+# icon_function <- function(trib){
+#   if(trib == "2024-Bg"){
+#     return(sprintf("http://www.w3.org/2000/svg"))
+#   }else if(trib == "2024-Sm"){
+#     return(sprintf("http://www.w3.org/2000/svg"))
+#   }else if(trib == "2025-Sm"){
+#     return(sprintf("http://www.w3.org/2000/svg"))
+#   }
+# }
+
+icon_ph <- awesomeIcons(
+  icon = c("circle", bs_icon("suit-diamond-fill"), bs_icon("square-fill"))[match(chem$year_trib, c("2024-Bg", "2024-Sm", "2025-Sm"))], # Map factor levels to icon names
+  library = "fa",
+  iconColor = pal.ph(chem$p_h))
+
+iconSet <- awesomeIconList(
+  "2024-Bg" = makeAwesomeIcon(
+    icon = "circle",
+    library = 'fa'
+  ),
+  "2024-Sm" = makeAwesomeIcon(
+    icon = bs_icon("suit-diamond-fill")
+  ),
+  "2025-Sm" = makeAwesomeIcon(
+    icon = bs_icon("square-fill")
+  )
+)
+
+
+```
+
+
+```{r, popup_labels_chem}
+#| include: false
+# adds information to popups for each reach when it is selected
+
+
+label_text_gravel <- glue("<b><u>{'Tributary {chem$name}:'}</u></b> <br/>",
+  "<b>Predicted gravel size (D50): </b> {round(field_reaches$D50_pred, 1)} mm<br/>") |> 
+ 
+  lapply(htmltools::HTML)
+```
+
+```{r, map_chem}
+#| echo: false
+#| column: screen 
+#| warning: false
+
+exploits_map_chem <- exploits_map |> 
+  
+  addMapPane("data_ph", zIndex = 450) |> 
+  addMapPane("data_ec", zIndex = 445) |> 
+  addMapPane("data_ds", zIndex = 440) |> 
+  addMapPane("data_ak", zIndex = 435) |> 
+  addMapPane("data_dc", zIndex = 430) |> 
+  addMapPane("data_dn", zIndex = 425) |> 
+
+## pH
+  addAwesomeMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, options = pathOptions(pane = "data_ph"), group = "p_h", layerId = ~p_h, icon = icon_ph) |>
+      
+  addLegend(pal = pal.ph, values = chem$p_h, title = "pH", position = 'topright', group = "p_h", opacity = 1, na.label = "NA") |>
+  
+  addLegendAwesomeIcon(iconSet = iconSet,
+                       title = "Year - Tributary Size",
+                       position = 'topright',
+                       group = 'year-trib')  |>
+
+## ec  
+  addCircleMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, color = ~pal.ec(chem$ec), radius = 3, options = pathOptions(pane = "data_ec"), group = "ec", fillOpacity = 1, opacity = 1, layerId = ~ec) |>
+      
+  addLegend(pal = pal.ec, values = chem$ec, title = "Electrical conductivity", position = 'topright', group = "ec", opacity = 1, na.label = "NA") |>  
+  
+## ds 
+  addCircleMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, color = ~pal.ds(chem$dissolved_solids_ppm), radius = 3, options = pathOptions(pane = "data_ds"), group = "dissolved_solids_ppm", fillOpacity = 1, opacity = 1, layerId = ~dissolved_solids_ppm) |>
+      
+  addLegend(pal = pal.ds, values = chem$dissolved_solids_ppm, title = "Dissolved Solids", position = 'topright', group = "dissolved_solids_ppm", opacity = 1, na.label = "NA")  |>
+
+## ak 
+  addCircleMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, color = ~pal.ak(chem$alkalinity_ppm), radius = 3, options = pathOptions(pane = "data_ak"), group = "alkalinity_ppm", fillOpacity = 1, opacity = 1, layerId = ~alkalinity_ppm) |>
+      
+  addLegend(pal = pal.ak, values = chem$alkalinity_ppm, title = "Alkalinity", position = 'topright', group = "alkalinity_ppm", opacity = 1, na.label = "NA")  |>
+  
+## dc 
+  addCircleMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, color = ~pal.dc(chem$doc), radius = 3, options = pathOptions(pane = "data_dc"), group = "doc", fillOpacity = 1, opacity = 1, layerId = ~doc) |>
+      
+  addLegend(pal = pal.dc, values = chem$doc, title = "DOC", position = 'topright', group = "doc", opacity = 1, na.label = "NA")  |>
+  
+## dc 
+  addCircleMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, color = ~pal.dn(chem$tdn), radius = 3, options = pathOptions(pane = "data_dn"), group = "tdn", fillOpacity = 1, opacity = 1, layerId = ~tdn) |>
+      
+  addLegend(pal = pal.dn, values = chem$tdn, title = "TDN", position = 'topright', group = "tdn", opacity = 1, na.label = "NA")  |>
+  
+# ability to choose which layers to see
+  addGroupedLayersControl(
+    baseGroups = c("Satellite", "Topographic", "White & Grey"),
+    overlayGroups = list(
+      "Water chemistry data" = c("p_h", "ec", "dissolved_solids_ppm", "alkalinity_ppm", "doc", "tdn")),
+    position = "topleft",
+    options = groupedLayersControlOptions(
+      groupCheckboxes = FALSE,
+      collapsed = FALSE,
+      groupsCollapsable = FALSE,
+      sortLayers = FALSE,
+      sortGroups = FALSE,
+      sortBaseLayers = FALSE,
+      exclusiveGroups = c("Water chemistry data"),
+    )
+  )  |> 
+  htmlwidgets::onRender("
+        function() {
+            $('.leaflet-control-layers-overlays');
+        }
+    ") |>  
+  
+  hideGroup(c("pH", "ec", "dissolved_solids_ppm", "alkalinity_ppm", "doc", "tdn"))  |> 
+
+htmlwidgets::onRender("
+    function(el, x) {
+      this.on('overlayadd', function(e) {
+        // Dispatch custom event with the layer name
+        window.dispatchEvent(new CustomEvent('leafletLayerSelected', {
+          detail: e.name
+        }));
+      });
+    }
+  ")
+  
+
+exploits_map_chem
+
+```
+
+```{ojs}
+//| echo: false
+//| output: false
+
+import {legend} from "@d3/color-legend"
+import {rasterize} from "@mbostock/saving-svg"
+```
+
+\
+
+```{ojs}
+//| echo: false
+//| panel: fill
+
+viewof selectedLayerGroup = {
+  // 1. Create a container for the entire viewof component
+  let container = document.createElement("div");
+  
+  // 2. Create the fixed label and the dynamic display area
+  container.innerHTML = `
+    <div style="font-weight: bold; margin-bottom: 5px;">Map layer as X Axis:</div>
+    <div id="selection-display">p_h</div>
+  `;
+  
+  // 3. Define which element actually holds the value for Observable
+  const displayArea = container.querySelector("#selection-display");
+  container.value = "p_h";
+
+  // 4. Listen for the custom event
+  window.addEventListener("leafletLayerSelected", (e) => {
+    // Update only the dynamic area
+    displayArea.innerHTML = e.detail;
+    
+    // Update the value property of the container
+    container.value = e.detail;
+    
+    // Dispatch input event to update Observable
+    container.dispatchEvent(new Event("input", {bubbles: true}));
+  });
+
+  return container;
+}
+
+
+viewof yVariable = Inputs.select(["p_h", "ec", "dissolved_solids_ppm", "alkalinity_ppm", "doc", "tdn"], {value: "ec", label: html`<b>Select Y Axis:</b>`})
+
+
+viewof myPlot = Plot.plot({
+    grid: true,
+    color: {scheme: "inferno",
+      legend: false},
+    symbol: {legend: true, 
+    range: ["circle", "diamond", "square"]
+    },
+    marks: [
+      Plot.dot(data, {
+        x: selectedLayerGroup, 
+        y: yVariable,
+        fill: selectedLayerGroup,
+        symbol: "year_trib"})
+    ]
+  })
+
+data = transpose(chem_data)
+```
+

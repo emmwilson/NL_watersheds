@@ -142,8 +142,8 @@ NL_map <- leaflet(height = "85vh", width = "54vw", options = leafletOptions(zoom
                 color =  ~pal(color_id), weight = 1.5, fillOpacity = 0.5,
                 bringToFront = TRUE, sendToBack = TRUE))  |>
   
-  addScaleBar(position = "bottomright") |> 
-  addLogo(arrow)
+  addScaleBar(position = "bottomleft") |> 
+  addLogo(arrow, position = "bottomleft")
 
 NL_map
 ```

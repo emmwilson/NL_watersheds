@@ -1,0 +1,133 @@
+---
+title: "trial chem"
+author: "Emmerson Wilson"
+date: "`r Sys.Date()`"
+format:
+  html:
+---
+
+```{r, library}
+#| include: false
+
+pacman::p_load(shiny,
+               ggplot2,
+               tidyverse,
+               openxlsx,
+               janitor,
+               plotly)
+
+theme_set(theme_bw())
+
+```
+
+
+```{r}
+chem <- read.xlsx("/Users/emmersonEmmerson/Documents/Master\'s/Water_Quality_data_explore.xlsx", sheet = "Data") |> 
+  clean_names() |> 
+  group_by(year, site_code, trib_size) |> 
+  summarise(across(.cols = c(p_h, ec, dissolved_solids_ppm, alkalinity_ppm, doc, tdn, tdn_100), .fns = ~ mean(.x, na.rm = TRUE))) 
+  
+chem$year <- as.factor(chem$year)
+chem$trib_size <- as.factor(chem$trib_size)
+
+ojs_define(chem)
+```
+
+```{r}
+#| eval: False
+## all with plotly
+ p <- plot_ly(chem) 
+
+plotly_chem <- function(x_ax) {
+  p <- plot_ly(chem, x = as.formula(paste0("~`", x_ax, "`"))) 
+  
+  col_list <- chem |> 
+    ungroup() |> 
+    select(!c(x_ax, year, site_code, trib_size)) |> 
+    colnames()
+  
+  for (i in 1:length(col_list)) {
+    p <- p |> 
+      add_markers(y = as.formula(paste0("~`", col_list[i], "`")), # Use as.formula to dynamically specify y-axis
+        name = paste(col_list[i]),
+        visible = F)
+  }
+  
+buttons <- lapply(seq_along(col_list), function(i) {
+  list(method = "update", label = paste(col_list[i]), args = list(list(visible = (seq_along(col_list) == i)), list(yaxis = list(title = paste(col_list[i])))))
+})
+
+  p <- p |>
+    layout(
+    updatemenus = list(
+      list( active = 0,
+        y = 0.8, # Position of the dropdown menu
+        buttons = buttons
+    )
+  )) 
+p
+}
+
+lapply(colnames(select(ungroup(chem), !c(year, site_code, trib_size))), plotly_chem)
+```
+
+
+```{ojs}
+// i think it will be easier with observable js
+viewof xVariable = Inputs.select(["mpg", "hp", "weight"], {value: "mpg", label: "X Axis"})
+viewof yVariable = Inputs.select(["hp", "mpg", "weight"], {value: "hp", label: "Y Axis"})
+
+
+Plot.plot({
+  grid: true,
+  color: {scheme: "dark2" ,
+  legend: false},
+  marks: [
+    Plot.dot(cars, {
+      x: xVariable, 
+      y: yVariable,
+      tip: true // Adds tooltips
+    })
+  ]
+})
+
+
+```
+
+
+
+```{r}
+#| eval: False
+plot_ph_ec <- ggplot(chem, aes(p_h, ec, shape = year, colour = year)) +
+  geom_point(size = 2) 
+
+
+plot_ph_ec
+
+plot_ph_ds <- ggplot(chem, aes(p_h, dissolved_solids_ppm, shape = year, colour = year)) +
+  geom_point(size = 2) 
+
+plot_ph_ds
+
+plot_ph_ak <- ggplot(chem, aes(p_h, alkalinity_ppm, shape = year, colour = year)) +
+  geom_point(size = 2) 
+
+plot_ph_ak
+
+plot_ec_ds <- ggplot(chem, aes(ec, dissolved_solids_ppm, shape = year, colour = year)) +
+  geom_point(size = 2) 
+
+plot_ec_ds
+
+plot_ec_ak <- ggplot(chem, aes(ec, alkalinity_ppm, shape = year, colour = year)) +
+  geom_point(size = 2) 
+
+plot_ec_ak
+
+plot_ak_ds <- ggplot(chem, aes(alkalinity_ppm, dissolved_solids_ppm, shape = year, colour = year)) +
+  geom_point(size = 2) 
+
+plot_ak_ds
+```
+
+
