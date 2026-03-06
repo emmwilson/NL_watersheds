@@ -291,15 +291,15 @@ img[src*=".png"] {
   color: #333333 !important;
 }
 
-#htmlwidget-a0553aa6e12f4844437c > div.leaflet-control-container > div.leaflet-top.leaflet-right > div.info.legend.leaflet-control.leaflegend-group-yeartrib > div:nth-child(3) > div > i {
+.leaflet-control-container > div.leaflet-top.leaflet-right > div.info.legend.leaflet-control.leaflegend-group-yeartrib > div:nth-child(3) > div > i {
   color: #333333 !important;
 }
 
-#htmlwidget-a0553aa6e12f4844437c > div.leaflet-control-container > div.leaflet-top.leaflet-right > div.info.legend.leaflet-control.leaflegend-group-yeartrib > div:nth-child(4) > div > i {
+.leaflet-control-container > div.leaflet-top.leaflet-right > div.info.legend.leaflet-control.leaflegend-group-yeartrib > div:nth-child(4) > div > i {
   color: #333333 !important;
 }
 
-.leaflegend-group-yeartrib {
+.leaflet-control-container > div.leaflet-top.leaflet-right > div.info.legend.leaflet-control.leaflegend-group-yeartrib {
   order: -1;
 }
 

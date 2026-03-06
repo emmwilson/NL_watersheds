@@ -8,7 +8,7 @@ website:
     left:
       - text: "Home" 
         href: index.qmd
-      - text: "Watersheds"
+      - text: "Watershed predictions"
         menu:
         - text: "Strait of Belle Isle - South Shore watershed"
           href: "map_Strait%20of%20Belle%20Isle%20-%20South%20Shore.html"

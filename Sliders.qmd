@@ -513,7 +513,7 @@ Plot.plot({
 
 | <u><b>Desciption of models and variables:</b></u> 
 
-| 
+| Gravel size is important to the Atlantic Salmon spawning; too fine or too coarse, and the salmon will either not spawn or have poor egg survival (Purchase 2018). 
 
 | <b>D50 Gravel size:</b> was predicted based on the following calculations (Wilkins & Snyder 2011)
 | 
@@ -542,6 +542,13 @@ Plot.plot({
 | This equation associates a higher probability of spawning in larger gravel for longer fish, and a higher probability of spawning in smaller gravel for smaller fish.  
 | Assumes the ideal spawning gravel for a fish of 2m is 64 mm,  for a fish of 1 m is 32 mm, for a fish of 0 m is 16 mm etc, with a bell shaped distribution of suitability around the ideal gravel size with a standard deviation of 8. If D50 is lower than 16 or higher than 64, the suitability is 0.
 |
+| <b> Citations: </b>
+|  
+| Barnes, H. 1967. Roughness Characteristics of Natural Channels. United States Geological Survey: Publications.  
+| Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6   
+| Lehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z   
+| Purchase, C. (2018). A systematic review on the effectiveness of salmonid spawning habitat improvements, and recommendations to potentially increase productivity of depressed Newfoundland Atlantic salmon (Salmo salar) populations.  
+| Wilkins, and Snyder. 2011. Geomorphic comparison of two Atlantic coastal rivers: Toward an understanding of physical controls on Atlantic salmon habitat. River Research and Applications.  
 
 :::
 <div id="bottom"></div>
