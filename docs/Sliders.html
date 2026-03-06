@@ -136,10 +136,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-watersheds" role="link" data-bs-toggle="dropdown" aria-expanded="false">
- <span class="menu-text">Watersheds</span>
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-watershed-predictions" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Watershed predictions</span>
     </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-watersheds">    
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-watershed-predictions">    
         <li>
     <a class="dropdown-item" href="./map_Strait of Belle Isle - South Shore.html">
  <span class="dropdown-text">Strait of Belle Isle - South Shore watershed</span></a>
@@ -981,7 +981,7 @@ Description of the models can be found at the <a href="#bottom">bottom</a> of ea
 <p><br>
 </p>
 <div class="line-block"><u><b>Desciption of models and variables:</b></u></div>
-<div class="line-block"></div>
+<div class="line-block">Gravel size is important to the Atlantic Salmon spawning; too fine or too coarse, and the salmon will either not spawn or have poor egg survival (Purchase 2018).</div>
 <div class="line-block"><b>D50 Gravel size:</b> was predicted based on the following calculations (Wilkins &amp; Snyder 2011)<br>
 <br>
 D50 = 𝛕<sub>b</sub> / (𝛒<sub>s</sub> - 𝛒) * g * 𝛕<sup>* </sup><br>
@@ -1008,7 +1008,14 @@ Ideal.fish.gravel = 109 * (1.26<sup>fish.length</sup> - 1)<br>
 <br>
 This equation associates a higher probability of spawning in larger gravel for longer fish, and a higher probability of spawning in smaller gravel for smaller fish.<br>
 Assumes the ideal spawning gravel for a fish of 2m is 64 mm, for a fish of 1 m is 32 mm, for a fish of 0 m is 16 mm etc, with a bell shaped distribution of suitability around the ideal gravel size with a standard deviation of 8. If D50 is lower than 16 or higher than 64, the suitability is 0.<br>
-</div>
+<br>
+<b> Citations: </b><br>
+<br>
+Barnes, H. 1967. Roughness Characteristics of Natural Channels. United States Geological Survey: Publications.<br>
+Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6<br>
+Lehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z<br>
+Purchase, C. (2018). A systematic review on the effectiveness of salmonid spawning habitat improvements, and recommendations to potentially increase productivity of depressed Newfoundland Atlantic salmon (Salmo salar) populations.<br>
+Wilkins, and Snyder. 2011. Geomorphic comparison of two Atlantic coastal rivers: Toward an understanding of physical controls on Atlantic salmon habitat. River Research and Applications.</div>
 </div>
 <div id="bottom">
 
