@@ -67,10 +67,21 @@ img[src*=".png"] {
 }
 
 /*for some reason above placement wasn;t applying to home page so need to specify*/
-[id = "1772813438.73507"] {
-  bottom: 40px !important;
-  left: 2px !important;
-  position: absolute !important;
+.cell-output-display img[src*=".png"] {
+  position: absolute;
+  bottom: 18px;
+  right: 5px;
+  width: 40px;
+  height: 55px;
+  border-radius: 5px;
+  padding: 6px 6px 6px 6px;
+  color: #333;
+  background: rgba(255,255,255,0.5);
+  margin-top: 2px;
+  margin-left: -5px;
+  margin-bottom: 10px;
+  border: 2px solid rgba(0,0,0,0.2);
+  background-clip: padding-box;
 }
 
 
