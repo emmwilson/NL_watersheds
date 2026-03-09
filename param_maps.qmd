@@ -191,13 +191,18 @@ D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,top_D50), na.color = 
 #| include: false
 # adds information to popups for each reach wehn it is selected
 
-  label_text <- glue("<b><u>{'Segment info:'}</u></b> <br/>",
+label_text <- glue("<b><u>{'Segment info:'}</u></b> <br/>",
 "<b>Predicted gravel size (D50): </b> {round(rivers$D50, 1)} mm<br/>",
 "<b>Discharge: </b> {round(rivers$DIS_AV_CMS, 1)} m<sup>3</sup>/s<br/>",
 "<b>Width: </b> {round(rivers$width,1)} m<br/>",
 "<b>Gradient: </b> {round(rivers$sgr_dk_rav/10,1)} mm/m<br/>") |> 
 
   lapply(htmltools::HTML)
+  
+  
+label_text_barrier <- glue("<b><u>{'CABD barrier data:'}</u></b> <br/>",
+                   "<b>Feature type: </b> {barriers$feature_ty}<br/>") |>
+  lapply(htmltools::HTML)  
 ```
 
 ```{r, map}
@@ -230,7 +235,7 @@ map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSn
       addMapPane("data_width90", zIndex = 439) |> 
       addMapPane("data_grad", zIndex = 435) |>
       addMapPane("data_grad90", zIndex = 434) |>
-      addMapPane("inaccess", zIndex = 455) |> 
+      addMapPane("inaccess", zIndex = 449) |> 
       addMapPane("barriers", zIndex = 460) |> 
   
       
@@ -248,7 +253,7 @@ map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSn
   ## add barriers  
   addPolylines(data = smooth(inaccess, method = "ksmooth", smoothness = 0.5), color = "#C41F02", weight = 2.5, options = pathOptions(pane = "inaccess"), group = "CABD barriers and areas past", opacity = 1, popup = ~label_text) |>
   
-  addCircleMarkers(data = barriers, color = "#720F0F", weight = 1, fillColor = "#720F0F", radius = 3.5, fillOpacity = 1, fill = T, opacity = 1, options = pathOptions(pane = "inaccess"), group = "CABD barriers and areas past", popup = ~label_text) |> 
+  addCircleMarkers(data = barriers, color = "#720F0F", weight = 1, fillColor = "#720F0F", radius = 3.5, fillOpacity = 1, fill = T, opacity = 1, options = pathOptions(pane = "inaccess"), group = "CABD barriers and areas past", popup = ~label_text_barrier) |> 
   
   addLegend(colors = "#C41F02", opacity = 1, labels = "<b>CABD barriers and areas past</b>", group = "CABD barriers and areas past", position = "topright") |> 
   
