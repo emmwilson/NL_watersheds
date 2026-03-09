@@ -67,11 +67,12 @@ img[src*=".png"] {
 }
 
 /*for some reason above placement wasn;t applying to home page so need to specify*/
-[id = "1772219232.4781"] {
+[id = "1772813438.73507"] {
   bottom: 40px !important;
   left: 2px !important;
   position: absolute !important;
 }
+
 
 /* edit appearance of north arrow for exploits page too*/
 .panel-tabset img[src*=".png"] {
