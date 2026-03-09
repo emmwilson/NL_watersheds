@@ -84,9 +84,6 @@ watersheds <- vect("data/spatial data/NL_subsubbasins.shp") |>
     project("EPSG:4326 - WGS 84") |> 
     tidyterra::mutate(html = paste0("map_", gsub(" ", "%20", watershed), ".html"))
 
-watersheds$html <- replace(watersheds$html, watersheds$watershed == "Exploits", "Exploits_map.html")
-watersheds$html <- replace(watersheds$html, watersheds$watershed == "Red Indian Lake", "Exploits_map.html")
-
   # import arrow
 arrow <- "https://cdn.pixabay.com/photo/2013/07/12/17/54/arrow-152596_960_720.png"
 ```

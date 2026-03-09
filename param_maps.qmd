@@ -191,7 +191,7 @@ D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,top_D50), na.color = 
 #| include: false
 # adds information to popups for each reach wehn it is selected
 
-label_text <- glue("<b><u>{'Segment info:'}</u></b> <br/>",
+label_text <- glue("<b><u>Segment info:</u></b> <br/>",
 "<b>Predicted gravel size (D50): </b> {round(rivers$D50, 1)} mm<br/>",
 "<b>Discharge: </b> {round(rivers$DIS_AV_CMS, 1)} m<sup>3</sup>/s<br/>",
 "<b>Width: </b> {round(rivers$width,1)} m<br/>",
@@ -200,7 +200,7 @@ label_text <- glue("<b><u>{'Segment info:'}</u></b> <br/>",
   lapply(htmltools::HTML)
   
   
-label_text_barrier <- glue("<b><u>{'CABD barrier data:'}</u></b> <br/>",
+label_text_barrier <- glue("<b><u>CABD barrier data:</u></b> <br/>",
                    "<b>Feature type: </b> {barriers$feature_ty}<br/>") |>
   lapply(htmltools::HTML)  
 ```
