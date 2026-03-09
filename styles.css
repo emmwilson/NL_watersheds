@@ -211,7 +211,7 @@ img[src*=".png"] {
 #tabset-1-5 > div.panel-fill.panel-grid > div > div {
   display: grid;
   grid-template-columns: 25% 75%;  
-  grid-template-rows: 10% 90%;
+  grid-template-rows: 20% 30% auto;
 }
 
 #tabset-1-5 > div.panel-fill.panel-grid > div > div > div:nth-child(2) {
@@ -219,19 +219,17 @@ img[src*=".png"] {
   grid-column: 1 / span 1; 
 }
 
-
 #tabset-1-5 > div.panel-fill.panel-grid > div > div > div:nth-child(3) {
   grid-row: 2 / span 1;
   grid-column: 1 / span 1; 
   align-self: start !important;
 }
 
-
-
 #tabset-1-5 > div.panel-fill.panel-grid > div > div > div:nth-child(4) {
-  grid-row: 1 / span 2;
+  grid-row: 1 / span 3;
   grid-column: 2 / span 1;
 }
+
 
 #ojs-cell-1-2 > div:nth-child(1) > form {
   display: grid;
@@ -268,15 +266,6 @@ img[src*=".png"] {
   align-self: start !important;
   height: 30% !important;
   font-size: 0.75em !important;
-}
-
-.plot-d6a7b5-ramp {
-  grid-row: 2 / span 1;
-  grid-column: 1 / span 1;
-  justify-self: center !important;
-  align-self: center !important;
-  width:40% !important;
-  font-size: 0.5em;
 }
 
 
