@@ -235,7 +235,7 @@ map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSn
       addMapPane("data_width90", zIndex = 439) |> 
       addMapPane("data_grad", zIndex = 435) |>
       addMapPane("data_grad90", zIndex = 434) |>
-      addMapPane("inaccess", zIndex = 449) |> 
+      addMapPane("inaccess", zIndex = 455) |> 
       addMapPane("barriers", zIndex = 460) |> 
   
       
