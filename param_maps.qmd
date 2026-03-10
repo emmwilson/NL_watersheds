@@ -191,7 +191,7 @@ D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,top_D50), na.color = 
 #| include: false
 # adds information to popups for each reach wehn it is selected
 
-label_text <- glue("<b><u>Segment info:</u></b> <br/>",
+label_text <- glue("<b><u>Segment data:</u></b> <br/>",
 "<b>Predicted gravel size (D50): </b> {round(rivers$D50, 1)} mm<br/>",
 "<b>Discharge: </b> {round(rivers$DIS_AV_CMS, 1)} m<sup>3</sup>/s<br/>",
 "<b>Width: </b> {round(rivers$width,1)} m<br/>",
@@ -200,7 +200,7 @@ label_text <- glue("<b><u>Segment info:</u></b> <br/>",
   lapply(htmltools::HTML)
   
   
-label_text_barrier <- glue("<b><u>CABD barrier data:</u></b> <br/>",
+label_text_barrier <- glue("<b><u>CABD:</u></b> <br/>",
                    "<b>Feature type: </b> {barriers$feature_ty}<br/>") |>
   lapply(htmltools::HTML)  
 ```
@@ -346,7 +346,7 @@ map
 | W = channel width (m), Calculated as the surface river area of the river reach segment divided by length of the river reach segment.    
 |  
 | <b>CABD barriers and areas past:</b>
-| Potential barriers to upstream salmon movement were taken from the Canadian Aquatic Barriers Database. Barriers were filtered to remove barriers that are insufficient to impede movement: a fishway exists, barrier has been decommissioned/removed, barrier was a dam less than 5 m high, or barrier's Used for Network Analysis field was false. Any stream segment upstream of the barrier is considered potentially inaccessible. Many of these barriers may in fact be passable by salmon (e.g. passable rapid listed as waterfall) but we lack sufficient information to remove them from list the of potential barriers. Therefore, each barrier must be assessed on an individual basis if being incorporated into management or research plans.    
+| Potential barriers to upstream salmon movement were sourced from the Canadian Aquatic Barriers Database. Barriers were filtered to remove those that are unlikely sufficient to impede movement: a fishway exists, barrier has been decommissioned/removed, barrier was a dam less than 5 m high, or barrier's Used for Network Analysis field was false. Any stream segment upstream of a remaining barrier is considered potentially inaccessible. Many of these barriers may in fact be passable by salmon (e.g. passable rapid listed as waterfall) but we lack sufficient information to remove them from list. Therefore, each barrier must be assessed on an individual basis if being incorporated into management or research plans.    
 |  
 | <b> Data and citations: </b>
 | [Click here to download the `r params$watershed` HydroATLAS data shapefile](`r paste0("https://github.com/emmwilson/NL_watersheds/blob/0d9a7a8e31f9d6fc5a61aac211dbf85ce949138c/data/spatial%20data/watersheds/river_",params$watershed,".shp?raw=true")`)  

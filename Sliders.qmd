@@ -301,7 +301,9 @@ Plot.plot({
 
 | Invertebrate density (g cm⁻²): The density of all invertebrates predicted to occur based on GLMs.
 
-| Periphyton density (μg cm⁻²): The density of algae, microbes, bacteria, and detritus attached to substrate, predicted to occur based on GLMs.   
+| Periphyton density (μg cm⁻²): The density of algae, microbes, bacteria, and detritus attached to substrate, predicted to occur based on GLMs. 
+
+| Citation: ...
 
 ## Gravel and spawning estimates
 :::{.outer-container}
