@@ -307,7 +307,25 @@ exploits_map_chem
 //| output: false
 
 import {legend} from "@d3/color-legend"
-import {rasterize} from "@mbostock/saving-svg"
+
+htmlToImage = import("https://cdn.skypack.dev/html-to-image@1.11.1?min")
+
+image = async (node) => {
+  const n = d3.select(node);
+  const pb = n.style("padding-bottom");
+  const bg = n.style("background-color");
+  if (node.nodeName === "FIGURE") {
+    n.style("padding-bottom", ".4em");
+    n.style("background-color", "white");
+  }
+  const im = await htmlToImage.toCanvas(node, { pixelRatio: 2 });
+  im.style = `width: ${im.width >> 1}px`;
+  if (pb) n.style("padding-bottom", pb); // restores the original styles.
+  if (bg) n.style("background-color", bg);
+  return im;
+}
+
+
 ```
 
 \
@@ -349,7 +367,7 @@ viewof selectedLayerGroup = {
 viewof yVariable = Inputs.select(["p_h", "ec", "dissolved_solids_ppm", "alkalinity_ppm", "doc", "tdn"], {value: "ec", label: html`<b>Select Y Axis:</b>`})
 
 
-viewof myPlot = Plot.plot({
+myPlot = Plot.plot({
     grid: true,
     color: {scheme: "inferno",
       legend: false},
@@ -367,4 +385,33 @@ viewof myPlot = Plot.plot({
 
 data = transpose(chem_data)
 ```
+
+```{ojs}
+//| echo: false
+//| output: false
+
+plotImage = image(myPlot)
+
+
+```
+
+
+```{ojs}
+//| echo: false
+
+viewof downloadSVG = Inputs.button("Download Plot PNG", {
+  reduce: () => {
+    var canvas = document.querySelector('canvas');
+    var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+  
+    var element = document.createElement('a');
+    var filename = 'water_quality_plot.png';
+    element.setAttribute('href', image);
+    element.setAttribute('download', filename);
+
+    element.click();
+  }
+})
+```
+
 
