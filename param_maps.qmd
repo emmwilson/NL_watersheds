@@ -117,56 +117,56 @@ rivers$D50 <- (rivers$tb/((ps-p)*g*t))*1000
 #| warning: false
 #| echo: false
  #colour palettes for predictions
-  # invert.pal <- colorNumeric(c("#f47c3c", "#d9534f"), domain = predictions_reaches$invert, na.color = "transparent")
-  # embed.pal <- colorNumeric(c("#e9c602", "#93c54b"), domain =  predictions_reaches$embed, na.color = "transparent")
+  # invert.pal <- colorNumeric(c("#f47c3c", "#d9534f"), domain = predictions_reaches$invert)
+  # embed.pal <- colorNumeric(c("#e9c602", "#93c54b"), domain =  predictions_reaches$embed)
 top_discharge <- quantile(rivers$DIS_AV_CMS, 0.9, na.rm = T)
 
-discharge.pal <- colorNumeric(c("#dfdce3", "#600075"), domain = c(0, top_discharge), na.color = "transparent")
+discharge.pal <- colorNumeric(c("#dfdce3", "#A600E3", "#57106e"), domain = c(0, top_discharge))
 discharge.col <- discharge.pal(rivers$DIS_AV_CMS)
 
-discharge.pal90 <- colorNumeric(c("#600075"), domain = c(top_discharge, max(rivers$DIS_AV_CMS)), na.color = "transparent") 
+discharge.pal90 <- colorNumeric(c("#57106e"), domain = c(top_discharge, max(rivers$DIS_AV_CMS))) 
 discharge.col90 <- discharge.pal90(rivers$DIS_AV_CMS)
 
 # colour palette for legend so high numbers at top
 discharge.col.leg <- discharge.pal(seq(0, top_discharge, by = top_discharge/7))
-discharge.pal.leg <- colorNumeric(rev(discharge.col.leg), domain = c(0, top_discharge), na.color = "transparent")  
+discharge.pal.leg <- colorNumeric(rev(discharge.col.leg), domain = c(0, top_discharge))  
 
 
 # colour palette for width
 # make top 90th percentile one colour
 top_width <- quantile(rivers$width, 0.9, na.rm = T)
 
-width.pal <- colorNumeric(c("#F5DAEA", "#B50061"), domain = c(0, top_width), na.color = "transparent") # 
+width.pal <- colorNumeric(c("#F5DAEA", "#B34D63",  "#C2002A"), domain = c(0, top_width)) # 
 width.col <- width.pal(rivers$width)
 
-width.pal90 <- colorNumeric(colorRamp(c("#B50061")), domain = c(top_width, max(rivers$width)), na.color = "transparent") 
+width.pal90 <- colorNumeric(colorRamp(c("#C2002A")), domain = c(top_width, max(rivers$width))) 
 width.col90 <- width.pal90(rivers$width)
   
 # colour palette for legend so high numbers at top
 width.col.leg <- width.pal(seq(0, top_width, by = top_width/7))
-width.pal.leg <- colorNumeric(rev(width.col.leg), domain = c(0, top_width), na.color = "transparent")  
+width.pal.leg <- colorNumeric(rev(width.col.leg), domain = c(0, top_width))  
 
-#width.pal <- colorFactor(c("#f2ca97", "#d4021d"), domain = exploits_river$width*1000, na.color = "transparent") use this function for any categorical data you want to include in the map
+#width.pal <- colorFactor(c("#f2ca97", "#d4021d"), domain = exploits_river$width*1000) use this function for any categorical data you want to include in the map
   
 # colour palette for stream gradient
 
 # make top 90th percentile one colour
 top_gradient <- quantile(rivers$sgr_dk_rav/10000, 0.9, na.rm = T)
 
-gradient.pal <- colorNumeric(colorRamp(c("white", "#1C1C1C")), domain = c(0, top_gradient), na.color = "transparent") 
+gradient.pal <- colorNumeric(colorRamp(c("#FFFFD9", "#f98e09", "#422300")), domain = c(0, top_gradient)) 
 gradient.col <- gradient.pal(rivers$sgr_dk_rav/10000)
 
-gradient.pal90 <- colorNumeric(colorRamp(c("#1C1C1C")), domain = c(top_gradient, max(rivers$sgr_dk_rav/10000)), na.color = "transparent") 
+gradient.pal90 <- colorNumeric(colorRamp(c("#422300")), domain = c(top_gradient, max(rivers$sgr_dk_rav/10000))) 
 gradient.col90 <- gradient.pal90(rivers$sgr_dk_rav/10000)
 
 
 # colour palette for legend so high numbers at top
 gradient.col.leg <- gradient.pal(seq(0, top_gradient, by = top_gradient/7))
-gradient.pal.leg <- colorNumeric(rev(gradient.col.leg), domain = c(0, top_gradient), na.color = "transparent")  
+gradient.pal.leg <- colorNumeric(rev(gradient.col.leg), domain = c(0, top_gradient))  
 
 # colour palette for D50, with 16-64 green and over 90 orange
   
-D50.pal <- colorNumeric(c("#e9c602","#e9c602", "#e9c602","#FD602F"), domain = c(0, 16, 64, ceiling(max(rivers$D50, na.rm = T)/16)*16), na.color = "brown")
+D50.pal <- colorNumeric(c("white","#e9c602", "#e9c602","#FD602F"), domain = c(0, 16, 64, ceiling(max(rivers$D50, na.rm = T)/16)*16))
  
  # if D50s reach over 200 then use 200 as cap, but if not then use closest multiple of 10 to max D50 as cap
 top_D50 <- ifelse(max(rivers$D50, na.rm = T) >= 200, 200, ceiling(max(rivers$D50, na.rm = T)/10)*10)
@@ -182,7 +182,7 @@ D50.col.leg <- D50.pal(seq(0, top_D50, by = top_D50/10))
 D50.col.leg[seq(0, top_D50, by = top_D50/10) >= 16 & seq(0, top_D50, by = top_D50/10) <= 64] <- "#00D458"
 D50.col.leg[seq(0, top_D50, by = top_D50/10) >= top_D50] <- "#FD602F"
 
-D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,top_D50), na.color = "brown")
+D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,top_D50))
 
 ```
 
@@ -297,7 +297,8 @@ map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSn
   addGroupedLayersControl(
     baseGroups = c("Satellite", "Topographic", "White & Grey"),
     overlayGroups = list(
-      "Predictions and HydroSHEDs data" = c("D50", "Discharge", "Width", "Gradient"),
+      "Prediction" = c("D50"),
+      "HydroSHEDs data" = c("Discharge", "Width", "Gradient"),
       "Barriers" = c("CABD barriers and areas past")
     ),
     position = "topleft",
@@ -308,6 +309,8 @@ map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSn
       sortLayers = FALSE,
       sortGroups = FALSE,
       sortBaseLayers = FALSE,
+      autoZIndex = FALSE,
+      exclusiveGroups = c("HydroSHEDs data")
     )
   ) |> 
   

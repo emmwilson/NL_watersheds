@@ -1,5 +1,6 @@
 ---
-title: "chem_explore"
+title: "chem explore"
+theme: sandstone
 format:
   html:
     css: styles.css
@@ -31,8 +32,7 @@ pacman::p_load(shiny,
                leaflet.providers,
                janitor,
                openxlsx,
-               bsicons,
-               crosstalk)
+               bsicons)
 
 if (!requireNamespace("leaflet.extras", quietly = TRUE)) {
   remotes::install_github("trafficonese/leaflet.extras")
@@ -58,10 +58,6 @@ exploits_river <- vect("data/spatial data/exploits_river_field_data.shp") |>
 lakes <- vect("data/spatial data/Exploits_lakes.shp") |>  
   project("EPSG:4326 - WGS 84")
   
-## data from river reaches sampled
-field_reaches <- vect("data/spatial data/exploits_reaches_with_sites.shp") |>  # to be updated with 2025 sites
-  project("EPSG:4326 - WGS 84")
-  
 ## shape of NL
 NL <- vect("data/spatial data/NL_boundaries.shp") |>  
   project("EPSG:4326 - WGS 84")  
@@ -72,6 +68,33 @@ barriers <- vect(file_barriers)
 
 file_inaccess <- paste0("data/spatial data/exploits_inaccess.shp")
 inaccess <- vect(file_inaccess)
+
+# field data:
+## invert
+invert_field <- read.xlsx("data/Fielddata_2024_2025.xlsx", sheet = "Invertebrate and periphyton") |> 
+  clean_names()
+
+invert_field$y <- as.numeric(invert_field$y)
+invert_field$x <- as.numeric(invert_field$x)
+
+## parr and fry
+parrfry_field <- read.xlsx("data/Fielddata_2024_2025.xlsx", sheet = "Juvenile fish 2025")|> 
+  clean_names()
+
+
+parrfry_field$y <- as.numeric(parrfry_field$y)
+parrfry_field$x <- as.numeric(parrfry_field$x)
+
+## smolts
+
+
+## gravel
+## data from river reaches sampled
+gravel_field <- vect("data/spatial data/FieldSites.shp") |>  # to be updated with 2025 sites
+  project("EPSG:4326 - WGS 84")
+
+## water chem field data
+chem <- read.xlsx("data/Water_Quality_data_explore.xlsx", sheet = "Data")
    
 # import arrow
 arrow <- "https://cdn.pixabay.com/photo/2013/07/12/17/54/arrow-152596_960_720.png"
@@ -98,8 +121,6 @@ exploits_map <- leaflet(width = "100vw", height = "72vh", options = leafletOptio
   addMapPane("drainage", zIndex = 410) |> 
   addMapPane("river", zIndex = 415) |> 
   addMapPane("lakes", zIndex = 420) |>
-  addMapPane("inaccess", zIndex = 455) |> 
-  addMapPane("barriers", zIndex = 460) |>   
       
   # addPolygons(data = NL, color = "#A1929B", weight = 1.5, fillColor = "#A1929B", fillOpacity = 0.25, options = pathOptions(pane = "NL")) |>
       
@@ -121,24 +142,26 @@ exploits_map <- leaflet(width = "100vw", height = "72vh", options = leafletOptio
 ```
 
 
+::: {.panel-tabset}
 
-
-### Water chemistry
+### Water Quality
 
 Describe data here...   
   
-Click on a reach to see the data for each segment. Link to download shapefile is [below map](#bottom4).   
+Explore water quality variables from various tributaries across the Exploits watershed. Click on a site to see the data collected. The water quality layer selected is also plotted [below the map](#bottom5) against any other water quality variable you specify.
+ 
+Link to download data is [below map](#bottom5).   
 
 ```{r}
 #| echo: false
 #| include: false
 
-chem <- read.xlsx("/Users/emmersonEmmerson/Documents/Master\'s/Water_Quality_data_explore.xlsx", sheet = "Data") |> 
+chem <- chem |> 
   clean_names() |> 
   mutate(x = as.numeric(x)*-1) |> 
-  mutate(year_trib = paste0(year, "-", trib_size)) |> 
+  mutate(year_trib = paste0(year, "-", ifelse(trib_size == "Bg", "Big", "Small"))) |> 
   group_by(year, site_code, trib_size, year_trib, x, y) |> 
-  summarise(across(.cols = c(p_h, ec, dissolved_solids_ppm, alkalinity_ppm, doc, tdn, tdn_100), .fns = ~ mean(.x, na.rm = TRUE))) |>
+  summarise(across(.cols = c(water_temp, p_h, ec, dissolved_solids_ppm, alkalinity_ppm, doc, tdn, tdn_100), .fns = ~ mean(.x, na.rm = TRUE))) |>
   ungroup()
   
 chem$year <- as.factor(chem$year)
@@ -147,53 +170,100 @@ chem$year_trib <- as.factor(chem$year_trib)
 chem$y <- as.numeric(chem$y)
 chem$x <- as.numeric(chem$x)
 
+names(chem)[names(chem) == 'water_temp'] <- 'Water temperature (˚c)'
+names(chem)[names(chem) == 'p_h'] <- 'pH'
+names(chem)[names(chem) == 'ec'] <- 'Electrical conductivity (µS/cm)'
+names(chem)[names(chem) == 'dissolved_solids_ppm'] <- 'Dissolved solids (ppm)'
+names(chem)[names(chem) == 'alkalinity_ppm'] <- 'Alkalinity (ppm)'
+names(chem)[names(chem) == 'doc'] <- 'Dissolved organic carbon (mg/L)'
+names(chem)[names(chem) == 'tdn'] <- 'Total dissolved nitrogen (mg/L)'
+
+
+
 ojs_define(chem_data = chem)
 ```
 
 ```{r, palettes_chem}
 #| include: false
 
-pal.ph <- colorNumeric(palette = "inferno", domain = chem$p_h)
+pal.tp <- colorNumeric(palette = "inferno", domain = chem$`Water temperature (˚c)`)
+pal.tp.leg <- colorNumeric(palette = "inferno", domain = chem$`Water temperature (˚c)`, reverse = T)
 
-pal.ec <- colorNumeric(palette = "inferno", domain = chem$ec)
+pal.ph <- colorNumeric(palette = "inferno", domain = chem$`pH`)
+pal.ph.leg <- colorNumeric(palette = "inferno", domain = chem$`pH`, reverse = T)
 
-pal.ds <- colorNumeric(palette = "inferno", domain = chem$dissolved_solids_ppm)
+pal.ec <- colorNumeric(palette = "inferno", domain = chem$`Electrical conductivity (µS/cm)`)
+pal.ec.leg <- colorNumeric(palette = "inferno", domain = chem$`Electrical conductivity (µS/cm)`, reverse = T)
 
-pal.ak <- colorNumeric(palette = "inferno", domain = chem$alkalinity_ppm)
+pal.ds <- colorNumeric(palette = "inferno", domain = chem$`Dissolved solids (ppm)`)
+pal.ds.leg <- colorNumeric(palette = "inferno", domain = chem$`Dissolved solids (ppm)`, reverse = T)
 
-pal.dc <- colorNumeric(palette = "inferno", domain = chem$doc)
+pal.ak <- colorNumeric(palette = "inferno", domain = chem$`Alkalinity (ppm)`)
+pal.ak.leg <- colorNumeric(palette = "inferno", domain = chem$`Alkalinity (ppm)`, reverse = T)
 
-pal.dn <- colorNumeric(palette = "inferno", domain = chem$tdn)
+pal.dc <- colorNumeric(palette = "inferno", domain = chem$`Dissolved organic carbon (mg/L)`)
+pal.dc.leg <- colorNumeric(palette = "inferno", domain = chem$`Dissolved organic carbon (mg/L)`, reverse = T)
+
+pal.dn <- colorNumeric(palette = "inferno", domain = chem$`Total dissolved nitrogen (mg/L)`)
+pal.dn.leg <- colorNumeric(palette = "inferno", domain = chem$`Total dissolved nitrogen (mg/L)`, reverse = T)
+
+
 ```
-
-
 
 ```{r, icons}
 #| include: false
-# icon_function <- function(trib){
-#   if(trib == "2024-Bg"){
-#     return(sprintf("http://www.w3.org/2000/svg"))
-#   }else if(trib == "2024-Sm"){
-#     return(sprintf("http://www.w3.org/2000/svg"))
-#   }else if(trib == "2025-Sm"){
-#     return(sprintf("http://www.w3.org/2000/svg"))
-#   }
-# }
+icon_tp <- awesomeIcons(
+  icon = c("circle", bs_icon("suit-diamond-fill"), bs_icon("square-fill"))[match(chem$year_trib, c("2024-Big", "2024-Small", "2025-Small"))], # Map factor levels to icon names
+  library = "fa",
+  iconColor = pal.tp(chem$`Water temperature (˚c)`))
 
 icon_ph <- awesomeIcons(
-  icon = c("circle", bs_icon("suit-diamond-fill"), bs_icon("square-fill"))[match(chem$year_trib, c("2024-Bg", "2024-Sm", "2025-Sm"))], # Map factor levels to icon names
+  icon = c("circle", bs_icon("suit-diamond-fill"), bs_icon("square-fill"))[match(chem$year_trib, c("2024-Big", "2024-Small", "2025-Small"))], # Map factor levels to icon names
   library = "fa",
-  iconColor = pal.ph(chem$p_h))
+  iconColor = pal.ph(chem$`pH`))
+
+
+icon_ec <- awesomeIcons(
+  icon = c("circle", bs_icon("suit-diamond-fill"), bs_icon("square-fill"))[match(chem$year_trib, c("2024-Big", "2024-Small", "2025-Small"))], # Map factor levels to icon names
+  library = "fa",
+  iconColor = pal.ec(chem$`Electrical conductivity (µS/cm)`))
+
+
+icon_ds <- awesomeIcons(
+  icon = c("circle", bs_icon("suit-diamond-fill"), bs_icon("square-fill"))[match(chem$year_trib, c("2024-Big", "2024-Small", "2025-Small"))], # Map factor levels to icon names
+  library = "fa",
+  iconColor = pal.ds(chem$`Dissolved solids (ppm)`))
+
+
+icon_ak <- awesomeIcons(
+  icon = c("circle", bs_icon("suit-diamond-fill"), bs_icon("square-fill"))[match(chem$year_trib, c("2024-Big", "2024-Small", "2025-Small"))], # Map factor levels to icon names
+  library = "fa",
+  iconColor = pal.ak(chem$`Alkalinity (ppm)`))
+
+
+icon_dc <- awesomeIcons(
+  icon = c("circle", bs_icon("suit-diamond-fill"), bs_icon("square-fill"))[match(chem$year_trib, c("2024-Big", "2024-Small", "2025-Small"))], # Map factor levels to icon names
+  library = "fa",
+  iconColor = pal.dc(chem$`Dissolved organic carbon (mg/L)`))
+
+
+icon_dn <- awesomeIcons(
+  icon = c("circle", bs_icon("suit-diamond-fill"), bs_icon("square-fill"))[match(chem$year_trib, c("2024-Big", "2024-Small", "2025-Small"))], # Map factor levels to icon names
+  library = "fa",
+  iconColor = pal.dn(chem$`Total dissolved nitrogen (mg/L)`),
+  extraClasses = "down-6")
+
+
 
 iconSet <- awesomeIconList(
-  "2024-Bg" = makeAwesomeIcon(
+  "2024-Big" = makeAwesomeIcon(
     icon = "circle",
     library = 'fa'
   ),
-  "2024-Sm" = makeAwesomeIcon(
+  "2024-Small" = makeAwesomeIcon(
     icon = bs_icon("suit-diamond-fill")
   ),
-  "2025-Sm" = makeAwesomeIcon(
+  "2025-Small" = makeAwesomeIcon(
     icon = bs_icon("square-fill")
   )
 )
@@ -201,14 +271,19 @@ iconSet <- awesomeIconList(
 
 ```
 
-
 ```{r, popup_labels_chem}
 #| include: false
 # adds information to popups for each reach when it is selected
 
 
-label_text_gravel <- glue("<b><u>{'Tributary {chem$name}:'}</u></b> <br/>",
-  "<b>Predicted gravel size (D50): </b> {round(field_reaches$D50_pred, 1)} mm<br/>") |> 
+label_text_chem <- glue("<b><u>Tributary:</u></b> <br/>",
+  "<b>Water Temperature: </b> {round(chem$`Water temperature (˚c)`, 1)} ˚c<br/>",                      
+  "<b>pH: </b> {round(chem$pH, 2)}<br/>",
+  "<b>Electrical conductivity:</b> {round(chem$`Electrical conductivity (µS/cm)`,1)} µS/cm<br/>",
+  "<b>Dissolved Solids: </b> {round(chem$`Dissolved solids (ppm)`,1)} ppm<br/>",
+  "<b>Alkalinity: </b> {round(chem$`Alkalinity (ppm)`,1)} ppm<br/>",
+  "<b>Dissolved organic carbon: </b> {round(chem$`Dissolved organic carbon (mg/L)`,2)} mg/L<br/>",
+  "<b>Total dissolved nitrogen: </b> {round(chem$`Total dissolved nitrogen (mg/L)`,2)} mg/L<br/>") |> 
  
   lapply(htmltools::HTML)
 ```
@@ -218,8 +293,10 @@ label_text_gravel <- glue("<b><u>{'Tributary {chem$name}:'}</u></b> <br/>",
 #| column: screen 
 #| warning: false
 
+
 exploits_map_chem <- exploits_map |> 
   
+  addMapPane("data_tp", zIndex = 455) |> 
   addMapPane("data_ph", zIndex = 450) |> 
   addMapPane("data_ec", zIndex = 445) |> 
   addMapPane("data_ds", zIndex = 440) |> 
@@ -227,10 +304,15 @@ exploits_map_chem <- exploits_map |>
   addMapPane("data_dc", zIndex = 430) |> 
   addMapPane("data_dn", zIndex = 425) |> 
 
-## pH
-  addAwesomeMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, options = pathOptions(pane = "data_ph"), group = "p_h", layerId = ~p_h, icon = icon_ph) |>
+## temp
+  addAwesomeMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, options = pathOptions(pane = "data_tp"), group = "Water temperature (˚c)", layerId = ~`Water temperature (˚c)`, icon = icon_tp, popup = ~ label_text_chem) |>
       
-  addLegend(pal = pal.ph, values = chem$p_h, title = "pH", position = 'topright', group = "p_h", opacity = 1, na.label = "NA") |>
+  addLegend(pal = pal.tp.leg, values = chem$`Water temperature (˚c)`, title = "Water temperature (˚c)", position = 'topright', group = "Water temperature (˚c)", opacity = 1, na.label = "NA", labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))) |>
+  
+## pH
+  addAwesomeMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, options = pathOptions(pane = "data_ph"), group = "pH", layerId = ~pH, icon = icon_ph, popup = ~ label_text_chem) |>
+      
+  addLegend(pal = pal.ph.leg, values = chem$`pH`, title = "pH", position = 'topright', group = "pH", opacity = 1, na.label = "NA", labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))) |>
   
   addLegendAwesomeIcon(iconSet = iconSet,
                        title = "Year - Tributary Size",
@@ -238,35 +320,35 @@ exploits_map_chem <- exploits_map |>
                        group = 'year-trib')  |>
 
 ## ec  
-  addCircleMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, color = ~pal.ec(chem$ec), radius = 3, options = pathOptions(pane = "data_ec"), group = "ec", fillOpacity = 1, opacity = 1, layerId = ~ec) |>
+  addAwesomeMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, options = pathOptions(pane = "data_ec"), group = "Electrical conductivity (µS/cm)", layerId = ~`Electrical conductivity (µS/cm)`, icon = icon_ec, popup = ~ label_text_chem) |>
       
-  addLegend(pal = pal.ec, values = chem$ec, title = "Electrical conductivity", position = 'topright', group = "ec", opacity = 1, na.label = "NA") |>  
+  addLegend(pal = pal.ec.leg, values = chem$`Electrical conductivity (µS/cm)`, title = "Electrical conductivity (µS/cm)", position = 'topright', group = "Electrical conductivity (µS/cm)", opacity = 1, na.label = "NA", labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))) |>  
   
 ## ds 
-  addCircleMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, color = ~pal.ds(chem$dissolved_solids_ppm), radius = 3, options = pathOptions(pane = "data_ds"), group = "dissolved_solids_ppm", fillOpacity = 1, opacity = 1, layerId = ~dissolved_solids_ppm) |>
+  addAwesomeMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, options = pathOptions(pane = "data_ds"), group = "Dissolved solids (ppm)", layerId = ~ `Dissolved solids (ppm)`, icon = icon_ds, popup = ~ label_text_chem) |>
       
-  addLegend(pal = pal.ds, values = chem$dissolved_solids_ppm, title = "Dissolved Solids", position = 'topright', group = "dissolved_solids_ppm", opacity = 1, na.label = "NA")  |>
+  addLegend(pal = pal.ds.leg, values = chem$`Dissolved solids (ppm)`, title = "Dissolved Solids (ppm)", position = 'topright', group = "Dissolved solids (ppm)", opacity = 1, na.label = "NA", labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE)))  |>
 
 ## ak 
-  addCircleMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, color = ~pal.ak(chem$alkalinity_ppm), radius = 3, options = pathOptions(pane = "data_ak"), group = "alkalinity_ppm", fillOpacity = 1, opacity = 1, layerId = ~alkalinity_ppm) |>
+  addAwesomeMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, options = pathOptions(pane = "data_ak"), group = "Alkalinity (ppm)", layerId = ~ `Alkalinity (ppm)`, icon = icon_ak, popup = ~ label_text_chem) |>
       
-  addLegend(pal = pal.ak, values = chem$alkalinity_ppm, title = "Alkalinity", position = 'topright', group = "alkalinity_ppm", opacity = 1, na.label = "NA")  |>
+  addLegend(pal = pal.ak.leg, values = chem$`Alkalinity (ppm)`, title = "Alkalinity (ppm)", position = 'topright', group = "Alkalinity (ppm)", opacity = 1, na.label = "NA", labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE)))  |>
   
 ## dc 
-  addCircleMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, color = ~pal.dc(chem$doc), radius = 3, options = pathOptions(pane = "data_dc"), group = "doc", fillOpacity = 1, opacity = 1, layerId = ~doc) |>
+  addAwesomeMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, options = pathOptions(pane = "data_dc"), group = "Dissolved organic carbon (mg/L)", layerId = ~ `Dissolved organic carbon (mg/L)`, icon = icon_dc, popup = ~ label_text_chem) |>
       
-  addLegend(pal = pal.dc, values = chem$doc, title = "DOC", position = 'topright', group = "doc", opacity = 1, na.label = "NA")  |>
+  addLegend(pal = pal.dc.leg, values = chem$`Dissolved organic carbon (mg/L)`, title = "Dissolved organic carbon (mg/L)", position = 'topright', group = "Dissolved organic carbon (mg/L)", opacity = 1, na.label = "NA", labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE)))  |>
   
-## dc 
-  addCircleMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, color = ~pal.dn(chem$tdn), radius = 3, options = pathOptions(pane = "data_dn"), group = "tdn", fillOpacity = 1, opacity = 1, layerId = ~tdn) |>
+## dn
+  addAwesomeMarkers(data = chem, lng = ~ chem$x, lat = ~chem$y, options = pathOptions(pane = "data_dn"), group = "Total dissolved nitrogen (mg/L)", layerId = ~ `Total dissolved nitrogen (mg/L)`, icon = icon_dn, popup = ~ label_text_chem) |>
       
-  addLegend(pal = pal.dn, values = chem$tdn, title = "TDN", position = 'topright', group = "tdn", opacity = 1, na.label = "NA")  |>
+  addLegend(pal = pal.dn.leg, values = chem$`Total dissolved nitrogen (mg/L)`, title = "TDN", position = 'topright', group = "Total dissolved nitrogen (mg/L)", opacity = 1, na.label = "NA", labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE)))  |>
   
 # ability to choose which layers to see
   addGroupedLayersControl(
     baseGroups = c("Satellite", "Topographic", "White & Grey"),
     overlayGroups = list(
-      "Water chemistry data" = c("p_h", "ec", "dissolved_solids_ppm", "alkalinity_ppm", "doc", "tdn")),
+      "Water quality data" = c("Water temperature (˚c)", "pH", "Electrical conductivity (µS/cm)", "Dissolved solids (ppm)", "Alkalinity (ppm)", "Dissolved organic carbon (mg/L)", "Total dissolved nitrogen (mg/L)")),
     position = "topleft",
     options = groupedLayersControlOptions(
       groupCheckboxes = FALSE,
@@ -275,16 +357,11 @@ exploits_map_chem <- exploits_map |>
       sortLayers = FALSE,
       sortGroups = FALSE,
       sortBaseLayers = FALSE,
-      exclusiveGroups = c("Water chemistry data"),
+      exclusiveGroups = c("Water quality data"),
     )
   )  |> 
-  htmlwidgets::onRender("
-        function() {
-            $('.leaflet-control-layers-overlays');
-        }
-    ") |>  
-  
-  hideGroup(c("pH", "ec", "dissolved_solids_ppm", "alkalinity_ppm", "doc", "tdn"))  |> 
+
+hideGroup(c("pH", "Electrical conductivity (µS/cm)", "Dissolved solids (ppm)", "Alkalinity (ppm)", "Dissolved organic carbon (mg/L)", "Total dissolved nitrogen (mg/L)"))  |> 
 
 htmlwidgets::onRender("
     function(el, x) {
@@ -302,6 +379,8 @@ exploits_map_chem
 
 ```
 
+\  
+
 ```{ojs}
 //| echo: false
 //| output: false
@@ -310,10 +389,20 @@ import {legend} from "@d3/color-legend"
 
 htmlToImage = import("https://cdn.skypack.dev/html-to-image@1.11.1?min")
 
+
 image = async (node) => {
+  const tabPanel = node.closest('.tab-pane').classList.add('active', 'show');
+  
+  let originalDisplay = '';
+  if (tabPanel && tabPanel.style.display === 'none') {
+    originalDisplay = 'none';
+    tabPanel.style.display = 'block';
+  }
+  
   const n = d3.select(node);
   const pb = n.style("padding-bottom");
   const bg = n.style("background-color");
+  
   if (node.nodeName === "FIGURE") {
     n.style("padding-bottom", ".4em");
     n.style("background-color", "white");
@@ -324,11 +413,7 @@ image = async (node) => {
   if (bg) n.style("background-color", bg);
   return im;
 }
-
-
 ```
-
-\
 
 ```{ojs}
 //| echo: false
@@ -341,12 +426,12 @@ viewof selectedLayerGroup = {
   // 2. Create the fixed label and the dynamic display area
   container.innerHTML = `
     <div style="font-weight: bold; margin-bottom: 5px;">Map layer as X Axis:</div>
-    <div id="selection-display">p_h</div>
+    <div id="selection-display">Water temperature (˚c)</div>
   `;
   
   // 3. Define which element actually holds the value for Observable
   const displayArea = container.querySelector("#selection-display");
-  container.value = "p_h";
+  container.value = "Water temperature (˚c)";
 
   // 4. Listen for the custom event
   window.addEventListener("leafletLayerSelected", (e) => {
@@ -364,7 +449,7 @@ viewof selectedLayerGroup = {
 }
 
 
-viewof yVariable = Inputs.select(["p_h", "ec", "dissolved_solids_ppm", "alkalinity_ppm", "doc", "tdn"], {value: "ec", label: html`<b>Select Y Axis:</b>`})
+viewof yVariable = Inputs.select(["Water temperature (˚c)", "pH", "Electrical conductivity (µS/cm)", "Dissolved solids (ppm)", "Alkalinity (ppm)", "Dissolved organic carbon (mg/L)", "Total dissolved nitrogen (mg/L)"], {value: "Electrical conductivity (µS/cm)", label: html`<b>Select Y Axis:</b>`})
 
 
 myPlot = Plot.plot({
@@ -414,4 +499,23 @@ viewof downloadSVG = Inputs.button("Download Plot PNG", {
 })
 ```
 
+\   
+Describe water chem data and data collection...    
+What is a big trib vs a small trib...  
+  
+[Click here to download the Exploits River water quality data](https://github.com/emmwilson/NL_watersheds/blob/0d9a7a8e31f9d6fc5a61aac211dbf85ce949138c/data/spatial%20data/Water_Quality_data_explore.xlsx?raw=true)   
+  
+Citation: ...  
+  
+<div id="bottom5"></div>   
 
+
+
+
+### Invertebrates and periphyton
+  
+Explore the invertebrate an
+
+
+
+:::
