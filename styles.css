@@ -144,7 +144,7 @@ img[src*=".png"] {
 /* make horizontal sliders line up with bars */
 
 /* allows label to go ontop of slider*/
-#tabset-1-1 .oi-3a86ea {
+#slider-tabset #tabset-1-1 .oi-3a86ea {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -153,12 +153,12 @@ img[src*=".png"] {
 }
 
 /* makes label wider */
-#tabset-1-1 .oi-3a86ea label {
+#slider-tabset #tabset-1-1 .oi-3a86ea label {
   min-width: 100%;
 }
 
 /* puts sliders side by side */
-#tabset-1-1 .quarto-layout-panel  {
+#slider-tabset #tabset-1-1 .quarto-layout-panel  {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -167,7 +167,7 @@ img[src*=".png"] {
 }
 
 /* make basic styling for row more flexible*/
-#tabset-1-1 .quarto-layout-row {
+#slider-tabset #tabset-1-1 .quarto-layout-row {
   display: flex;
   justify-content: center;
   padding-right: 0px;
@@ -175,7 +175,7 @@ img[src*=".png"] {
 }
 
 /* remove uneven padding around sliders and make sure sldiers centered*/
-#tabset-1-1 .quarto-layout-cell {
+#slider-tabset #tabset-1-1 .quarto-layout-cell {
   padding-right: 0px;
   padding-left: 5%;
   margin: 0px;
@@ -208,28 +208,33 @@ img[src*=".png"] {
 
 
 /* chem plot layout*/
-#tabset-1-1 > div.panel-fill.panel-grid > div > div {
+#field-tabset #tabset-1-1 > div.panel-fill.panel-grid > div > div {
   display: grid;
   grid-template-columns: 25% 75%;  
-  grid-template-rows: 20% 30% auto;
+  grid-template-rows: 10% 5% 10% auto;
 }
 
-#tabset-1-1 > div.panel-fill.panel-grid > div > div > div:nth-child(2) {
+#field-tabset #tabset-1-1 > div.panel-fill.panel-grid > div > div > div:nth-child(2) {
   grid-row: 1 / span 1;
   grid-column: 1 / span 1; 
 }
 
-#tabset-1-1 > div.panel-fill.panel-grid > div > div > div:nth-child(3) {
+#field-tabset #tabset-1-1 > div.panel-fill.panel-grid > div > div > div:nth-child(3) {
   grid-row: 2 / span 1;
   grid-column: 1 / span 1; 
   align-self: start !important;
 }
 
-#tabset-1-1 > div.panel-fill.panel-grid > div > div > div:nth-child(4) {
-  grid-row: 1 / span 3;
-  grid-column: 2 / span 1;
+#field-tabset #tabset-1-1 > div.panel-fill.panel-grid > div > div > div:nth-child(4) {
+  grid-row: 4 / span 1;
+  grid-column: 1 / span 1; 
+  align-self: start !important;
 }
 
+#field-tabset #tabset-1-1 > div.panel-fill.panel-grid > div > div > div:nth-child(5) {
+  grid-row: 1 / span 4;
+  grid-column: 2 / span 1;
+}
 
 #ojs-cell-1-2 > div:nth-child(1) > form {
   display: grid;
@@ -242,6 +247,8 @@ img[src*=".png"] {
   grid-template-columns: 100%;
   grid-template-rows: 50% 50%;
 }
+
+
 
 /* chem plot legends on right */
 .plot-d6a7b5-figure {
@@ -266,10 +273,7 @@ img[src*=".png"] {
   font-size: 0.95em !important;
 }
 
-/*download button smaller*/
-.btn-quarto {
-  align-self: flex-end;
-}
+
 
 
 /* map markers no background color (tbh not sure which of these did the job o I've left them all)*/
@@ -315,4 +319,17 @@ img[src*=".png"] {
 }
 
 
+/* footer widths control */
+/* Allow the left footer subsection to grow to fit its contents */
+.nav-footer .nav-footer-left {
+  flex: 1 0 auto;
+  width: max-content;
+  white-space: nowrap; /* Prevents text from wrapping to a new line */
+}
 
+/* Ensure the overall footer container handles the layout properly */
+.nav-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

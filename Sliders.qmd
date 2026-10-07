@@ -75,9 +75,10 @@ function negativetozero(equation) {
 
 ```
 
+::: {#slider-tabset}
 ::: {.panel-tabset}
 
-## Invertebrate, periphyton and juvenile salmon estimates
+## Invertebrate and periphyton estimates
 
 ```{ojs}
 //| echo: false
@@ -229,7 +230,7 @@ images = aq.table({
 
 // create the bar plot based on predictions_ps
 Plot.plot({
-  width: Math.max(width, 550),
+  width: Math.max(width, 250),
   height: Math.floor(0.25 * width),
   marginLeft: 0,
   marginRight: 0,
@@ -304,6 +305,171 @@ Plot.plot({
 | Periphyton density (μg cm⁻²): The density of algae, microbes, bacteria, and detritus attached to substrate, predicted to occur based on GLMs. 
 
 | Citation: ...
+
+## Parr length and growth responses
+:::{.outer-container}
+```{ojs}
+//| echo: false
+//| panel: sidebar
+
+// sliders for predictor variables
+
+//discharge
+viewof invert_bio = {  //name slider
+  const form = Inputs.range(
+  [0, 20],  // put minimum values and maximum
+  {value: 1, // starting value
+   step: 20/1000, // amount able to step by
+   label: "Invertebrate biomass (g):"} // label above slider
+);  // below is all styling
+  form.range.style.cssText += "accent-color: #1f78b4; width: 110%";
+  form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
+    
+  const label = form.querySelector("label");
+  label.style.cssText += "width: 100%";
+
+  return form;
+}
+
+// Stream width
+viewof conduct = {
+  const form = Inputs.range(
+  [10, 50], 
+  {value: 30, step: 40/100, label: "Conductivity (units):"}
+);
+  form.range.style.cssText += "accent-color: #1f78b4; width: 110%";
+  form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
+  
+  const label = form.querySelector("label");
+  label.style.cssText += "width: 100%; margin-top: 10px";
+
+  return form;
+}
+
+// Stream gradient
+viewof alkalinity = {
+  const form = Inputs.range(
+  [10, 40], 
+  {value: 25, step: 30/100, label: "Alkalinity (units):"}
+);
+  form.range.style.cssText += "accent-color: #1f78b4; width: 110%";
+  form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
+  
+  const label = form.querySelector("label");
+  label.style.cssText += "width: 100%; margin-top: 10px";
+
+  return form;
+}
+
+```
+
+```{ojs}
+//| echo: false
+//| panel: fill
+
+// prediction functions
+
+// parr length model(s)
+function parrlen(invert_bio, conduct) {
+  return negativetozero(1.133+0.19+(5.50+1.89)*conduct); //believe the relationship between predictor variables and parr length were made indpendantly, how to put this into sliders???
+}
+
+// parr growth rate model(s)
+function parrgrow(alkalinity, conduct) {
+  return negativetozero(1.133+0.19+(5.50+1.89)*conduct); //believe the relationship between predictor variables and parr length were made indpendantly, how to put this into sliders???
+}
+
+
+
+// function that takes input from sliders and creates prediction of each response variable based on above functions
+
+function parrFunction(invert_bio, conduct, alkalinity) {
+  return aq.table({
+  'invert_bio': [invert_bio, invert_bio], // repeat for each value predicting
+  'conduct': [conduct, conduct],
+  'alkalinity':[alkalinity, alkalinity],
+  'response_type': ["Salmon parr growth rate (units)",
+                      "Salmon parr length (mm)"
+                    ], // ordered alphabetically
+                      
+  'response_predict': [parrgrow(alkalinity, conduct),
+                        parrlen(invert_bio, conduct)
+                      ],
+  'response_predict_label': [parrgrow(alkalinity, conduct),
+                        parrlen(invert_bio, conduct)
+                      ]
+  })
+}
+
+// create the table
+predictions_parr = parrFunction(invert_bio, conduct, alkalinity)
+
+// create a tables that stores the image paths
+image_parrlen = aq.table({ //split gravel and salmon so I could specify the image sizes better
+  'response_type': ["Salmon parr length (mm)"
+                    ], 
+  'image_path': [imageURL_gravel
+                  ] 
+})
+
+image_parrgrow = aq.table({ 
+  'response_type': ["Salmon parr growth rate (units)",
+                    ],
+  'image_path': [imageURL_salmon
+                  ] 
+})
+
+// create the bar plot based on predictions_ps
+Plot.plot({
+  width: Math.max(width, 550),
+  height: Math.floor(0.45 * width),
+  marginLeft: 0,
+  marginRight: 0,
+  marginBottom: 70,
+  color: {scheme: "dark2" ,
+  legend: false},
+  y: {domain: [0, 2100], label: null},
+  x: {label: null},
+  marks:[
+    Plot.axisX({fontSize: Math.max(16, width / 60), marginBottom: 40}),
+    Plot.barY(predictions_parr,
+     {x: "response_type",
+     y: "response_predict",
+     fill: "response_type"}), // create bar graph
+    Plot.text(predictions_parr, {x: "response_type", y: "response_predict", text: "response_predict_label", dy: -7, dx: -width/8, lineAnchor: "bottom", fontSize: Math.max(16, width / 60)}) // write out predicted value
+   ]
+})
+
+// add images below each bar
+Plot.plot({
+  width: Math.max(width, 550),
+  height: Math.floor(0.1 * width),
+  marginTop: 20,
+  marginLeft: 0,
+  marginRight: 0,
+  colour: {legend: false},
+  y: {domain: [0,0], axis: null},
+  x: {label: "Response type", axis: null, fontSize: 22},
+  marks:[
+    Plot.image(image_gravel, 
+      {x: "response_type",
+      y: [0, 0],
+      src: "image_path",
+      width: width/8,
+      axis: null
+      }),
+    Plot.image(image_salmon, 
+      {x: "response_type",
+      y: [0, 0],
+      src: "image_path",
+      width: 200,
+      axis: null
+      })
+   ]
+})
+
+```
+:::
 
 ## Gravel and spawning estimates
 :::{.outer-container}
@@ -386,7 +552,7 @@ viewof fish = {
 
 // gravel model
 function gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) {
-  return (2000 * op.pow(0.04, (3 / 5)) * op.pow((DIS_AV_CMS / swidth), (3 / 5)) * op.pow(sgr_dk_rav/1000, (7 / 10)) / (650 * 0.04)) * 1000 ;
+  return (2000 * op.pow(0.05, (3 / 5)) * op.pow((DIS_AV_CMS / swidth), (3 / 5)) * op.pow(sgr_dk_rav/1000, (7 / 10)) / (650 * 0.04)) * 1000 ;
 }
 
 
@@ -498,19 +664,7 @@ Plot.plot({
 
 ```
 
-<!-- optional to add popup descriptions -->
-<!-- :::{.left-popcontainer} --> 
-<!-- :::{.left-popup} -->
-<!-- Text to popup left -->
-<!-- ::: -->
-<!-- ::: -->
-
-<!-- :::{.right-popcontainer} -->
-<!-- :::{.right-popup} -->
-<!-- Text to popup right -->
-<!-- ::: -->
-<!-- ::: -->
-<!-- ::: -->
+\
 \
 
 | <u><b>Desciption of models and variables:</b></u> 
@@ -525,9 +679,9 @@ Plot.plot({
 | 𝛕<sub>b</sub> = 𝛒 * g * n<sup>3/5</sup> * [Q/W]<sup>3/5</sup> * S<sup>7/10</sup>
 | 𝛒 = density of water = 1000 kg/m<sup>3</sup>
 | g = acceleration by gravity = 9.80665 m/s<sup>2</sup>
-| n = channel roughness coefficient = n = 0.04 as estimate for gravel bed rivers from Barnes 1967
+| n = channel roughness coefficient = 0.05 as within estimates for gravel, cobble and boulder rivers (Aldridge & Garrett, 1973; Barnes, 1967)
 | 𝛒<sub>s</sub> = sediment density = 2650 kg/m<sup>3</sup>
-| <sup>*</sup>  =  Shields parameter = 0.04 to follow Wilkins & Snyder 2011
+| 𝛕<sup>*</sup>  =  Shields parameter = 0.04 a median estimate of gravel-bed rivers by Mueller et al. (2005) and Wilkins & Snyder (2011)
 | 
 | <u>Variables to retreive from HydroSHEDs:</u>
 | S = channel gradient, Calculated as the ratio between the elevation drop within the river reach (i.e. the difference between min. and max. elevation along the reach) and the length of the reach.
@@ -546,11 +700,17 @@ Plot.plot({
 |
 | <b> Citations: </b>
 |  
-| Barnes, H. 1967. Roughness Characteristics of Natural Channels. United States Geological Survey: Publications.  
-| Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6   
-| Lehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z   
-| Purchase, C. (2018). A systematic review on the effectiveness of salmonid spawning habitat improvements, and recommendations to potentially increase productivity of depressed Newfoundland Atlantic salmon (Salmo salar) populations.  
-| Wilkins, and Snyder. 2011. Geomorphic comparison of two Atlantic coastal rivers: Toward an understanding of physical controls on Atlantic salmon habitat. River Research and Applications.  
+| Aldridge, B. N., & Garrett, J. M. (1973). Roughness coefficients for stream channels in Arizona (p. 87). U.S. Geological Survey.
+| Barnes, H. H. Jr. (1967). Roughness characteristics of natural channels (U.S. Geological Survey Water-Supply Paper 1849, p. 213). U.S. Geological Survey. 
+| Lehner, B., & Grill, G. (2013). Global river hydrography and network routing: Baseline data and new approaches to study the world’s large river systems. Hydrological Processes, 27(15), 2171– 2186. https://doi.org/10.1002/hyp.9740 
+| Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., & Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data, 6(1), 283. https://doi.org/10.1038/s41597-019-0300-6  
+| Mueller, E. R., Pitlick, J., & Nelson, J. M. (2005). Variation in the reference Shields stress for bed load transport in gravel-bed streams and rivers. Water Resources Research, 41(4). https://doi.org/10.1029/2004WR003692
+| Purchase, C. P. (2026). A systematic review on the effectiveness of salmonid spawning habitat improvements, and recommendations to potentially increase productivity of depressed Newfoundland Atlantic salmon (Salmo salar) populations. EcoEvoRxiv. https://doi.org/10.32942/X2V673
+| Wilkins, B. C., & Snyder, N. P. (2011). Geomorphic comparison of two Atlantic coastal rivers: Toward on understanding of physical controls on Atlantic salmon habitat. River Research and Applications, 27(2), 135–156. https://doi.org/10.1002/rra.1343 
 
 :::
+
 <div id="bottom"></div>
+
+:::
+:::

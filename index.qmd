@@ -1,5 +1,5 @@
 ---
-title: "NL Salmon resource predictions"
+title: "NL Salmon resource exploration"
 theme: sandstone
 format:
   html:
@@ -21,10 +21,10 @@ Project description paragraph.....
 Use the map to explore predictions for watersheds across Newfoundland. You can also use the top navigation bar to explore predictions under the Watersheds tab, and to investigate the relationships between input variable and predicted values on our Sliders page. 
 
 
-Affiliated manuscript:  
+Affiliated manuscripts:  
 Authors:  
 Affiliations:  
-Funding:  
+Funding: Department of Fisheries and Oceans Canada - Aquatic Ecosystems Restoration Fund to the Environment and Resources Management Association (ERMA), FCAS, 
 App development: Emmerson Wilson
 :::
 
@@ -146,3 +146,8 @@ NL_map
 ```
 :::
 :::
+
+```{r}
+
+```
+

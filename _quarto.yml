@@ -3,7 +3,7 @@ project:
   output-dir: docs
 
 website:
-  title: "NL Salmon resource predictions"
+  title: "NL Salmon resource exploration"
   navbar:
     left:
       - text: "Home" 
@@ -77,11 +77,16 @@ website:
       - text: "Sliders"
         href: Sliders.qmd 
       - text: "Resources"
-        href: resources.qmd         
+        href: resources.qmd   
+  page-footer:
+    background: "#343a40"
+    left: "[![](data/MUN_Logo_CMYK_color.jpg){height=45px}](https://www.mun.ca/biology/) [![](data/erma.jpeg){height=45px}](http://erma.ca/) [![](data/fcas.jpg){height=45px}](https://www.salmonconservation.ca/) [![](data/dfo.jpg){height=45px}](https://www.dfo-mpo.gc.ca/index-eng.html)"
+    right:
+      - icon: github
+        href: http://github.com/exploitssalmonproject
 format:
-  html:
+  html: 
     theme: sandstone
     css: styles.css
     toc: false
-
 

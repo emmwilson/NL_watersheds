@@ -99,7 +99,7 @@ arrow <- "https://cdn.pixabay.com/photo/2013/07/12/17/54/arrow-152596_960_720.pn
 ps <- 2650 # kg/m3, density of sediment
 p <- 2000 # kg/m3, density of water
 g <- 9.80665 # m/s2, acceleration by gravity
-n <- 0.04 # channel roughness coefficient
+n <- 0.05 # channel roughness coefficient
 t <- 0.04 # shields parameter
 
 ## predict responses based on data from field at each reach
@@ -314,7 +314,7 @@ map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSn
     )
   ) |> 
   
-  hideGroup("CABD barriers and areas past") |> 
+  hideGroup(c("CABD barriers and areas past", "Discharge (m<sup>3</sup>/s)", "Width (m)")) |> 
   
   addScaleBar(position = "bottomleft") |> 
   
@@ -329,24 +329,24 @@ map
 |  
 | <b>D50 Gravel size:</b>
 |  
-| Gravel size is important to the Atlantic Salmon spawning; too fine or too coarse, and the salmon will either not spawn or have poor egg survival (Purchase 2018). We considered 16 - 64 mm to be the most suitable substrate size, and this is represented as green on th D50 map. However, salmon may spawn in substrate that isn't ideal, represented by yellow on the map. Finally, unsuitable substrate is represented by orange.
+| Gravel size is important to the Atlantic Salmon spawning; too fine or too coarse, and the salmon will either not spawn or have poor egg survival (Purchase 2018). We considered 16 - 64 mm to be the most suitable substrate size, and this is represented as green on th D50 map. However, salmon may spawn in substrate that isn't ideal, represented on the map by yellow for slightly larger than ideal and white for slightly smaller than ideal. Finally, unsuitable substrate is represented by orange.
 | 
 | D50 was predicted based on the following calculations (Wilkins & Snyder 2011)  
 |  
-| D50 = 𝛕<sub>b</sub> / (𝛒<sub>s</sub> - 𝛒) * g * 𝛕<sup>*</sup>   
-|  
-| <u>Parameters:</u>   
-| 𝛕<sub>b</sub> = 𝛒 * g * n<sup>3/5</sup> * [Q/W]<sup>3/5</sup> * S<sup>7/10</sup>  
-| 𝛒 = density of water = 1000 kg/m<sup>3</sup>  
-| g = acceleration by gravity = 9.80665 m/s<sup>2</sup>  
-| n = channel roughness coefficient = n = 0.04 as estimate for gravel bed rivers from Barnes 1967  
-| 𝛒<sub>s</sub> = sediment density = 2650 kg/m<sup>3</sup>  
-| 𝛕<sup>*</sup>  =  Shields parameter = 0.04 to follow Wilkins & Snyder 2011  
-|  
-| <u>Variables to retreive from HydroSHEDs:</u>  
-| S = channel gradient, Calculated as the ratio between the elevation drop within the river reach (i.e. the difference between min. and max. elevation along the reach) and the length of the reach.  
-| Q = Discharge (m<sup>3</sup>/s), Average long-term discharge estimate for river reach, in cubic meters per second.    
-| W = channel width (m), Calculated as the surface river area of the river reach segment divided by length of the river reach segment.    
+| D50 = 𝛕<sub>b</sub> / (𝛒<sub>s</sub> - 𝛒) * g * 𝛕<sup>* </sup>
+| 
+| <u>Parameters:</u>
+| 𝛕<sub>b</sub> = 𝛒 * g * n<sup>3/5</sup> * [Q/W]<sup>3/5</sup> * S<sup>7/10</sup>
+| 𝛒 = density of water = 1000 kg/m<sup>3</sup>
+| g = acceleration by gravity = 9.80665 m/s<sup>2</sup>
+| n = channel roughness coefficient = 0.05 as within estimates for gravel, cobble and boulder rivers (Aldridge & Garrett, 1973; Barnes, 1967)
+| 𝛒<sub>s</sub> = sediment density = 2650 kg/m<sup>3</sup>
+| 𝛕<sup>*</sup>  =  Shields parameter = 0.04 a median estimate of gravel-bed rivers by Mueller et al. (2005) and Wilkins & Snyder (2011)
+| 
+| <u>Variables to retreive from HydroSHEDs:</u>
+| S = channel gradient, Calculated as the ratio between the elevation drop within the river reach (i.e. the difference between min. and max. elevation along the reach) and the length of the reach.
+| Q = Discharge (m<sup>3</sup>/s), Average long-term discharge estimate for river reach, in cubic meters per second.
+| W = channel width (m), Calculated as the surface river area of the river reach segment divided by length of the river reach segment.
 |  
 | <b>CABD barriers and areas past:</b>
 | Potential barriers to upstream salmon movement were sourced from the Canadian Aquatic Barriers Database. Barriers were filtered to remove those that are unlikely sufficient to impede movement: a fishway exists, barrier has been decommissioned/removed, barrier was a dam less than 5 m high, or barrier's Used for Network Analysis field was false. Any stream segment upstream of a remaining barrier is considered potentially inaccessible. Many of these barriers may in fact be passable by salmon (e.g. passable rapid listed as waterfall) but we lack sufficient information to remove them from list. Therefore, each barrier must be assessed on an individual basis if being incorporated into management or research plans.    
@@ -354,10 +354,11 @@ map
 | <b> Data and citations: </b>
 | [Click here to download the `r params$watershed` HydroATLAS data shapefile](`r paste0("https://github.com/emmwilson/NL_watersheds/blob/0d9a7a8e31f9d6fc5a61aac211dbf85ce949138c/data/spatial%20data/watersheds/river_",params$watershed,".shp?raw=true")`)  
 | 
-| Barnes, H. 1967. Roughness Characteristics of Natural Channels. United States Geological Survey: Publications.  
-| Canadian Wildlife Federation. (2024). Canadian Aquatic Barriers Database (CABD). Retrieved from https://aquaticbarriers.ca/  
-| Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi: https://doi.org/10.1038/s41597-019-0300-6   
-| Lehner, B., Messager, M.L., Korver, M.C., Linke, S. (2022). Global hydro-environmental lake characteristics at high spatial resolution. Scientific Data 9: 351. doi: https://doi.org/10.1038/s41597-022-01425-z   
-| Purchase, C. (2018). A systematic review on the effectiveness of salmonid spawning habitat improvements, and recommendations to potentially increase productivity of depressed Newfoundland Atlantic salmon (Salmo salar) populations.  
-| Wilkins, and Snyder. 2011. Geomorphic comparison of two Atlantic coastal rivers: Toward an understanding of physical controls on Atlantic salmon habitat. River Research and Applications.  
+| Aldridge, B. N., & Garrett, J. M. (1973). Roughness coefficients for stream channels in Arizona (p. 87). U.S. Geological Survey.
+| Barnes, H. H. Jr. (1967). Roughness characteristics of natural channels (U.S. Geological Survey Water-Supply Paper 1849, p. 213). U.S. Geological Survey. 
+| Lehner, B., & Grill, G. (2013). Global river hydrography and network routing: Baseline data and new approaches to study the world’s large river systems. Hydrological Processes, 27(15), 2171– 2186. https://doi.org/10.1002/hyp.9740 
+| Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., & Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data, 6(1), 283. https://doi.org/10.1038/s41597-019-0300-6  
+| Mueller, E. R., Pitlick, J., & Nelson, J. M. (2005). Variation in the reference Shields stress for bed load transport in gravel-bed streams and rivers. Water Resources Research, 41(4). https://doi.org/10.1029/2004WR003692
+| Purchase, C. P. (2026). A systematic review on the effectiveness of salmonid spawning habitat improvements, and recommendations to potentially increase productivity of depressed Newfoundland Atlantic salmon (Salmo salar) populations. EcoEvoRxiv. https://doi.org/10.32942/X2V673
+| Wilkins, B. C., & Snyder, N. P. (2011). Geomorphic comparison of two Atlantic coastal rivers: Toward on understanding of physical controls on Atlantic salmon habitat. River Research and Applications, 27(2), 135–156. https://doi.org/10.1002/rra.1343  
 :::
