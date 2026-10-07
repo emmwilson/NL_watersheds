@@ -316,7 +316,7 @@ img[src*=".png"] {
 
 .leaflet-control-container > div.leaflet-top.leaflet-right > div.info.legend.leaflet-control.leaflegend-group-yeartrib {
   order: -1;
-}
+} 
 
 
 /* footer widths control */
