@@ -24,7 +24,7 @@ Use the map to explore predictions for watersheds across Newfoundland. You can a
 Affiliated manuscripts:  
 Authors:  
 Affiliations:  
-Funding: Department of Fisheries and Oceans Canada - Aquatic Ecosystems Restoration Fund to the Environment and Resources Management Association (ERMA), FCAS, 
+Funding: Department of Fisheries and Oceans Canada, Foundation for the Conservation of Atlantic Salmon, Canadian Foundation for Innovation, NSERC
 App development: Emmerson Wilson
 :::
 

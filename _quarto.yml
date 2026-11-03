@@ -3,8 +3,9 @@ project:
   output-dir: docs
 
 website:
-  title: "NL Salmon resource exploration"
+  title: ""
   navbar:
+    logo: data/erma_small.jpeg
     left:
       - text: "Home" 
         href: index.qmd
@@ -80,7 +81,9 @@ website:
         href: resources.qmd   
   page-footer:
     background: "#343a40"
-    left: "[![](data/MUN_Logo_CMYK_color.jpg){height=45px}](https://www.mun.ca/biology/) [![](data/erma.jpeg){height=45px}](http://erma.ca/) [![](data/fcas.jpg){height=45px}](https://www.salmonconservation.ca/) [![](data/dfo.jpg){height=45px}](https://www.dfo-mpo.gc.ca/index-eng.html)"
+    left: |
+      Partners <span style='display:inline-block; width: 192px;'></span> Funders <br>
+      [![](data/MUN_Logo_CMYK_color.jpg){height=45px}](https://www.mun.ca/biology/) [![](data/erma.jpeg){height=45px}](http://erma.ca/) &nbsp;&nbsp;&nbsp; [![](data/fcas.jpg){height=45px}](https://www.salmonconservation.ca/) [![](data/dfo.jpg){height=45px}](https://www.dfo-mpo.gc.ca/index-eng.html) [![](data/cfi.jpg){height=45px}](https://www.innovation.ca/) [![](data/nserc.jpg){height=45px}](https://nserc-crsng.canada.ca/en)
     right:
       - icon: github
         href: http://github.com/exploitssalmonproject

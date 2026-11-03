@@ -307,14 +307,120 @@ Plot.plot({
 | Citation: ...
 
 ## Parr length and growth responses
-:::{.outer-container}
+
 ```{ojs}
 //| echo: false
-//| panel: sidebar
+//| output: false
+
+// Start with "invert" as the default active slider
+viewof active_slider = Inputs.radio(["alkalinity", "conduct", "invert_bio"], {
+  value: "alkalinity"
+})
+```
+
+Click a variable to activate. 
+
+```{ojs}
+//| echo: false
+//| panel: input
+//| layout-ncol: 3
 
 // sliders for predictor variables
 
-//discharge
+// Stream alkalinity
+viewof alkalinity = {
+  const form = Inputs.range(
+  [10, 50], 
+  {value: 25, step: 40/100, label: "Alkalinity (mg/L):"}
+);
+  form.range.style.cssText += "accent-color: #1f78b4; width: 110%";
+  form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
+  
+  const label = form.querySelector("label");
+  label.style.cssText += "width: 100%; margin-top: 10px";
+
+  const wrapper = html`<div style="
+    padding: 10px; 
+    border-radius: 7px; 
+    cursor: pointer;
+    transition: opacity 0.2s;
+    opacity: ${active_slider === "alkalinity" ? "1" : "0.4"};
+  "></div>`;
+  
+  wrapper.appendChild(form);
+
+  // Set initial value
+  wrapper.value = form.value;
+
+  form.addEventListener("input", (e) => {
+    e.stopPropagation(); // Stop the inner event loop
+    wrapper.value = form.value; // Sync the value
+    wrapper.dispatchEvent(new Event("input", { bubbles: true })); // Notify Observable
+  });
+  
+  // Disable internal inputs if this source isn't active
+  form.querySelectorAll("input").forEach(inp => {
+    inp.disabled = (active_slider !== "alkalinity");
+  });
+
+  // Catch clicks on a disabled slider to activate it
+  wrapper.addEventListener("click", (e) => {
+    if (active_slider !== "alkalinity") {
+      // Update the master controller cell
+      viewof active_slider.value = "alkalinity";
+      viewof active_slider.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  });
+  
+  return wrapper;
+
+}
+
+// Stream conductivity
+viewof conduct = {
+  const form = Inputs.range(
+  [10, 50], 
+  {value: 30, step: 40/100, label: "Conductivity (µS/cm):"}
+);
+  form.range.style.cssText += "accent-color: #1f78b4; width: 110%";
+  form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
+  
+  const label = form.querySelector("label");
+  label.style.cssText += "width: 100%; margin-top: 10px";
+
+  // Dynamically disable based on our toggle state
+  const wrapper = html`<div style="
+    padding: 6px; border-radius: 4px; cursor: pointer; transition: opacity 0.2s;
+    opacity: ${active_slider === "conduct" ? "1" : "0.4"};
+  "></div>`;
+  
+  wrapper.appendChild(form);
+  wrapper.value = form.value;
+
+  form.addEventListener("input", (e) => {
+    e.stopPropagation();
+    wrapper.value = form.value;
+    wrapper.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  
+  form.querySelectorAll("input").forEach(inp => inp.disabled = (active_slider !== "conduct"));
+  
+  //Catch clicks on a disabled slider to activate it
+  wrapper.addEventListener("click", (e) => {
+    if (active_slider !== "conduct") {
+      // Update the master controller cell
+      viewof active_slider.value = "conduct";
+      viewof active_slider.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  });
+  
+  return wrapper;
+}
+
+
+
+//invert biomass
+
 viewof invert_bio = {  //name slider
   const form = Inputs.range(
   [0, 20],  // put minimum values and maximum
@@ -328,40 +434,39 @@ viewof invert_bio = {  //name slider
   const label = form.querySelector("label");
   label.style.cssText += "width: 100%";
 
-  return form;
-}
-
-// Stream width
-viewof conduct = {
-  const form = Inputs.range(
-  [10, 50], 
-  {value: 30, step: 40/100, label: "Conductivity (units):"}
-);
-  form.range.style.cssText += "accent-color: #1f78b4; width: 110%";
-  form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
+  // Dynamically disable based on our toggle state
+  const wrapper = html`<div style="
+    padding: 6px; border-radius: 4px; cursor: pointer; transition: opacity 0.2s;
+    opacity: ${active_slider === "invert_bio" ? "1" : "0.4"};
+  "></div>`;
   
-  const label = form.querySelector("label");
-  label.style.cssText += "width: 100%; margin-top: 10px";
+  wrapper.appendChild(form);
+  wrapper.value = form.value;
 
-  return form;
-}
-
-// Stream gradient
-viewof alkalinity = {
-  const form = Inputs.range(
-  [10, 40], 
-  {value: 25, step: 30/100, label: "Alkalinity (units):"}
-);
-  form.range.style.cssText += "accent-color: #1f78b4; width: 110%";
-  form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
+  form.addEventListener("input", (e) => {
+    e.stopPropagation();
+    wrapper.value = form.value;
+    wrapper.dispatchEvent(new Event("input", { bubbles: true }));
+  });
   
-  const label = form.querySelector("label");
-  label.style.cssText += "width: 100%; margin-top: 10px";
-
-  return form;
+  form.querySelectorAll("input").forEach(inp => inp.disabled = (active_slider !== "invert_bio"));
+  
+  //Catch clicks on a disabled slider to activate it
+  wrapper.addEventListener("click", (e) => {
+    if (active_slider !== "invert_bio") {
+      // Update the master controller cell
+      viewof active_slider.value = "invert_bio";
+      viewof active_slider.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  });
+  
+  return wrapper;
+  
 }
 
 ```
+
+
 
 ```{ojs}
 //| echo: false
@@ -370,39 +475,129 @@ viewof alkalinity = {
 // prediction functions
 
 // parr length model(s)
-function parrlen(invert_bio, conduct) {
-  return negativetozero(1.133+0.19+(5.50+1.89)*conduct); //believe the relationship between predictor variables and parr length were made indpendantly, how to put this into sliders???
+function parrlenin(invert_bio) {
+  return negativetozero(85.0179+(0.7332)*invert_bio); 
+}
+
+function parrlenco(conduct) {
+  return negativetozero(78.2348+(0.4124)*conduct); 
 }
 
 // parr growth rate model(s)
-function parrgrow(alkalinity, conduct) {
-  return negativetozero(1.133+0.19+(5.50+1.89)*conduct); //believe the relationship between predictor variables and parr length were made indpendantly, how to put this into sliders???
+function parrgrowal(alkalinity) {
+  return negativetozero(8.1524+(0.6794)*alkalinity); 
 }
 
+function parrgrowco(conduct) {
+  return negativetozero(10.1007+(0.4872)*conduct); 
+}
 
+// error bar functions
+
+//high
+function parrlenin_high(invert_bio) {
+  return negativetozero((85.0179+2.2681)+(0.7332+0.2326)*invert_bio); 
+}
+
+function parrlenco_high(conduct) {
+  return negativetozero((78.2348+5.6265)+(0.4124+0.1806)*conduct); 
+}
+
+function parrgrowal_high(alkalinity) {
+  return negativetozero((8.1524+5.4389)+(0.6794+0.2165)*alkalinity);
+}
+
+function parrgrowco_high(conduct) {
+  return negativetozero((10.1007+5.0549)+(0.4872+0.1623)*conduct); 
+}
+
+//low
+function parrlenin_low(invert_bio) {
+  return negativetozero((85.0179-2.2681)+(0.7332-0.2326)*invert_bio); 
+}
+
+function parrlenco_low(conduct) {
+  return negativetozero((78.2348-5.6265)+(0.4124-0.1806)*conduct); 
+}
+
+function parrgrowal_low(alkalinity) {
+  return negativetozero((8.1524-5.4389)+(0.6794-0.2165)*alkalinity);
+}
+
+function parrgrowco_low(conduct) {
+  return negativetozero((10.1007-5.0549)+(0.4872-0.1623)*conduct); 
+}
 
 // function that takes input from sliders and creates prediction of each response variable based on above functions
+// put into toggle output so that when either slider is seleceted, the other turns off
 
-function parrFunction(invert_bio, conduct, alkalinity) {
+function parrFunction1(invert_bio, conduct, alkalinity) {
   return aq.table({
   'invert_bio': [invert_bio, invert_bio], // repeat for each value predicting
   'conduct': [conduct, conduct],
   'alkalinity':[alkalinity, alkalinity],
-  'response_type': ["Salmon parr growth rate (units)",
+  'response_type': ["Salmon parr growth rate (mm/yr)",
                       "Salmon parr length (mm)"
                     ], // ordered alphabetically
                       
-  'response_predict': [parrgrow(alkalinity, conduct),
-                        parrlen(invert_bio, conduct)
+  'response_predict': [parrgrowco(conduct),
+                        parrlenco(conduct)
                       ],
-  'response_predict_label': [parrgrow(alkalinity, conduct),
-                        parrlen(invert_bio, conduct)
-                      ]
+  'response_predict_label': [parrgrowco(conduct),
+                        parrlenco(conduct)
+                      ],
+  'response_errorhigh': [parrgrowco_high(conduct), // order same as response type
+                        parrlenco_high(conduct),
+                      //** parrhigh(variable1)
+                        ],
+  'response_errorlow': [parrgrowco_low(conduct), // order same as response type
+                        parrlenco_low(conduct),
+                      //** parrlow(variable1)
+                        ]
+  })
+}
+
+function parrFunction2(invert_bio, conduct, alkalinity) {
+  return aq.table({
+  'invert_bio': [invert_bio, invert_bio], // repeat for each value predicting
+  'conduct': [conduct, conduct],
+  'alkalinity':[alkalinity, alkalinity],
+  'response_type': ["Salmon parr growth rate (mm/yr)",
+                      "Salmon parr length (mm)"
+                    ], // ordered alphabetically
+                      
+  'response_predict': [parrgrowal(alkalinity),
+                        parrlenin(invert_bio)
+                      ],
+  'response_predict_label': [parrgrowal(alkalinity),
+                        parrlenin(invert_bio)
+                      ],
+  'response_errorhigh': [parrgrowal_high(alkalinity), // order same as response type
+                        parrlenin_high(invert_bio),
+                      //** parrhigh(variable1)
+                        ],
+  'response_errorlow': [parrgrowal_low(alkalinity), // order same as response type
+                        parrlenin_low(invert_bio),
+                      //** parrlow(variable1)
+                        ]
   })
 }
 
 // create the table
-predictions_parr = parrFunction(invert_bio, conduct, alkalinity)
+predictions_parr1 = parrFunction1(invert_bio, conduct, alkalinity)
+predictions_parr2 = parrFunction2(invert_bio, conduct, alkalinity)
+
+active_data = {
+  if (active_slider === "conduct") {
+    // Calculate with Table A using the active invert_bio variable
+    return predictions_parr1;
+  } else {
+    // Fallback default dataset
+    return predictions_parr2;
+  }
+}
+
+
 
 // create a tables that stores the image paths
 image_parrlen = aq.table({ //split gravel and salmon so I could specify the image sizes better
@@ -413,7 +608,7 @@ image_parrlen = aq.table({ //split gravel and salmon so I could specify the imag
 })
 
 image_parrgrow = aq.table({ 
-  'response_type': ["Salmon parr growth rate (units)",
+  'response_type': ["Salmon parr growth rate (mm/yr)",
                     ],
   'image_path': [imageURL_salmon
                   ] 
@@ -421,22 +616,25 @@ image_parrgrow = aq.table({
 
 // create the bar plot based on predictions_ps
 Plot.plot({
-  width: Math.max(width, 550),
-  height: Math.floor(0.45 * width),
+  width: Math.max(width, 250),
+  height: Math.floor(0.25 * width),
   marginLeft: 0,
   marginRight: 0,
   marginBottom: 70,
   color: {scheme: "dark2" ,
   legend: false},
-  y: {domain: [0, 2100], label: null},
+  y: {domain: [0, 200], label: null},
   x: {label: null},
   marks:[
-    Plot.axisX({fontSize: Math.max(16, width / 60), marginBottom: 40}),
-    Plot.barY(predictions_parr,
+    Plot.axisX({fontSize: Math.max(16, width / 80), marginBottom: 40}),
+    Plot.barY(active_data,
      {x: "response_type",
      y: "response_predict",
      fill: "response_type"}), // create bar graph
-    Plot.text(predictions_parr, {x: "response_type", y: "response_predict", text: "response_predict_label", dy: -7, dx: -width/8, lineAnchor: "bottom", fontSize: Math.max(16, width / 60)}) // write out predicted value
+    Plot.text(active_data, {x: "response_type", y: "response_predict", text: "response_predict_label", dy: -7, dx: -width/8, lineAnchor: "bottom", fontSize: Math.max(16, width / 80)}), 
+    
+    // add error bars
+    Plot.ruleX(active_data, {x: "response_type", y1: 'response_errorlow', y2: 'response_errorhigh', strokeWidth: 3}) 
    ]
 })
 
@@ -469,13 +667,45 @@ Plot.plot({
 })
 
 ```
-:::
+
+\
+
+| <u><b>Desciption of models and variables:</b></u> 
+
+| A suite of predictor variables, measured in field, were assessed for their correlation to salmon parr growth rate and length, using general linear models (GLMs). The variables with significant correlation to salmon parr growth rate and length are represented as sliders above.  
+
+| <b>Sliders</b>: 
+
+| Alkalinity (mg/L): ...
+
+| Conductivity (µS/cm): .... 
+
+| Invertebrate density (g m⁻²): .... 
+
+| <b>Predicted values</b>: 
+
+| Salmon parr growth rate (mm/yr): The growth rate of salmon parr, difference between lengths of salmon parr aged 2 year and 1 year over time (1 year),  predicted to occur based on alklainity or conductivity.
+
+|   Salmon parr growth rate = (8.1524±5.4389)+(0.6794±0.2165)*alkalinity
+
+|   Salmon parr growth rate = (10.1007±5.0549)+(0.4872±0.1623)*conductivity
+
+| Salmon parr length (mm): The length of salmon parr predicted to occur based on conductivity or invertebrate biomass.
+
+|   Salmon parr length = (85.0179±2.2681)+(0.7332±0.2326)*invertebrate biomass
+
+|   Salmon parr length = (78.2348±5.6265)+(0.4124±0.1806)*conductivity
+
+
+| Citation: ...
 
 ## Gravel and spawning estimates
-:::{.outer-container}
+
 ```{ojs}
 //| echo: false
-//| panel: sidebar
+//| panel: input
+//| layout-ncol: 2
+//| layout-nrow: 2
 
 // sliders for predictor variables
 
@@ -615,8 +845,8 @@ image_salmon = aq.table({
 
 // create the bar plot based on predictions_ps
 Plot.plot({
-  width: Math.max(width, 550),
-  height: Math.floor(0.45 * width),
+  width: Math.max(width, 350),
+  height: Math.floor(0.25 * width),
   marginLeft: 0,
   marginRight: 0,
   marginBottom: 70,
@@ -625,18 +855,18 @@ Plot.plot({
   y: {domain: [0, 2100], label: null},
   x: {label: null},
   marks:[
-    Plot.axisX({fontSize: Math.max(16, width / 60), marginBottom: 40}),
+    Plot.axisX({fontSize: Math.max(16, width / 80), marginBottom: 40}),
     Plot.barY(predictions_gravel,
      {x: "response_type",
      y: "response_predict",
      fill: "response_type"}), // create bar graph
-    Plot.text(predictions_gravel, {x: "response_type", y: "response_predict", text: "response_predict_label", dy: -7, dx: -width/8, lineAnchor: "bottom", fontSize: Math.max(16, width / 60)}) // write out predicted value
+    Plot.text(predictions_gravel, {x: "response_type", y: "response_predict", text: "response_predict_label", dy: -7, dx: -width/8, lineAnchor: "bottom", fontSize: Math.max(16, width / 80)}) // write out predicted value
    ]
 })
 
 // add images below each bar
 Plot.plot({
-  width: Math.max(width, 550),
+  width: Math.max(width, 300),
   height: Math.floor(0.1 * width),
   marginTop: 20,
   marginLeft: 0,
@@ -708,9 +938,9 @@ Plot.plot({
 | Purchase, C. P. (2026). A systematic review on the effectiveness of salmonid spawning habitat improvements, and recommendations to potentially increase productivity of depressed Newfoundland Atlantic salmon (Salmo salar) populations. EcoEvoRxiv. https://doi.org/10.32942/X2V673
 | Wilkins, B. C., & Snyder, N. P. (2011). Geomorphic comparison of two Atlantic coastal rivers: Toward on understanding of physical controls on Atlantic salmon habitat. River Research and Applications, 27(2), 135–156. https://doi.org/10.1002/rra.1343 
 
-:::
 
+
+
+:::
+:::
 <div id="bottom"></div>
-
-:::
-:::

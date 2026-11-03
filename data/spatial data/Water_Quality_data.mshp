@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SAGA_METADATA>
+  <DATABASE>
+    <FIELDS>
+      <FIELD TYPE="STRING">Site code</FIELD>
+      <FIELD TYPE="STRING">Trib size</FIELD>
+      <FIELD TYPE="STRING">Date</FIELD>
+      <FIELD TYPE="LONGINT">Year</FIELD>
+      <FIELD TYPE="STRING">Downstream</FIELD>
+      <FIELD TYPE="STRING">Upstream c</FIELD>
+      <FIELD TYPE="DOUBLE">X</FIELD>
+      <FIELD TYPE="DOUBLE">Y</FIELD>
+      <FIELD TYPE="LONGINT">Combo mete</FIELD>
+      <FIELD TYPE="DOUBLE">Water temp</FIELD>
+      <FIELD TYPE="DOUBLE">pH</FIELD>
+      <FIELD TYPE="DOUBLE">EC</FIELD>
+      <FIELD TYPE="LONGINT">Dissolved</FIELD>
+      <FIELD TYPE="LONGINT">Alkalinity</FIELD>
+      <FIELD TYPE="DOUBLE">DOC</FIELD>
+      <FIELD TYPE="DOUBLE">TDN</FIELD>
+      <FIELD TYPE="DOUBLE">TDN*100</FIELD>
+    </FIELDS>
+  </DATABASE>
+  <SOURCE></SOURCE>
+  <HISTORY saga-version="9.10.2">
+    <TOOL library="shapes_points" id="19" name="Snap Points to Lines">
+      <OPTION type="double" id="DISTANCE" name="Search Distance">100</OPTION>
+      <INPUT type="shapes" id="INPUT" name="Points">
+        <FILE>/private/var/folders/hm/pjb3hj7s3hbgwbh5crnc_4qh0000gn/T/processing_nqHsZQ/8f78989449624cf39fe90d902cdf7e6d/INPUT.shp</FILE>
+      </INPUT>
+      <INPUT type="shapes" id="SNAP" name="Snap Features">
+        <FILE>/Users/emmersonEmmerson/Documents/Master's/Work feb 2025/SubPredictionsExploits_rp.shp</FILE>
+      </INPUT>
+      <OUTPUT type="shapes" id="OUTPUT" name="Result">INPUT [snapped]</OUTPUT>
+    </TOOL>
+  </HISTORY>
+  <FILE></FILE>
+  <DESCRIPTION></DESCRIPTION>
+  <PROJECTION>
+    <WKT2>GEODCRS["WGS 84",DATUM["World Geodetic System 1984",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ID["EPSG",6326]],PRIMEM["Greenwich",0,ANGLEUNIT["Degree",0.0174532925199433]],CS[ellipsoidal,2],AXIS["longitude",east,ORDER[1],ANGLEUNIT["Degree",0.0174532925199433]],AXIS["latitude",north,ORDER[2],ANGLEUNIT["Degree",0.0174532925199433]]]</WKT2>
+    <PROJ>+proj=longlat +datum=WGS84 +no_defs +type=crs</PROJ>
+    <CODE>-1</CODE>
+  </PROJECTION>
+</SAGA_METADATA>
