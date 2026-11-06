@@ -5,7 +5,7 @@ project:
 website:
   title: ""
   navbar:
-    logo: data/erma_small.jpeg
+    logo: data/logo_website.jpeg
     left:
       - text: "Home" 
         href: index.qmd

@@ -62,9 +62,11 @@ vg = require('vega-lite')
 // references to images stored in data folder for each response variable
 imageURL_invert = FileAttachment("/data/invert 2.png").url()
 imageURL_peri = FileAttachment("/data/periphyton.png").url()
-imageURL_gravel = FileAttachment("/data/gravel.png").url()
-imageURL_parr = FileAttachment("/data/par_len.png").url()
+imageURL_gravel = FileAttachment("/data/gravel.png").url() 
+imageURL_parr = FileAttachment("/data/parr_len.png").url()
 imageURL_salmon = FileAttachment("/data/NOAA_atlantic_salmon.png").url()
+imageURL_parrgrow = FileAttachment("/data/parr_grow.png").url()
+
 //** imageURL_response = FileAttachment("/data/response_file_name.png").url() 
 
 
@@ -72,6 +74,12 @@ imageURL_salmon = FileAttachment("/data/NOAA_atlantic_salmon.png").url()
 function negativetozero(equation) { 
   return op.bin(equation, 0, op.greatest(equation), 0.0001)
 }
+
+// colour scheme for bars
+myColours = ["#325D88", "#1F78B4"]
+
+
+ 
 
 ```
 
@@ -234,8 +242,8 @@ Plot.plot({
   height: Math.floor(0.25 * width),
   marginLeft: 0,
   marginRight: 0,
-  marginBottom: 70,
-  color: {scheme: "dark2" ,
+  marginBottom: 30,
+  color: {range: myColours,
   legend: false},
   y: {domain: [0,8], axis: null},
   x: {label: null, domain: ["Predicted invertebrate density (g/m²)", 
@@ -262,7 +270,7 @@ Plot.plot({
 // add images below each bar
 Plot.plot({
   width: Math.max(width, 550),
-  height: Math.floor(0.1 * width),
+  height: Math.floor(0.08 * width),
   marginLeft: 0,
   marginRight: 0,
   colour: {legend: false},
@@ -304,7 +312,7 @@ Plot.plot({
 
 | Periphyton density (μg cm⁻²): The density of algae, microbes, bacteria, and detritus attached to substrate, predicted to occur based on GLMs. 
 
-| Citation: ...
+| <b>Citation:</b> ...
 
 ## Parr length and growth responses
 
@@ -603,14 +611,14 @@ active_data = {
 image_parrlen = aq.table({ //split gravel and salmon so I could specify the image sizes better
   'response_type': ["Salmon parr length (mm)"
                     ], 
-  'image_path': [imageURL_gravel
+  'image_path': [imageURL_parr
                   ] 
 })
 
 image_parrgrow = aq.table({ 
   'response_type': ["Salmon parr growth rate (mm/yr)",
                     ],
-  'image_path': [imageURL_salmon
+  'image_path': [imageURL_parrgrow
                   ] 
 })
 
@@ -620,8 +628,8 @@ Plot.plot({
   height: Math.floor(0.25 * width),
   marginLeft: 0,
   marginRight: 0,
-  marginBottom: 70,
-  color: {scheme: "dark2" ,
+  marginBottom: 30,
+  color: {range: myColours,
   legend: false},
   y: {domain: [0, 200], label: null},
   x: {label: null},
@@ -641,22 +649,22 @@ Plot.plot({
 // add images below each bar
 Plot.plot({
   width: Math.max(width, 550),
-  height: Math.floor(0.1 * width),
-  marginTop: 20,
+  height: Math.floor(0.085 * width),
+  marginTop: 10,
   marginLeft: 0,
   marginRight: 0,
   colour: {legend: false},
   y: {domain: [0,0], axis: null},
   x: {label: "Response type", axis: null, fontSize: 22},
   marks:[
-    Plot.image(image_gravel, 
+    Plot.image(image_parrgrow, 
       {x: "response_type",
       y: [0, 0],
       src: "image_path",
       width: width/8,
       axis: null
       }),
-    Plot.image(image_salmon, 
+    Plot.image(image_parrlen, 
       {x: "response_type",
       y: [0, 0],
       src: "image_path",
@@ -697,7 +705,7 @@ Plot.plot({
 |   Salmon parr length = (78.2348±5.6265)+(0.4124±0.1806)*conductivity
 
 
-| Citation: ...
+| <b>Citation:</b> ...
 
 ## Gravel and spawning estimates
 
@@ -849,13 +857,13 @@ Plot.plot({
   height: Math.floor(0.25 * width),
   marginLeft: 0,
   marginRight: 0,
-  marginBottom: 70,
-  color: {scheme: "dark2" ,
-  legend: false},
+  marginBottom: 60,
+  color: {range: myColours,
+    legend: false},
   y: {domain: [0, 2100], label: null},
   x: {label: null},
   marks:[
-    Plot.axisX({fontSize: Math.max(16, width / 80), marginBottom: 40}),
+    Plot.axisX({fontSize: Math.max(16, width / 80), marginBottom: 50}),
     Plot.barY(predictions_gravel,
      {x: "response_type",
      y: "response_predict",
@@ -867,10 +875,11 @@ Plot.plot({
 // add images below each bar
 Plot.plot({
   width: Math.max(width, 300),
-  height: Math.floor(0.1 * width),
+  height: Math.floor(0.09 * width),
   marginTop: 20,
   marginLeft: 0,
   marginRight: 0,
+  marginBottom: 20,
   colour: {legend: false},
   y: {domain: [0,0], axis: null},
   x: {label: "Response type", axis: null, fontSize: 22},
@@ -879,7 +888,7 @@ Plot.plot({
       {x: "response_type",
       y: [0, 0],
       src: "image_path",
-      width: width/8,
+      width: width/10,
       axis: null
       }),
     Plot.image(image_salmon, 
