@@ -1,2 +1,7 @@
 /.quarto/
 .Rproj.user
+**/*.quarto_ipynb
+TerraNova_map.qmd
+chem_explore.pdf
+.Rhistory
+smolt tab - field data page.R
