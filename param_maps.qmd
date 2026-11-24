@@ -356,6 +356,7 @@ map
 | 
 | Aldridge, B. N., & Garrett, J. M. (1973). Roughness coefficients for stream channels in Arizona (p. 87). U.S. Geological Survey.
 | Barnes, H. H. Jr. (1967). Roughness characteristics of natural channels (U.S. Geological Survey Water-Supply Paper 1849, p. 213). U.S. Geological Survey. 
+| Foote, K.J., Leroux, S.J., Hart, A.J., Murphy, N.C., and Purchase, C.F. (2026). Predicting substrate size at a watershed scale to inform conservation planning for a declining salmonid species. EcoEvoRxiv preprint, https://doi.org/10.32942/X2PD67.
 | Lehner, B., & Grill, G. (2013). Global river hydrography and network routing: Baseline data and new approaches to study the world’s large river systems. Hydrological Processes, 27(15), 2171– 2186. https://doi.org/10.1002/hyp.9740 
 | Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., & Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data, 6(1), 283. https://doi.org/10.1038/s41597-019-0300-6  
 | Mueller, E. R., Pitlick, J., & Nelson, J. M. (2005). Variation in the reference Shields stress for bed load transport in gravel-bed streams and rivers. Water Resources Research, 41(4). https://doi.org/10.1029/2004WR003692
