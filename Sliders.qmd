@@ -197,8 +197,8 @@ function myFunction(peri,
           //** EPT,
           EPT],
   //** 'variable1': [variable1, variable1, variable1],
-  'response_type': ["Predicted invertebrate density (g/m²)", 
-                    "Predicted periphyton density (μg/cm²)",
+  'response_type': ["Predicted periphyton density (μg/cm²)", 
+                    "Predicted invertebrate density (g/m²)"
                     //** "Predicted parr density (g m⁻²)"
                     ],
   'response_predict': [invertbiomass(peri), // order same as response type
@@ -225,13 +225,10 @@ predictions_ps = myFunction(peri,
 
 // create a table that stores the image paths
 images = aq.table({
-  'response_type': ["Predicted invertebrate density (g/m²)",
-                    "Predicted periphyton density (μg/cm²)",
-                    //** "Predicted parr density (g m⁻²)",
+  'response_type': ["Predicted periphyton density (μg/cm²)", 
+                    "Predicted invertebrate density (g/m²)"
                     ],
-  'image_path': [imageURL_invert, //order these to match  ordered response variables (response_type)
-                  imageURL_peri
-                  //** imageURL_parr,
+  'image_path': [imageURL_peri, imageURL_invert //order these to match  ordered response variables (response_type)
                   ] 
 })
 
@@ -246,10 +243,8 @@ Plot.plot({
   color: {range: myColours,
   legend: false},
   y: {domain: [0,8], axis: null},
-  x: {label: null, domain: ["Predicted invertebrate density (g/m²)", 
-                            "Predicted periphyton density (μg/cm²)",
-                            //** "Predicted parr density (g m⁻²) "
-                            ]},
+  x: {label: null, domain: ["Predicted periphyton density (μg/cm²)", 
+                            "Predicted invertebrate density (g/m²)"]},
   
   // create bar graph
   marks:[
@@ -276,9 +271,8 @@ Plot.plot({
   colour: {legend: false},
   y: {domain: [0,0], axis: null},
   x: {label: "Response type", axis: null, fontSize: 22, 
-      domain: ["Predicted invertebrate density (g/m²)", // match this order to above
-              "Predicted periphyton density (μg/cm²)",
-               //** "Predicted parr density (g m⁻²) "
+      domain: ["Predicted periphyton density (μg/cm²)",
+              "Predicted invertebrate density (g/m²)" // match this order to above
                ]},
   marks:[
     Plot.image(images, 
@@ -546,7 +540,7 @@ function parrFunction1(invert_bio, conduct, alkalinity) {
   'alkalinity':[alkalinity, alkalinity],
   'response_type': ["Salmon parr growth rate (mm/yr)",
                       "Salmon parr length (mm)"
-                    ], // ordered alphabetically
+                    ], 
                       
   'response_predict': [parrgrowco(conduct),
                         parrlenco(conduct)
@@ -707,7 +701,7 @@ Plot.plot({
 
 | <b>Citation:</b> ...
 
-## Gravel and spawning estimates
+## Gravel and spawning capacity
 
 ```{ojs}
 //| echo: false
@@ -767,8 +761,8 @@ viewof sgr_dk_rav = {
 // Fish length
 viewof fish = {
   const form = Inputs.range(
-  [40, 200], 
-  {value: 100, step: (200-40)/100, label: "Fish length (cm):"}
+  [100, 2000], 
+  {value: 1000, step: (2000-100)/100, label: "Fish length (mm):"}
 );
   form.range.style.cssText += "accent-color: #1f78b4; width: 110%";
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
@@ -797,20 +791,69 @@ function gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) {
 
 // ideal fish size as exponential curve, where 16 is ideal for 0.1 m fish and 64 is ideal for 2m fish
 
-function idealsize(fish) {
-  return 109 * (op.pow(1.26, fish/100) - 1)
-}
+//function idealsize(fish) {
+//  return 109 * (op.pow(1.26, fish/100) - 1)
+//}
 
 // spawning suitability that responds to fish length
-function spawningprob(DIS_AV_CMS, swidth, sgr_dk_rav, fish) {
-  if(16 <= gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) <=64) {
-  return op.exp((-1/2) * (op.pow((gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) - idealsize(fish))/8, 2)));
-  } else {
-  return 0
-  }
+//function spawningprob(DIS_AV_CMS, swidth, sgr_dk_rav, fish) {
+//  if(16 <= gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) <=64) {
+//  return op.exp((-1/2) * (op.pow((gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) - idealsize(fish))/8, 2)));
+//  } else {
+//  return 0
+//  }
+//}
+
+// Average fish length (for now)
+
+avgfish_mm = 500
+
+// Redd area
+function RArea(fish) {
+  return 3.3 * (op.pow(fish/avgfish_mm, 2.3));
+}
+
+// Movable particle size
+function Dt(fish) {
+  return 115 * (op.pow(fish/avgfish_mm, 0.62));
+}
+
+// Calculate D84 from D50
+function D84(DIS_AV_CMS, swidth, sgr_dk_rav) {
+  return 2 * gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) ;
 }
 
 
+// Coverage of movable particle size 
+
+//z stat
+// denominator is calculated as log(D84/D50) which is equivalent to log(2) = 0.683 if using above equation
+function z(fish, DIS_AV_CMS, swidth, sgr_dk_rav) {
+  return op.log(Dt(fish)/gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav))/0.693;
+}
+
+//fractional area movable particles
+function Fm(fish, DIS_AV_CMS, swidth, sgr_dk_rav) {
+  return op.pow(1 + op.exp(-1.702*z(fish, DIS_AV_CMS, swidth, sgr_dk_rav)) , -1);
+}
+
+
+// Redd capacity
+function Nredds(fish, DIS_AV_CMS, swidth, sgr_dk_rav) {
+  return Fm(fish, DIS_AV_CMS, swidth, sgr_dk_rav)/RArea(fish);
+}
+
+// Reproductive potential
+
+//E
+function E(fish) {
+  return negativetozero(8.1*fish - 1450);
+}
+
+//N eggs
+function Neggs(fish, DIS_AV_CMS, swidth, sgr_dk_rav) {
+  return Fm(fish, DIS_AV_CMS, swidth, sgr_dk_rav) * E(fish) / RArea(fish);
+}
 
 // function that takes input from sliders and creates prediction of each response variable based on above functions
 
@@ -821,14 +864,14 @@ function gravelFunction(DIS_AV_CMS, swidth, sgr_dk_rav, fish) {
   'sgr_dk_rav':[sgr_dk_rav, sgr_dk_rav],
   'fish': [fish, fish],
   'response_type': ["Predicted gravel size (D50; mm)", 
-                    "Suitability of predicted gravel size for \nspawning by salmon of given length" //not sure what this variable will be yet
-                    ], // ordered alphabetically
+                    "Number of eggs per unit area that reach\ncan accommodate for salmon of given length" //not sure what this variable will be yet
+                    ], 
                       
   'response_predict': [gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav),
-                        spawningprob(DIS_AV_CMS, swidth, sgr_dk_rav, fish)*2000
+                        Neggs(fish, DIS_AV_CMS, swidth, sgr_dk_rav)
                       ],
   'response_predict_label': [gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav),
-                        spawningprob(DIS_AV_CMS, swidth, sgr_dk_rav, fish)
+                        Neggs(fish, DIS_AV_CMS, swidth, sgr_dk_rav)
                       ]
   })
 }
@@ -860,8 +903,8 @@ Plot.plot({
   marginBottom: 60,
   color: {range: myColours,
     legend: false},
-  y: {domain: [0, 2100], label: null},
-  x: {label: null},
+  y: {domain: [0, 800], label: null},
+  x: {label: null, domain: ["Predicted gravel size (D50; mm)", "Number of eggs per unit area that reach\ncan accommodate for salmon of given length"]},
   marks:[
     Plot.axisX({fontSize: Math.max(16, width / 80), marginBottom: 50}),
     Plot.barY(predictions_gravel,
@@ -928,14 +971,21 @@ Plot.plot({
 | W = channel width (m), Calculated as the surface river area of the river reach segment divided by length of the river reach segment.
 |  
 | 
-| <b>Spawning suitability:</b> in predicted gravel size  for fish of chosen length (m) calculated using the following equation:
+| <b>Reproductive potential:</b> Number of eggs per unit area that reach can accommodate for salmon of given length, was predicted based on the following calculations (citation)
+|
+| Neggs = Fm * E / Aredd
+|
+| <u>Parameters:</u>
+| Aredd = Area fish of given length requires to build a redd using coupled measurements of fish lengths and published redd dimensions = 3.3 * (fish_length/avgerage_fish_length)<sup>2/3</sup>
+| fish_length (mm) = fish length input from slider
+| average_fish_length (mm) = average fish length for watershed = 500
+| E = number of eggs that a fish of given length can produce = 8.1 * fish_length - 1450 ≥ 0
+| Fm = Fractional area of movable particles for fish of given length = (1+e<sup>-1.702*z</sup>)<sup>-1</sup>
+| z = Difference between threshold size of movable particles and mean size of particles = log(Dt/D50)/log(D84/D50)
+| D50 calculated above
+| D84 (mm) = 84th percentile gravel size = 2 * D50 (Recking 2013)
+| Dt (mm) = Size of the largest particle diameter fish of given length can move, based on published empirical data = 115 * (fish_length/average_fish_length)<sup>0.62</sup>
 | 
-| Suitability = e<sup>((-1/2) * ((D50 - ideal.fish.gravel)/8)<sup>2</sup>)</sup>
-| 
-| Ideal.fish.gravel = 109 * (1.26<sup>fish.length</sup> - 1)
-| 
-| This equation associates a higher probability of spawning in larger gravel for longer fish, and a higher probability of spawning in smaller gravel for smaller fish.  
-| Assumes the ideal spawning gravel for a fish of 2m is 64 mm,  for a fish of 1 m is 32 mm, for a fish of 0 m is 16 mm etc, with a bell shaped distribution of suitability around the ideal gravel size with a standard deviation of 8. If D50 is lower than 16 or higher than 64, the suitability is 0.
 |
 | <b> Citations: </b>
 |  
@@ -946,6 +996,7 @@ Plot.plot({
 | Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., & Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data, 6(1), 283. https://doi.org/10.1038/s41597-019-0300-6  
 | Mueller, E. R., Pitlick, J., & Nelson, J. M. (2005). Variation in the reference Shields stress for bed load transport in gravel-bed streams and rivers. Water Resources Research, 41(4). https://doi.org/10.1029/2004WR003692
 | Purchase, C. P. (2026). A systematic review on the effectiveness of salmonid spawning habitat improvements, and recommendations to potentially increase productivity of depressed Newfoundland Atlantic salmon (Salmo salar) populations. EcoEvoRxiv. https://doi.org/10.32942/X2V673
+| Recking A (2013) An analysis of nonlinearity effects on bed load transport prediction. JGR Earth Surface 118:1264–1281. https://doi.org/10.1002/jgrf.20090
 | Wilkins, B. C., & Snyder, N. P. (2011). Geomorphic comparison of two Atlantic coastal rivers: Toward on understanding of physical controls on Atlantic salmon habitat. River Research and Applications, 27(2), 135–156. https://doi.org/10.1002/rra.1343 
 
 
