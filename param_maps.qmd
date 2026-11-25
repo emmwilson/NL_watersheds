@@ -88,7 +88,7 @@ inaccess <- vect(file_inaccess)
 arrow <- "https://cdn.pixabay.com/photo/2013/07/12/17/54/arrow-152596_960_720.png"
 ```
 
-```{r, predictions}
+```{r, predictions_D50}
 #| include: false
 #| warning: false
 #| echo: false
@@ -111,6 +111,70 @@ rivers$D50 <- (rivers$tb/((ps-p)*g*t))*1000
 
 
 ```
+
+```{r, predictions_spawn}
+#| include: false
+#| warning: false
+#| echo: false
+
+#fish lengths
+min_fish_length <- 200
+avg_fish_length <- 500
+max_fish_length <- 900
+
+# for avg length fish
+
+
+Aredd_avg <- 3.3*((avg_fish_length/avg_fish_length)^2.3) 
+
+Dt_avg <- 115*((avg_fish_length/avg_fish_length)^0.62)
+
+rivers$D84 <- 2*rivers$D50
+
+rivers$z_avg <- log(Dt_avg/rivers$D50)/log(rivers$D84/rivers$D50)
+
+rivers$Fm_avg <- (1+exp(-1.702*rivers$z_avg))^-1
+
+rivers$Nredd_avg <- (rivers$Fm_avg*rivers$ria_ha_csu)/Aredd_avg
+
+E_avg <- 8.1*avg_fish_length-1450
+
+rivers$Neggs_avg <- (rivers$Fm_avg*rivers$ria_ha_csu)*E_avg/Aredd_avg
+
+# for max length fish
+Aredd_max <- 3.3*((max_fish_length/avg_fish_length)^2.3)
+
+Dt_max <- 115*((max_fish_length/avg_fish_length)^0.62)
+
+rivers$z_max <- log(Dt_max/rivers$D50)/log(rivers$D84/rivers$D50)
+
+rivers$Fm_max <- (1+exp(-1.702*rivers$z_max))^-1
+
+rivers$Nredd_max <- (rivers$Fm_max*rivers$ria_ha_csu)/Aredd_max #something about this calculation isn't giving sensable answers
+# isn't Fm unitless so actually need to be dividing a measured area (multiplied by Fm) by the Aredd
+# Hydrosheds have river area 
+
+E_max <- 8.1*max_fish_length-1450
+
+rivers$Neggs_max <- (rivers$Fm_max*rivers$ria_ha_csu)*E_max/Aredd_max
+
+# for min length fish
+Aredd_min <- 3.3*((min_fish_length/avg_fish_length)^2.3) # this is giving an incredibly small area
+
+Dt_min <- 115*((min_fish_length/avg_fish_length)^0.62)
+
+rivers$z_min <- log(Dt_min/rivers$D50)/log(rivers$D84/rivers$D50)
+
+rivers$Fm_min <- (1+exp(-1.702*rivers$z_min))^(-1)
+
+rivers$Nredd_min <- (rivers$Fm_min*rivers$ria_ha_csu)/Aredd_min
+
+E_min <- ifelse(8.1*min_fish_length-1450<0, 0, 8.1*min_fish_length-1450)
+
+rivers$Neggs_min <- (rivers$Fm_min*rivers$ria_ha_csu)*E_min/Aredd_min
+
+```
+
 
 ```{r, palettes}
 #| include: false
@@ -148,6 +212,7 @@ width.pal.leg <- colorNumeric(rev(width.col.leg), domain = c(0, top_width))
 
 #width.pal <- colorFactor(c("#f2ca97", "#d4021d"), domain = exploits_river$width*1000) use this function for any categorical data you want to include in the map
   
+
 # colour palette for stream gradient
 
 # make top 90th percentile one colour
@@ -159,31 +224,41 @@ gradient.col <- gradient.pal(rivers$sgr_dk_rav/10000)
 gradient.pal90 <- colorNumeric(colorRamp(c("#422300")), domain = c(top_gradient, max(rivers$sgr_dk_rav/10000))) 
 gradient.col90 <- gradient.pal90(rivers$sgr_dk_rav/10000)
 
-
 # colour palette for legend so high numbers at top
 gradient.col.leg <- gradient.pal(seq(0, top_gradient, by = top_gradient/7))
 gradient.pal.leg <- colorNumeric(rev(gradient.col.leg), domain = c(0, top_gradient))  
 
+
 # colour palette for D50, with 16-64 green and over 90 orange
   
-D50.pal <- colorNumeric(c("white","#e9c602", "#e9c602","#FD602F"), domain = c(0, 16, 64, ceiling(max(rivers$D50, na.rm = T)/16)*16))
+D50.pal <- colorNumeric(c("white","#e9c602", "#e9c602","#FD602F"), domain = c(0, 10, 45, ceiling(max(rivers$D50, na.rm = T)/16)*16))
  
  # if D50s reach over 200 then use 200 as cap, but if not then use closest multiple of 10 to max D50 as cap
 top_D50 <- ifelse(max(rivers$D50, na.rm = T) >= 200, 200, ceiling(max(rivers$D50, na.rm = T)/10)*10)
 
- 
  # map colours
 D50.col <-  D50.pal(rivers$D50)
-D50.col[rivers$D50 >= 16 & rivers$D50 <= 64] <- "#00D458"
+D50.col[rivers$D50 >= 10 & rivers$D50 <= 45] <- "#00D458"
 D50.col[rivers$D50 >= top_D50] <- "#FD602F" 
 
   #legend
 D50.col.leg <- D50.pal(seq(0, top_D50, by = top_D50/10))
-D50.col.leg[seq(0, top_D50, by = top_D50/10) >= 16 & seq(0, top_D50, by = top_D50/10) <= 64] <- "#00D458"
+D50.col.leg[seq(0, top_D50, by = top_D50/10) >= 10 & seq(0, top_D50, by = top_D50/10) <= 45] <- "#00D458"
 D50.col.leg[seq(0, top_D50, by = top_D50/10) >= top_D50] <- "#FD602F"
 
 D50.pal.leg <- colorNumeric(rev(D50.col.leg), domain = c(0,top_D50))
 
+
+# colour palette for Nredd
+top_Nredd <- quantile(rivers$Nredd_min, 0.9, na.rm = T)
+
+Nredd.pal <- colorNumeric(c("#FD602F", "#e9c602","#00D458"),  domain = c(0, top_Nredd))
+  
+# colour palette for legend so high numbers at top
+Nredd.col.leg <- Nredd.pal(seq(0, top_Nredd, by = top_Nredd/7))
+Nredd.pal.leg <- colorNumeric(rev(Nredd.col.leg), domain = c(0, top_Nredd))
+
+Nredd.pal90 <- colorNumeric(colorRamp(c("#00D458")), domain = c(top_Nredd, max(rivers$Nredd_min, na.rm = T)), na.color = "transparent") 
 ```
 
 
@@ -195,7 +270,11 @@ label_text <- glue("<b><u>Segment data:</u></b> <br/>",
 "<b>Predicted gravel size (D50): </b> {round(rivers$D50, 1)} mm<br/>",
 "<b>Discharge: </b> {round(rivers$DIS_AV_CMS, 1)} m<sup>3</sup>/s<br/>",
 "<b>Width: </b> {round(rivers$width,1)} m<br/>",
-"<b>Gradient: </b> {round(rivers$sgr_dk_rav/10,1)} mm/m<br/>") |> 
+"<b>Gradient: </b> {round(rivers$sgr_dk_rav/10,1)} mm/m<br/>",
+"<b>Number of redds that can be built in a reach:</b><br/>",
+"by an average length fish: {round(rivers$Nredd_avg,1)} mm/m<br/>",
+"by a maximum length fish: {round(rivers$Nredd_max,1)} mm/m<br/>",
+"by a minimum length fish: {round(rivers$Nredd_min,1)} mm/m<br/>") |> 
 
   lapply(htmltools::HTML)
   
@@ -229,6 +308,7 @@ map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSn
       addMapPane("rivers", zIndex = 415) |> 
       addMapPane("lakes", zIndex = 420) |>
       addMapPane("data_D50", zIndex = 450) |> 
+      addMapPane("data_Nredd", zIndex = 447) |> 
       addMapPane("data_disch", zIndex = 445) |> 
       addMapPane("data_disch90", zIndex = 444) |> 
       addMapPane("data_width", zIndex = 440) |> 
@@ -248,7 +328,7 @@ map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSn
       addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = "#588BAD", weight = rivers$width^(1/3), options = pathOptions(pane = "rivers"), group = "exploits", opacity = 0.8) |>
 
   ## lakes of the exploits
-      addPolygons(data = lakes, color = "#234667", stroke = FALSE, fillOpacity = 0.9, options = pathOptions(pane = "lakes"), group = "exploits") |>
+      addPolygons(data = lakes, color = "#234667", stroke = FALSE, fillOpacity = 1, options = pathOptions(pane = "lakes"), group = "exploits") |>
 
   ## add barriers  
   addPolylines(data = smooth(inaccess, method = "ksmooth", smoothness = 0.5), color = "#C41F02", weight = 2.5, options = pathOptions(pane = "inaccess"), group = "CABD barriers and areas past", opacity = 1, popup = ~label_text) |>
@@ -263,6 +343,26 @@ map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSn
       addLegend(pal = D50.pal.leg, values = seq(0, top_D50, by = top_D50/10), title = "D50 gravel size (mm)", position = 'topright', group = "D50", opacity = 1, labFormat = function(type, cuts, p) {
       paste0(rev(c(as.character(seq(0, top_D50-top_D50/10, by = top_D50/10)), ifelse(top_D50 >= 200, "≥200", paste0('≥ ', top_D50))))) 
     }) |>  
+ 
+  ### Nredd
+  #### average
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~Nredd.pal(rivers$Nredd_avg), weight = rivers$width^(1/3)-0.05, fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_Nredd"), group = "N redd for average length fish", popup = ~label_text) |> 
+  
+      addLegend(pal = Nredd.pal.leg, values = seq(0, top_Nredd, by = top_Nredd/7), title = "Number of redds that can be built in a reach", position = 'topright', opacity = 1, labFormat = function(type, cuts, p) {
+      paste0(rev(c(as.character(round(seq(0, top_Nredd-top_Nredd/7, by = top_Nredd/7), 3)), paste0('≥ ', round(top_Nredd, 1)))))
+        }, className = "info legend shared-legend") |>
+            
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~Nredd.pal90(rivers$Nredd_avg), weight = rivers$width^(1/3)-0.05, fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_Nredd"), group = "N redd for average length fish", popup = ~label_text) |> 
+  
+    #### max
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~Nredd.pal(rivers$Nredd_max), weight = rivers$width^(1/3)-0.05, fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_Nredd"), group = "N redd for max length fish", popup = ~label_text) |> 
+          
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~Nredd.pal90(rivers$Nredd_max), weight = rivers$width^(1/3)-0.05, fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_Nredd"), group = "N redd for max length fish", popup = ~label_text) |> 
+  
+      #### min
+      addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~Nredd.pal(rivers$Nredd_min), weight = rivers$width^(1/3)-0.05, fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_Nredd"), group = "N redd for min length fish", popup = ~label_text) |> 
+    
+        addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~Nredd.pal90(rivers$Nredd_min), weight = rivers$width^(1/3)-0.05, fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_Nredd"), group = "N redd for min length fish", popup = ~label_text) |> 
   
   
       ### discharge
@@ -273,6 +373,7 @@ map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSn
         }) |>
    
        addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~discharge.pal90(rivers$DIS_AV_CMS), weight = rivers$width^(1/3)-0.05, fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_disch90"), group = "Discharge", popup = ~label_text)  |># add in values above top quantile
+  
   
       ### width
       addPolylines(data = smooth(rivers, method = "ksmooth", smoothness = 0.5), color = ~width.pal(rivers$width), weight = rivers$width^(1/3)-0.1, fillOpacity = 1, opacity = 1, options = pathOptions(pane = "data_width"), group = "Width", popup = ~label_text) |>
@@ -297,7 +398,7 @@ map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSn
   addGroupedLayersControl(
     baseGroups = c("Satellite", "Topographic", "White & Grey"),
     overlayGroups = list(
-      "Prediction" = c("D50"),
+      "Predictions" = c("D50", "N redd for average length fish", "N redd for max length fish", "N redd for min length fish"),
       "HydroSHEDs data" = c("Discharge", "Width", "Gradient"),
       "Barriers" = c("CABD barriers and areas past")
     ),
@@ -314,11 +415,44 @@ map <- leaflet(width = "100vw", height = "75vh", options = leafletOptions(zoomSn
     )
   ) |> 
   
-  hideGroup(c("CABD barriers and areas past", "Discharge (m<sup>3</sup>/s)", "Width (m)")) |> 
+  hideGroup(c("CABD barriers and areas past", "Discharge", "Gradient", "Width", "Nredd_avg", "Nredd_max", "Nredd_min")) |> 
   
   addScaleBar(position = "bottomleft") |> 
   
-  addLogo(arrow, position = "bottomleft", offset.x = 2, offset.y = 40)
+  addLogo(arrow, position = "bottomleft", offset.x = 2, offset.y = 40) |> 
+  onRender("
+    function(el, x) {
+      var map = this;
+      // List the exact overlayGroups that share this legend
+      var watchedGroups = ['Nredd_avg', 'Nredd_max', 'Nredd_min'];
+      // Both groups are visible initially on load
+      var activeGroups = new Set(['Nredd_avg', 'Nredd_max', 'Nredd_min']);
+      var legend = el.querySelector('.shared-legend');
+
+      function updateLegend() {
+        var anyActive = watchedGroups.some(function(g) {
+          return activeGroups.has(g);
+        });
+        if (legend) {
+          legend.style.display = anyActive ? '' : 'none';
+        }
+      }
+
+      map.on('overlayadd', function(e) {
+        if (watchedGroups.includes(e.name)) {
+          activeGroups.add(e.name);
+          updateLegend();
+        }
+      });
+
+      map.on('overlayremove', function(e) {
+        if (watchedGroups.includes(e.name)) {
+          activeGroups.delete(e.name);
+          updateLegend();
+        }
+      });
+    }
+  ")
   
 
 map
@@ -329,7 +463,7 @@ map
 |  
 | <b>D50 Gravel size:</b>
 |  
-| Gravel size is important to the Atlantic Salmon spawning; too fine or too coarse, and the salmon will either not spawn or have poor egg survival (Purchase 2018). We considered 16 - 64 mm to be the most suitable substrate size, and this is represented as green on th D50 map. However, salmon may spawn in substrate that isn't ideal, represented on the map by yellow for slightly larger than ideal and white for slightly smaller than ideal. Finally, unsuitable substrate is represented by orange.
+| Gravel size is important to the Atlantic Salmon spawning; too fine or too coarse, and the salmon will either not spawn or have poor egg survival (Purchase 2018). We considered 16 - 35 mm to be the most suitable substrate size, and this is represented as green on th D50 map. However, salmon may spawn in substrate that isn't ideal, represented on the map by yellow for slightly larger than ideal and white for slightly smaller than ideal. Finally, unsuitable substrate is represented by orange.
 | 
 | D50 was predicted based on the following calculations (Wilkins & Snyder 2011)  
 |  
@@ -347,6 +481,23 @@ map
 | S = channel gradient, Calculated as the ratio between the elevation drop within the river reach (i.e. the difference between min. and max. elevation along the reach) and the length of the reach.
 | Q = Discharge (m<sup>3</sup>/s), Average long-term discharge estimate for river reach, in cubic meters per second.
 | W = channel width (m), Calculated as the surface river area of the river reach segment divided by length of the river reach segment.
+|
+| <b>Reproductive potential:</b> Number of redds per unit area that a reach of river can accommodate for salmon of given length, was predicted based on the following calculations (citation).
+|
+| Nredds = (Fm * reach_area) / Aredd
+|
+| <u>Parameters:</u>
+| Aredd (m<sup>2</sup>) = Area fish of given length requires to build a redd using coupled measurements of fish lengths and published redd dimensions = 3.3 * (fish_length/avgerage_fish_length)<sup>2/3</sup>
+| fish_length (mm) = minimum, maximum, average fish lengths for water shed = 200, 900, 500 respectively
+| average_fish_length (mm) = average fish length for watershed = 500
+| Fm = Fractional area of movable particles for fish of given length = (1+e<sup>-1.702*z</sup>)<sup>-1</sup>
+| z = Difference between threshold size of movable particles and mean size of particles = log(Dt/D50)/log(D84/D50)
+| D50 calculated above
+| D84 (mm) = 84th percentile gravel size = 2 * D50 (Recking 2013)
+| Dt (mm) = Size of the largest particle diameter fish of given length can move, based on published empirical data = 115 * (fish_length/average_fish_length)<sup>0.62</sup>
+| 
+| <u>Variables to retreive from HydroSHEDs:</u>
+| reach_area (m<sup>2</sup>) = Total surface area of river reach
 |  
 | <b>CABD barriers and areas past:</b>
 | Potential barriers to upstream salmon movement were sourced from the Canadian Aquatic Barriers Database. Barriers were filtered to remove those that are unlikely sufficient to impede movement: a fishway exists, barrier has been decommissioned/removed, barrier was a dam less than 5 m high, or barrier's Used for Network Analysis field was false. Any stream segment upstream of a remaining barrier is considered potentially inaccessible. Many of these barriers may in fact be passable by salmon (e.g. passable rapid listed as waterfall) but we lack sufficient information to remove them from list. Therefore, each barrier must be assessed on an individual basis if being incorporated into management or research plans.    
@@ -361,5 +512,6 @@ map
 | Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., & Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data, 6(1), 283. https://doi.org/10.1038/s41597-019-0300-6  
 | Mueller, E. R., Pitlick, J., & Nelson, J. M. (2005). Variation in the reference Shields stress for bed load transport in gravel-bed streams and rivers. Water Resources Research, 41(4). https://doi.org/10.1029/2004WR003692
 | Purchase, C. P. (2026). A systematic review on the effectiveness of salmonid spawning habitat improvements, and recommendations to potentially increase productivity of depressed Newfoundland Atlantic salmon (Salmo salar) populations. EcoEvoRxiv. https://doi.org/10.32942/X2V673
+| Recking A (2013) An analysis of nonlinearity effects on bed load transport prediction. JGR Earth Surface 118:1264–1281. https://doi.org/10.1002/jgrf.20090
 | Wilkins, B. C., & Snyder, N. P. (2011). Geomorphic comparison of two Atlantic coastal rivers: Toward on understanding of physical controls on Atlantic salmon habitat. River Research and Applications, 27(2), 135–156. https://doi.org/10.1002/rra.1343  
 :::

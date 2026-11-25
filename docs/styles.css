@@ -163,10 +163,19 @@ img[src*=".png"] {
 /* align legends and text in gravel field data so NA values and complicated quantiles can coexist*/
 #field-tabset #tabset-1-3 .leaflet-control-container .leaflet-top.leaflet-right div:has(#my-legend-title) > div:nth-child(2) {
   height: 201px !important;
+  display: flex;
 }
 
 #field-tabset #tabset-1-3 .leaflet-control-container .leaflet-top.leaflet-right div:has(#my-legend-title) > div:nth-child(2) span {
-  height: 100% !important;
+  background: linear-gradient(rgb(253, 96, 47), rgb(253, 96, 47) 0%, rgb(246, 152, 35) 14.2857%, rgb(235, 190, 12) 28.5714%, rgb(233, 198, 2) 42.8571%, rgb(233, 198, 2) 57.1429%, rgb(219, 207, 65) 71.4286%, rgb(179, 229, 148) 85.7143%, rgb(255, 255, 255) 100%, rgb(255, 255, 255)) !important;
+  opacity: 1;
+  display: inline-block !important; /* Allows height/max-height to take effect */
+  max-height: 100% !important;
+  height: 201px !important;
+  min-height: 0;
+  width: 18px;
+  display: block;
+  margin-top: 8px;
 }
 
 /* scroll drop down watersheds*/
