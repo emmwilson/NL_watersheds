@@ -65,6 +65,7 @@ imageURL_peri = FileAttachment("/data/periphyton.png").url()
 imageURL_gravel3 = FileAttachment("/data/gravel3.png").url() 
 imageURL_gravel2 = FileAttachment("/data/gravel2.png").url() 
 imageURL_parr = FileAttachment("/data/parr_len.png").url()
+imageURL_eggs = FileAttachment("/data/eggs.png").url()
 imageURL_salmon = FileAttachment("/data/NOAA_atlantic_salmon.png").url()
 imageURL_parrgrow = FileAttachment("/data/parr_grow.png").url()
 
@@ -762,8 +763,8 @@ viewof sgr_dk_rav = {
 // Fish length
 viewof fish = {
   const form = Inputs.range(
-  [200, 1000], 
-  {value: 500, step: (1000-200)/100, label: "Fish length (mm):"}
+  [400, 800], 
+  {value: 545, step: (800-400)/100, label: "Fish length (mm):"}
 );
   form.range.style.cssText += "accent-color: #1f78b4; width: 110%";
   form.number.style.cssText += "color: #031D5E; background-color: #E4F3F7; border: 1px solid #031D5E; border-radius: 3px; text-align: right; padding: none";
@@ -807,7 +808,7 @@ function gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) {
 
 // Average fish length (for now)
 
-avgfish_mm = 500
+avgfish_mm = 600
 reach_area = 400
 
 // Redd area
@@ -822,7 +823,7 @@ function Dt(fish) {
 
 // Calculate D84 from D50
 function D84(DIS_AV_CMS, swidth, sgr_dk_rav) {
-  return 2 * gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) ;
+  return 57.0285 + 2.5721 * gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav) ;
 }
 
 
@@ -861,20 +862,23 @@ function Neggs(fish, DIS_AV_CMS, swidth, sgr_dk_rav) {
 
 function gravelFunction(DIS_AV_CMS, swidth, sgr_dk_rav, fish) {
   return aq.table({
-  'DIS_AV_CMS': [DIS_AV_CMS, DIS_AV_CMS, DIS_AV_CMS], // repeat for each value predicting
-  'swidth': [swidth, swidth, swidth],
-  'sgr_dk_rav':[sgr_dk_rav, sgr_dk_rav, sgr_dk_rav],
-  'fish': [fish, fish, fish],
+  'DIS_AV_CMS': [DIS_AV_CMS, DIS_AV_CMS, DIS_AV_CMS, DIS_AV_CMS], // repeat for each value predicting
+  'swidth': [swidth, swidth, swidth, swidth],
+  'sgr_dk_rav':[sgr_dk_rav, sgr_dk_rav, sgr_dk_rav, sgr_dk_rav],
+  'fish': [fish, fish, fish, fish],
   'response_type': ["Predicted gravel size (D50; mm)", 
                     "Fractional coverage of movable particles for a given fish size",
-                    "Number of redds per unit area a reach\ncan accommodate for salmon of given length"], //not sure what this variable will be yet 
+                    "Number of redds per unit area a reach\ncan accommodate for salmon of given length",
+                    "Number of eggs per unit area a reach\ncan accommodate for salmon of given length"], //not sure what this variable will be yet 
                       
   'response_predict': [gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav),
                         Fm(fish, DIS_AV_CMS, swidth, sgr_dk_rav)*1000, 
-                        Nredds(fish, DIS_AV_CMS, swidth, sgr_dk_rav)],
+                        Nredds(fish, DIS_AV_CMS, swidth, sgr_dk_rav),
+                        Neggs(fish, DIS_AV_CMS, swidth, sgr_dk_rav)/1000],
   'response_predict_label': [gravelsize(DIS_AV_CMS, swidth, sgr_dk_rav),
                         Fm(fish, DIS_AV_CMS, swidth, sgr_dk_rav),
-                        Nredds(fish, DIS_AV_CMS, swidth, sgr_dk_rav)
+                        Nredds(fish, DIS_AV_CMS, swidth, sgr_dk_rav),
+                        Neggs(fish, DIS_AV_CMS, swidth, sgr_dk_rav)
                       ]
   })
 }
@@ -904,24 +908,31 @@ image_salmon = aq.table({
                   ] 
 })
 
+image_eggs = aq.table({ 
+  'response_type': ["Number of eggs per unit area a reach\ncan accommodate for salmon of given length"
+                    ],
+  'image_path': [imageURL_eggs
+                  ] 
+})
+
 // create the bar plot based on predictions_ps
 Plot.plot({
   width: Math.max(width, 350),
   height: Math.floor(0.25 * width),
   marginLeft: 0,
   marginRight: 0,
-  marginBottom: 60,
+  marginBottom: (350/width)*300,
   color: {range: myColours,
     legend: false},
   y: {domain: [0, 1000], label: null},
-  x: {label: null, domain: ["Predicted gravel size (D50; mm)", "Fractional coverage of movable particles for a given fish size", "Number of redds per unit area a reach\ncan accommodate for salmon of given length"]},
+  x: {label: null, domain: ["Predicted gravel size (D50; mm)", "Fractional coverage of movable particles for a given fish size", "Number of redds per unit area a reach\ncan accommodate for salmon of given length", "Number of eggs per unit area a reach\ncan accommodate for salmon of given length"]},
   marks:[
-    Plot.axisX({fontSize: Math.max(16, width / 80), marginBottom: 50}),
+    Plot.axisX({fontSize: Math.max(16, width / 80), marginBottom: 40, lineWidth: Math.max(5, (width / 4) / 18)}),
     Plot.barY(predictions_gravel,
      {x: "response_type",
      y: "response_predict",
      fill: "response_type"}), // create bar graph
-    Plot.text(predictions_gravel, {x: "response_type", y: "response_predict", text: "response_predict_label", dy: -7, dx: -width/8, lineAnchor: "bottom", fontSize: Math.max(16, width / 80)}) // write out predicted value
+    Plot.text(predictions_gravel, {x: "response_type", y: "response_predict", text: "response_predict_label", dy: -7, dx: -width/20, lineAnchor: "bottom", fontSize: Math.max(16, width / 80)}) // write out predicted value
    ]
 })
 
@@ -935,31 +946,39 @@ Plot.plot({
   marginBottom: 20,
   colour: {legend: false},
   y: {domain: [0,0], axis: null},
-  x: {label: "Response type", axis: null, fontSize: 22, domain: ["Predicted gravel size (D50; mm)", "Fractional coverage of movable particles for a given fish size", "Number of redds per unit area a reach\ncan accommodate for salmon of given length"]},
+  x: {label: "Response type", axis: null, fontSize: 22, domain: ["Predicted gravel size (D50; mm)", "Fractional coverage of movable particles for a given fish size", "Number of redds per unit area a reach\ncan accommodate for salmon of given length", "Number of eggs per unit area a reach\ncan accommodate for salmon of given length"]},
   marks:[
     Plot.image(image_gravel, 
       {x: "response_type",
       y: [0, 0],
       src: "image_path",
-      width: 200,
+      width: width/6,
       axis: null
       }),
     Plot.image(image_Fm, 
       {x: "response_type",
       y: [0, 0],
       src: "image_path",
-      width: 200,
+      width: width/6,
       axis: null
       }),
     Plot.image(image_salmon, 
       {x: "response_type",
       y: [0, 0],
       src: "image_path",
-      width: 200,
+      width: width/6,
+      axis: null
+      }),
+    Plot.image(image_eggs, 
+      {x: "response_type",
+      y: [0, 0],
+      src: "image_path",
+      width: width/6, 
+      height: width/8,
       axis: null
       })
    ]
-})
+}) 
 
 ```
 
@@ -974,6 +993,7 @@ Plot.plot({
 | Discharge (m<sup>3</sup>): ...
 | Stream width (m):...
 | Stream gradient (mm/m): ...
+| Fish length (mm): 
 | 
 | <u><b>Predicted values:</b></u>
 | 
@@ -1000,6 +1020,10 @@ Plot.plot({
 | 
 | Fm = (1+e<sup>-1.702*z</sup>)<sup>-1</sup>
 | 
+| Number of redd per unit area that reach can accommodate for salmon of given length predicted to occur based on the following calculations (citation). Assuming a reach of 400m<sup>2</sup>
+|
+| Nredds = (Fm * reach_area) / Aredd
+| 
 | Number of eggs per unit area that reach can accommodate for salmon of given length predicted to occur based on the following calculations (citation). Assuming a reach of 400m<sup>2</sup>
 |
 | Neggs = (Fm * reach_area) * E / Aredd
@@ -1012,7 +1036,7 @@ Plot.plot({
 | reach_area (m<sup>2</sup>) = Total surface area of given reach of river = 400
 | z = Difference between threshold size of movable particles and mean size of particles = log(Dt/D50)/log(D84/D50)
 | D50 calculated above
-| D84 (mm) = 84th percentile gravel size = 2 * D50 (Recking 2013)
+| D84 (mm) = 84th percentile gravel size calculated via regression from Exploits field data = 57.0285 + 2.5721 * D50 
 | Dt (mm) = Size of the largest particle diameter fish of given length can move, based on published empirical data = 115 * (fish_length/average_fish_length)<sup>0.62</sup>
 | 
 |

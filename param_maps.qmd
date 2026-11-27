@@ -118,18 +118,18 @@ rivers$D50 <- (rivers$tb/((ps-p)*g*t))*1000
 #| echo: false
 
 #fish lengths
-min_fish_length <- 200
-avg_fish_length <- 500
-max_fish_length <- 900
+min_fish_length <- 450
+avg_fish_length <- 550
+max_fish_length <- 700
 
 # for avg length fish
 
 
-Aredd_avg <- 3.3*((avg_fish_length/avg_fish_length)^2.3) 
+Aredd_avg <- 3.3*((avg_fish_length/600)^2.3) 
 
-Dt_avg <- 115*((avg_fish_length/avg_fish_length)^0.62)
+Dt_avg <- 115*((avg_fish_length/600)^0.62)
 
-rivers$D84 <- 2*rivers$D50
+rivers$D84 <- 57.0285 + 2.5721 *rivers$D50
 
 rivers$z_avg <- log(Dt_avg/rivers$D50)/log(rivers$D84/rivers$D50)
 
@@ -142,9 +142,9 @@ E_avg <- 8.1*avg_fish_length-1450
 rivers$Neggs_avg <- (rivers$Fm_avg*rivers$ria_ha_csu)*E_avg/Aredd_avg
 
 # for max length fish
-Aredd_max <- 3.3*((max_fish_length/avg_fish_length)^2.3)
+Aredd_max <- 3.3*((max_fish_length/600)^2.3)
 
-Dt_max <- 115*((max_fish_length/avg_fish_length)^0.62)
+Dt_max <- 115*((max_fish_length/600)^0.62)
 
 rivers$z_max <- log(Dt_max/rivers$D50)/log(rivers$D84/rivers$D50)
 
@@ -159,9 +159,9 @@ E_max <- 8.1*max_fish_length-1450
 rivers$Neggs_max <- (rivers$Fm_max*rivers$ria_ha_csu)*E_max/Aredd_max
 
 # for min length fish
-Aredd_min <- 3.3*((min_fish_length/avg_fish_length)^2.3) # this is giving an incredibly small area
+Aredd_min <- 3.3*((min_fish_length/600)^2.3) # this is giving an incredibly small area
 
-Dt_min <- 115*((min_fish_length/avg_fish_length)^0.62)
+Dt_min <- 115*((min_fish_length/600)^0.62)
 
 rivers$z_min <- log(Dt_min/rivers$D50)/log(rivers$D84/rivers$D50)
 
@@ -493,7 +493,7 @@ map
 | Fm = Fractional area of movable particles for fish of given length = (1+e<sup>-1.702*z</sup>)<sup>-1</sup>
 | z = Difference between threshold size of movable particles and mean size of particles = log(Dt/D50)/log(D84/D50)
 | D50 calculated above
-| D84 (mm) = 84th percentile gravel size = 2 * D50 (Recking 2013)
+| D84 (mm) = 84th percentile gravel size calculated via regression from Exploits field data = 57.0285 + 2.5721 * D50 
 | Dt (mm) = Size of the largest particle diameter fish of given length can move, based on published empirical data = 115 * (fish_length/average_fish_length)<sup>0.62</sup>
 | 
 | <u>Variables to retreive from HydroSHEDs:</u>
